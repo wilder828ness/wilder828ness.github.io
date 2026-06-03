@@ -6,6 +6,7 @@
     <title>Nubz Toys &amp; Collectibles • Est. 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: 'Inter', system_ui, sans-serif; }
@@ -27,7 +28,7 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
                 <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
-                    <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
+                    <img src="nubs-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
                 </div>
 
                 <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
@@ -68,10 +69,15 @@
         </div>
     </nav>
 
-    <!-- HOME PAGE -->
+    <!-- HOME PAGE with large centered logo -->
     <div id="home" class="page active pt-20">
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
+                <!-- Large Hero Logo -->
+                <div class="flex justify-center mb-8">
+                    <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
+                </div>
+
                 <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                     <span class="text-sm font-medium">Est. 2026 • Ships Worldwide</span>
@@ -100,15 +106,13 @@
         </section>
     </div>
 
-    <!-- CATEGORIES PAGE -->
+    <!-- CATEGORIES PAGE - 3 on top, 2 centered below -->
     <div id="categories" class="page pt-20 max-w-7xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
             <h2 class="section-header">Find What You're Looking For</h2>
         </div>
-        <div id="category-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Categories are generated dynamically by JavaScript -->
-        </div>
+        <div id="category-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center"></div>
     </div>
 
     <!-- ALL INVENTORY PAGE -->
@@ -138,8 +142,8 @@
             <h2 class="section-header">About Nubz Toys &amp; Collectibles</h2>
         </div>
         <div class="prose prose-invert max-w-none text-lg text-slate-300">
-            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: To just keep it simple. Remember when we used to just play? We owned the dialog. We wrote the scenes. We defined the storyline, it didn't define us. Well, maybe it did and we just got away from it some. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises, we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys & collectibles, but you're never to old for them.</p>
-            <p class="mt-4">We specialize in new and vintage action figures, Funko Pops, blind bags, model sets, unique toys and imagination for every generation.</p>
+            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: tTo just keep it simple. Remember when we used to just play? We owned the dialog. We wrote the scenes. We defined the storyline, it didn't define us. Well, maybe it did and we just got away from it some. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises, we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys & collectibles, but you're never to old for them.                                                                                                                                                                                                   </p>
+            <p class="mt-4">We specialize in new and vintage action figures, Funko Pops, blind bags, model sets, and unique toys for every generation.</p>
         </div>
     </div>
 
@@ -166,7 +170,7 @@
         </div>
     </footer>
 
-    <!-- ADMIN MODAL -->
+    <!-- ADMIN MODAL with Image Uploader -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8">
             <div class="flex justify-between items-center mb-6">
@@ -189,7 +193,11 @@
                         <input id="manual-price" type="number" placeholder="Price" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-category" placeholder="Category" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-status" placeholder="Status" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        <input id="manual-image" placeholder="Image URL" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Product Image</label>
+                            <input type="file" id="manual-image-upload" accept="image/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                            <p id="image-name" class="text-xs text-slate-500 mt-1"></p>
+                        </div>
                     </div>
                     <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
@@ -221,7 +229,6 @@
         let cart = [];
         let isAdminLoggedIn = false;
 
-        // Safe Supabase + localStorage
         window.supabaseInstance = window.supabaseInstance || null;
         try {
             if (typeof Supabase !== 'undefined') {
@@ -260,15 +267,13 @@
             renderInventory();
         }
 
-        // Dynamic Category Cards
         function renderCategoryCards() {
             const container = document.getElementById('category-grid');
             if (!container) return;
             container.innerHTML = '';
-
             categories.forEach(cat => {
                 const card = document.createElement('div');
-                card.className = `cursor-pointer bg-slate-900 border border-slate-700 hover:border-${cat.color} p-10 rounded-3xl text-center`;
+                card.className = `cursor-pointer bg-slate-900 border border-slate-700 hover:border-${cat.color} p-10 rounded-3xl text-center w-full max-w-xs`;
                 card.innerHTML = `
                     <i class="fa-solid ${cat.icon} text-6xl text-${cat.color} mb-6"></i>
                     <div class="font-bold text-2xl mb-2">${cat.name}</div>
@@ -291,15 +296,10 @@
             setTimeout(() => filterInventory(category), 100);
         }
 
-        // Improved Search
         function filterInventory(preSelectedCategory = '') {
             const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
             let filtered = products;
-
-            if (preSelectedCategory) {
-                filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
-            }
-
+            if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
             if (search) {
                 filtered = filtered.filter(p =>
                     (p.name && p.name.toLowerCase().includes(search)) ||
@@ -307,7 +307,6 @@
                     (p.description && p.description.toLowerCase().includes(search))
                 );
             }
-
             const container = document.getElementById('inventory-grid');
             container.innerHTML = '';
             filtered.forEach(product => container.appendChild(createProductCard(product)));
@@ -316,10 +315,7 @@
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
-            let statusHTML = product.status === "In Stock" 
-                ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` 
-                : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
-            
+            let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
             card.innerHTML = `
                 <div class="relative">
                     <img src="${product.image}" class="w-full h-56 object-cover">
@@ -330,8 +326,7 @@
                     <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
                     <div class="flex justify-between items-center mt-4">
                         <div class="text-3xl font-bold">$${product.price}</div>
-                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" 
-                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
+                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
                     </div>
                 </div>
             `;
@@ -427,7 +422,7 @@
                 loginDiv.classList.add('hidden');
                 panelDiv.classList.remove('hidden');
             } else {
-                alert("Wrong password. Try: check your notes in phone");
+                alert("Wrong password. Try: phone notes");
             }
         }
 
@@ -437,11 +432,22 @@
             const price = parseFloat(document.getElementById('manual-price').value);
             const category = document.getElementById('manual-category').value.trim();
             const status = document.getElementById('manual-status').value.trim() || "In Stock";
-            const image = document.getElementById('manual-image').value.trim();
+            const fileInput = document.getElementById('manual-image-upload');
 
             if (!title || !price) {
                 alert("Title and Price are required");
                 return;
+            }
+
+            let imageUrl = "https://picsum.photos/id/106/600/400";
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                imageUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
             }
 
             const newProduct = {
@@ -451,29 +457,23 @@
                 mainCategory: category || "Toys",
                 price: price,
                 status: status,
-                image: image || "https://picsum.photos/id/106/600/400",
+                image: imageUrl,
                 created_at: new Date().toISOString()
             };
 
-            if (window.supabase) {
-                try {
-                    await window.supabase.from('products').insert([newProduct]);
-                } catch (e) {
-                    products.unshift(newProduct);
-                    saveToLocalStorage();
-                }
-            } else {
-                products.unshift(newProduct);
-                saveToLocalStorage();
-            }
+            products.unshift(newProduct);
+            saveToLocalStorage();
 
-            alert("Product added!");
+            alert("Product added with image!");
+
+            // Clear form
             document.getElementById('manual-brand').value = "";
             document.getElementById('manual-title').value = "";
             document.getElementById('manual-price').value = "";
             document.getElementById('manual-category').value = "";
             document.getElementById('manual-status').value = "";
-            document.getElementById('manual-image').value = "";
+            document.getElementById('manual-image-upload').value = "";
+
             loadProducts();
         }
 
@@ -512,20 +512,11 @@
                         created_at: new Date().toISOString()
                     };
 
-                    if (window.supabase) {
-                        try {
-                            await window.supabase.from('products').insert([newProduct]);
-                        } catch (e) {
-                            products.unshift(newProduct);
-                            saveToLocalStorage();
-                        }
-                    } else {
-                        products.unshift(newProduct);
-                        saveToLocalStorage();
-                    }
+                    products.unshift(newProduct);
                     success++;
                 }
 
+                saveToLocalStorage();
                 resultDiv.innerHTML = `✅ Imported ${success} products.`;
                 loadProducts();
             };
@@ -563,7 +554,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Complete final version ready', 'color:#22d3ee');
+            console.log('%c✅ Complete file with 5 categories + centered layout ready', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
