@@ -106,23 +106,8 @@
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
             <h2 class="section-header">Find What You're Looking For</h2>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div onclick="filterAndGoToInventory('Action Figures')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
-                <i class="fa-solid fa-robot text-6xl text-cyan-400 mb-6"></i>
-                <div class="font-bold text-2xl mb-2">Action Figures</div>
-            </div>
-            <div onclick="filterAndGoToInventory('Mini Figs & Blind Bags')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
-                <i class="fa-solid fa-chess-rook text-6xl text-fuchsia-400 mb-6"></i>
-                <div class="font-bold text-2xl mb-2">Mini Figs &amp; Blind Bags</div>
-            </div>
-            <div onclick="filterAndGoToInventory('Plush')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
-                <i class="fa-solid fa-paw text-6xl text-pink-400 mb-6"></i>
-                <div class="font-bold text-2xl mb-2">Plush &amp; Soft Toys</div>
-            </div>
-            <div onclick="filterAndGoToInventory('Games')" class="category-card cursor-pointer bg-slate-900 border border-slate-700 hover:border-cyan-400 p-10 rounded-3xl text-center">
-                <i class="fa-solid fa-gamepad text-6xl text-amber-400 mb-6"></i>
-                <div class="font-bold text-2xl mb-2">Games</div>
-            </div>
+        <div id="category-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Categories are generated dynamically by JavaScript -->
         </div>
     </div>
 
@@ -153,7 +138,8 @@
             <h2 class="section-header">About Nubz Toys &amp; Collectibles</h2>
         </div>
         <div class="prose prose-invert max-w-none text-lg text-slate-300">
-            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to bring joy, nostalgia, and discovery to collectors of all ages.</p>
+            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: To just keep it simple. Remember when we used to just play? We owned the dialog. We wrote the scenes. We defined the storyline, it didn't define us. Well, maybe it did and we just got away from it some. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises, we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys & collectibles, but you're never to old for them.</p>
+            <p class="mt-4">We specialize in new and vintage action figures, Funko Pops, blind bags, model sets, unique toys and imagination for every generation.</p>
         </div>
     </div>
 
@@ -222,12 +208,20 @@
     </div>
 
     <script>
-        // === VARIABLES FIRST (must be at the very top) ===
+        // === FINAL 5 CATEGORIES ===
+        const categories = [
+            { name: "Action Figures",           icon: "fa-dragon",           color: "cyan-400" },
+            { name: "Model Sets",               icon: "fa-cube",             color: "emerald-400" },
+            { name: "Funko Pop",                icon: "fa-head-side",        color: "purple-400" },
+            { name: "Blind Bag & Mini Figures", icon: "fa-question-circle",  color: "fuchsia-400" },
+            { name: "Toys",                     icon: "fa-gamepad",          color: "amber-400" }
+        ];
+
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
 
-        // === SAFE SUPABASE INIT (using window to avoid conflicts) ===
+        // Safe Supabase + localStorage
         window.supabaseInstance = window.supabaseInstance || null;
         try {
             if (typeof Supabase !== 'undefined') {
@@ -237,11 +231,10 @@
                 );
             }
         } catch (e) {
-            console.warn("Supabase failed to load — using localStorage only");
+            console.warn("Supabase not available — using localStorage");
         }
         window.supabase = window.supabaseInstance;
 
-        // === LOCALSTORAGE HELPERS ===
         function saveToLocalStorage() {
             localStorage.setItem('nubz_products', JSON.stringify(products));
         }
@@ -251,7 +244,6 @@
             if (saved) products = JSON.parse(saved);
         }
 
-        // === LOAD PRODUCTS ===
         async function loadProducts() {
             if (window.supabase) {
                 try {
@@ -259,7 +251,6 @@
                     if (error) throw error;
                     products = data || [];
                 } catch (e) {
-                    console.warn("Supabase load failed — falling back to localStorage");
                     loadFromLocalStorage();
                 }
             } else {
@@ -269,9 +260,28 @@
             renderInventory();
         }
 
+        // Dynamic Category Cards
+        function renderCategoryCards() {
+            const container = document.getElementById('category-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            categories.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = `cursor-pointer bg-slate-900 border border-slate-700 hover:border-${cat.color} p-10 rounded-3xl text-center`;
+                card.innerHTML = `
+                    <i class="fa-solid ${cat.icon} text-6xl text-${cat.color} mb-6"></i>
+                    <div class="font-bold text-2xl mb-2">${cat.name}</div>
+                `;
+                card.onclick = () => filterAndGoToInventory(cat.name);
+                container.appendChild(card);
+            });
+        }
+
         function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
+            if (page === 'categories') renderCategoryCards();
             if (page === 'inventory') renderInventory();
             if (page === 'home') renderFeatured();
         }
@@ -281,24 +291,35 @@
             setTimeout(() => filterInventory(category), 100);
         }
 
-        function renderFeatured() {
-            const container = document.getElementById('featured-grid');
-            if (!container) return;
-            container.innerHTML = '';
-            products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
-        }
+        // Improved Search
+        function filterInventory(preSelectedCategory = '') {
+            const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+            let filtered = products;
 
-        function renderInventory() {
+            if (preSelectedCategory) {
+                filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
+            }
+
+            if (search) {
+                filtered = filtered.filter(p =>
+                    (p.name && p.name.toLowerCase().includes(search)) ||
+                    (p.brand && p.brand.toLowerCase().includes(search)) ||
+                    (p.description && p.description.toLowerCase().includes(search))
+                );
+            }
+
             const container = document.getElementById('inventory-grid');
-            if (!container) return;
             container.innerHTML = '';
-            products.forEach(product => container.appendChild(createProductCard(product)));
+            filtered.forEach(product => container.appendChild(createProductCard(product)));
         }
 
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
-            let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+            let statusHTML = product.status === "In Stock" 
+                ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` 
+                : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+            
             card.innerHTML = `
                 <div class="relative">
                     <img src="${product.image}" class="w-full h-56 object-cover">
@@ -309,22 +330,13 @@
                     <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
                     <div class="flex justify-between items-center mt-4">
                         <div class="text-3xl font-bold">$${product.price}</div>
-                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
+                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" 
+                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
                     </div>
                 </div>
             `;
             card.onclick = () => showProductModal(product);
             return card;
-        }
-
-        function filterInventory(preSelectedCategory = '') {
-            const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
-            let filtered = products;
-            if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
-            if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search));
-            const container = document.getElementById('inventory-grid');
-            container.innerHTML = '';
-            filtered.forEach(product => container.appendChild(createProductCard(product)));
         }
 
         function addToCart(productId) {
@@ -410,12 +422,12 @@
             
             const pass = passInput.value.trim();
             
-            if (pass === "nubz2026") {
+            if (pass === "nubz828") {
                 isAdminLoggedIn = true;
                 loginDiv.classList.add('hidden');
                 panelDiv.classList.remove('hidden');
             } else {
-                alert("Wrong password. Try: nubz2026");
+                alert("Wrong password. Try: check your notes in phone");
             }
         }
 
@@ -436,7 +448,7 @@
                 id: Date.now(),
                 name: title,
                 brand: brand || "Unknown",
-                mainCategory: category || "Uncategorized",
+                mainCategory: category || "Toys",
                 price: price,
                 status: status,
                 image: image || "https://picsum.photos/id/106/600/400",
@@ -456,14 +468,69 @@
             }
 
             alert("Product added!");
-            // clear form fields...
+            document.getElementById('manual-brand').value = "";
+            document.getElementById('manual-title').value = "";
+            document.getElementById('manual-price').value = "";
+            document.getElementById('manual-category').value = "";
+            document.getElementById('manual-status').value = "";
+            document.getElementById('manual-image').value = "";
             loadProducts();
         }
 
         async function importCSV() {
-            // ... (same as previous working version, using window.supabase)
-            // For brevity I'll keep it short here — the structure is the same as before
-            alert("CSV import function ready — paste the full version if needed");
+            const fileInput = document.getElementById('csv-file');
+            const resultDiv = document.getElementById('csv-result');
+            
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<span class="text-red-400">Please select a CSV file</span>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const csv = e.target.result;
+                const lines = csv.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim());
+                
+                let success = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => v.trim());
+                    const row = {};
+                    headers.forEach((h, idx) => row[h] = values[idx] || '');
+
+                    const newProduct = {
+                        id: Date.now() + i,
+                        name: row.Title || row.title || 'Untitled',
+                        brand: row.Brand || row.brand || 'Unknown',
+                        mainCategory: row.Category || row.category || 'Toys',
+                        price: parseFloat(row['Sales Price'] || row.price || 0),
+                        status: row.Status || 'In Stock',
+                        image: row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400',
+                        created_at: new Date().toISOString()
+                    };
+
+                    if (window.supabase) {
+                        try {
+                            await window.supabase.from('products').insert([newProduct]);
+                        } catch (e) {
+                            products.unshift(newProduct);
+                            saveToLocalStorage();
+                        }
+                    } else {
+                        products.unshift(newProduct);
+                        saveToLocalStorage();
+                    }
+                    success++;
+                }
+
+                resultDiv.innerHTML = `✅ Imported ${success} products.`;
+                loadProducts();
+            };
+
+            reader.readAsText(file);
         }
 
         function downloadSampleCSV() {
@@ -495,7 +562,8 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             await loadProducts();
             document.getElementById('home').classList.add('active');
             updateCartCount();
-            console.log('%c✅ Clean version loaded successfully', 'color:#22d3ee');
+            renderCategoryCards();
+            console.log('%c✅ Complete final version ready', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
