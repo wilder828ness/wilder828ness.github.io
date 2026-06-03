@@ -69,15 +69,13 @@
         </div>
     </nav>
 
-    <!-- HOME PAGE with large centered logo -->
+    <!-- HOME PAGE -->
     <div id="home" class="page active pt-20">
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
-                <!-- Large Hero Logo -->
-                <div class="flex justify-center mb-8">
-                    <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
+                <div class="hidden md:flex justify-center mb-8">
+                    <img src="nub-logoA.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
                 </div>
-
                 <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                     <span class="text-sm font-medium">Est. 2026 • Ships Worldwide</span>
@@ -106,7 +104,7 @@
         </section>
     </div>
 
-    <!-- CATEGORIES PAGE - 3 on top, 2 centered below -->
+    <!-- CATEGORIES PAGE -->
     <div id="categories" class="page pt-20 max-w-7xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
@@ -142,8 +140,7 @@
             <h2 class="section-header">About Nubz Toys &amp; Collectibles</h2>
         </div>
         <div class="prose prose-invert max-w-none text-lg text-slate-300">
-            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: tTo just keep it simple. Remember when we used to just play? We owned the dialog. We wrote the scenes. We defined the storyline, it didn't define us. Well, maybe it did and we just got away from it some. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises, we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys & collectibles, but you're never to old for them.                                                                                                                                                                                                   </p>
-            <p class="mt-4">We specialize in new and vintage action figures, Funko Pops, blind bags, model sets, and unique toys for every generation.</p>
+            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to just keep it simple. Remember when we used to just play? We owned the dialogue. We wrote the scenes. We defined the storyline — it didn't define us. Well, maybe it did, and we just got away from it for a while. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises — we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys &amp; collectibles, but you're never too old for them.</p>
         </div>
     </div>
 
@@ -170,7 +167,7 @@
         </div>
     </footer>
 
-    <!-- ADMIN MODAL with Image Uploader -->
+    <!-- ADMIN MODAL -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8">
             <div class="flex justify-between items-center mb-6">
@@ -216,7 +213,7 @@
     </div>
 
     <script>
-        // === FINAL 5 CATEGORIES ===
+        // === 5 CATEGORIES ===
         const categories = [
             { name: "Action Figures",           icon: "fa-dragon",           color: "cyan-400" },
             { name: "Model Sets",               icon: "fa-cube",             color: "emerald-400" },
@@ -252,19 +249,36 @@
         }
 
         async function loadProducts() {
+            console.log("Loading products...");
             if (window.supabase) {
                 try {
                     const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
                     if (error) throw error;
                     products = data || [];
                 } catch (e) {
+                    console.warn("Supabase failed, using localStorage");
                     loadFromLocalStorage();
                 }
             } else {
                 loadFromLocalStorage();
             }
+            console.log("Total products loaded:", products.length);
             renderFeatured();
             renderInventory();
+        }
+
+        function renderFeatured() {
+            const container = document.getElementById('featured-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventory-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.forEach(product => container.appendChild(createProductCard(product)));
         }
 
         function renderCategoryCards() {
@@ -284,6 +298,7 @@
         }
 
         function showPage(page) {
+            console.log('Navigating to:', page);
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
             if (page === 'categories') renderCategoryCards();
@@ -417,12 +432,12 @@
             
             const pass = passInput.value.trim();
             
-            if (pass === "nubz828") {
+            if (pass === "nubz2026") {
                 isAdminLoggedIn = true;
                 loginDiv.classList.add('hidden');
                 panelDiv.classList.remove('hidden');
             } else {
-                alert("Wrong password. Try: phone notes");
+                alert("Wrong password. Try: nubz2026");
             }
         }
 
@@ -466,7 +481,6 @@
 
             alert("Product added with image!");
 
-            // Clear form
             document.getElementById('manual-brand').value = "";
             document.getElementById('manual-title').value = "";
             document.getElementById('manual-price').value = "";
@@ -554,7 +568,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Complete file with 5 categories + centered layout ready', 'color:#22d3ee');
+            console.log('%c✅ Complete file loaded - Total products:', products.length, 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
