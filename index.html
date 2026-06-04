@@ -28,7 +28,7 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
                 <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
-                    <img src="nubs-logoA.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
+                    <img src="nubs-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
                 </div>
 
                 <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
@@ -74,7 +74,7 @@
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
                 <div class="hidden md:flex justify-center mb-8">
-                    <img src="nub-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
+                    <img src="nub-logoA.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
                 </div>
                 <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
@@ -104,17 +104,13 @@
         </section>
     </div>
 
-    <!-- CATEGORIES PAGE - FLEXBOX VERSION (Centered Last Row) -->
+    <!-- CATEGORIES PAGE (Flexbox - Centered) -->
     <div id="categories" class="page pt-20 max-w-7xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
             <h2 class="section-header">Find What You're Looking For</h2>
         </div>
-
-        <div id="category-grid" 
-             class="flex flex-wrap justify-center gap-6">
-            <!-- Cards injected by JavaScript -->
-        </div>
+        <div id="category-grid" class="flex flex-wrap justify-center gap-6"></div>
     </div>
 
     <!-- ALL INVENTORY PAGE -->
@@ -137,7 +133,7 @@
         <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- ABOUT US PAGE (with Explore Now button) -->
+    <!-- ABOUT US PAGE -->
     <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <div class="text-center mb-16">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
@@ -147,8 +143,7 @@
             <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to just keep it simple. Remember when we used to just play? We owned the dialogue. We wrote the scenes. We defined the storyline — it didn't define us. Well, maybe it did, and we just got away from it for a while. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises — we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys &amp; collectibles, but you're never too old for them.</p>
             
             <div class="mt-10 flex justify-center">
-                <button onclick="showPage('categories')" 
-                        class="px-10 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition-all flex items-center gap-x-2">
+                <button onclick="showPage('categories')" class="px-10 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition-all flex items-center gap-x-2">
                     Explore Now
                     <i class="fa-solid fa-arrow-right"></i>
                 </button>
@@ -179,9 +174,9 @@
         </div>
     </footer>
 
-    <!-- ADMIN MODAL (with password change) -->
+    <!-- ADMIN MODAL -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-6">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-2xl">Admin Panel</h3>
                 <button onclick="closeAdmin()" class="text-3xl text-slate-400 hover:text-white">×</button>
@@ -194,7 +189,7 @@
             </div>
 
             <div id="admin-panel" class="hidden">
-                <!-- Password Change -->
+                <!-- Change Password -->
                 <div class="mb-6 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Change Admin Password</h4>
                     <input type="password" id="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="New Password">
@@ -234,7 +229,6 @@
     </div>
 
     <script>
-        // === 5 CATEGORIES ===
         const categories = [
             { name: "Action Figures",           icon: "fa-dragon",           color: "cyan-400" },
             { name: "Model Sets",               icon: "fa-cube",             color: "emerald-400" },
@@ -246,8 +240,6 @@
         let products = [];
         let cart = [];
         let isAdminLoggedIn = false;
-
-        // Password (changeable)
         let adminPassword = localStorage.getItem('nubz_admin_password') || "nubz2026";
 
         window.supabaseInstance = window.supabaseInstance || null;
@@ -288,12 +280,24 @@
             renderInventory();
         }
 
-        // === UPDATED: Flexbox version for centered last row ===
+        function renderFeatured() {
+            const container = document.getElementById('featured-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventory-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.forEach(product => container.appendChild(createProductCard(product)));
+        }
+
         function renderCategoryCards() {
             const container = document.getElementById('category-grid');
             if (!container) return;
             container.innerHTML = '';
-
             categories.forEach(cat => {
                 const card = document.createElement('div');
                 card.className = `cursor-pointer bg-slate-900 border border-slate-700 hover:border-${cat.color} p-10 rounded-3xl text-center w-full max-w-[220px]`;
@@ -501,7 +505,7 @@
             products.unshift(newProduct);
             saveToLocalStorage();
 
-            alert("Product added with image!");
+            alert("Product added successfully!");
 
             document.getElementById('manual-brand').value = "";
             document.getElementById('manual-title').value = "";
@@ -555,7 +559,7 @@
                 }
 
                 saveToLocalStorage();
-                resultDiv.innerHTML = `✅ Imported ${success} products.`;
+                resultDiv.innerHTML = `✅ Imported ${success} products successfully.`;
                 loadProducts();
             };
 
@@ -592,7 +596,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Final version with centered categories loaded', 'color:#22d3ee');
+            console.log('%c✅ Clean version loaded - no script errors', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
