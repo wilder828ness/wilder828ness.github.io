@@ -104,7 +104,7 @@
         </section>
     </div>
 
-    <!-- CATEGORIES PAGE (Flexbox - Centered) -->
+    <!-- CATEGORIES PAGE -->
     <div id="categories" class="page pt-20 max-w-7xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
@@ -518,6 +518,7 @@
             loadProducts();
         }
 
+        // === IMPROVED CSV IMPORT (More Robust) ===
         async function importCSV() {
             const fileInput = document.getElementById('csv-file');
             const resultDiv = document.getElementById('csv-result');
@@ -533,24 +534,32 @@
             reader.onload = async function(e) {
                 const csv = e.target.result;
                 const lines = csv.trim().split('\n');
-                const headers = lines[0].split(',').map(h => h.trim());
                 
+                // Get headers and normalize them (lowercase + trim)
+                const rawHeaders = lines[0].split(',').map(h => h.trim());
+                const headers = rawHeaders.map(h => h.toLowerCase());
+
                 let success = 0;
 
                 for (let i = 1; i < lines.length; i++) {
                     const values = lines[i].split(',').map(v => v.trim());
                     const row = {};
-                    headers.forEach((h, idx) => row[h] = values[idx] || '');
+                    
+                    // Build row object with both original and lowercase keys for flexibility
+                    headers.forEach((h, idx) => {
+                        row[h] = values[idx] || '';
+                        row[rawHeaders[idx]] = values[idx] || ''; // keep original casing too
+                    });
 
                     const newProduct = {
                         id: Date.now() + i,
-                        name: row.Title || row.title || 'Untitled',
-                        brand: row.Brand || row.brand || 'Unknown',
-                        mainCategory: row.Category || row.category || 'Toys',
-                        price: parseFloat(row['Sales Price'] || row.price || 0),
-                        quantity: parseInt(row.Quantity || row.quantity || 10),
-                        status: row.Status || 'In Stock',
-                        image: row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400',
+                        name: row.title || row.Title || row.name || 'Untitled',
+                        brand: row.brand || row.Brand || 'Unknown',
+                        mainCategory: row.category || row.Category || 'Toys',
+                        price: parseFloat(row['sales price'] || row['Sales Price'] || row.price || row.PricePrice || 0),
+                        quantity: parseInt(row.quantity || row.Quantity || 10),
+                        status: row.status || row.Status || 'In Stock',
+                        image: row['image url'] || row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400',
                         created_at: new Date().toISOString()
                     };
 
@@ -596,7 +605,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Clean version loaded - no script errors', 'color:#22d3ee');
+            console.log('%c✅ Clean version with improved CSV import loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
