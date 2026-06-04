@@ -180,7 +180,7 @@
         </div>
     </footer>
 
-    <!-- ADMIN MODAL -->
+    <!-- ADMIN MODAL (with Danger Zone delete button) -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
@@ -547,7 +547,6 @@
             document.getElementById('new-password').value = "";
         }
 
-        // === DELETE ALL PRODUCTS ===
         function deleteAllProducts() {
             if (!confirm("Are you sure you want to DELETE ALL products? This cannot be undone.")) {
                 return;
@@ -595,6 +594,7 @@
                 compare_to: 0,
                 status: status,
                 image: imageUrl,
+                description: "",
                 created_at: new Date().toISOString()
             };
 
@@ -638,18 +638,26 @@
                     const row = {};
                     headers.forEach((h, idx) => row[h] = values[idx] || '');
 
+                    const get = (...possibleKeys) => {
+                        for (let key of possibleKeys) {
+                            if (row[key] !== undefined && row[key] !== '') return row[key];
+                        }
+                        return '';
+                    };
+
                     const newProduct = {
                         id: Date.now() + i,
-                        name: row.title || row.name || 'Untitled',
-                        brand: row.brand || 'Unknown',
-                        mainCategory: row.category || 'Toys',
-                        price: parseFloat(row['sales price'] || row.price || row['salesprice'] || 0),
-                        quantity: parseInt(row.quantity || 10),
-                        shipping_weight: parseFloat(row['shipping weight'] || row['shippingweight'] || 0),
-                        cost: parseFloat(row.cost || 0),
-                        compare_to: parseFloat(row['compare to'] || row['compareto'] || 0),
-                        status: row.status || 'In Stock',
-                        image: row['image url'] || row.image || 'https://picsum.photos/id/106/600/400',
+                        name: get('title', 'name', 'product name') || 'Untitled',
+                        brand: get('brand', 'manufacturer') || 'Unknown',
+                        mainCategory: get('category', 'main category') || 'Toys',
+                        price: parseFloat(get('sales price', 'price', 'sale price', 'salesprice')) || 0,
+                        quantity: parseInt(get('quantity', 'qty', 'stock')) || 10,
+                        shipping_weight: parseFloat(get('shipping weight', 'shippingweight', 'weight')) || 0,
+                        cost: parseFloat(get('cost', 'wholesale cost')) || 0,
+                        compare_to: parseFloat(get('compare to', 'compareto', 'compare price', 'msrp')) || 0,
+                        status: get('status', 'availability', 'stock status') || 'In Stock',
+                        image: get('image url', 'image', 'img', 'photo', 'picture') || 'https://picsum.photos/id/106/600/400',
+                        description: get('description', 'desc', 'details', 'product description') || '',
                         created_at: new Date().toISOString()
                     };
 
@@ -701,7 +709,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Version with Delete All Products ready', 'color:#22d3ee');
+            console.log('%c✅ Final version with correct logo names loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
