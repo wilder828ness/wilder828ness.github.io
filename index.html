@@ -195,12 +195,21 @@
             </div>
 
             <div id="admin-panel" class="hidden">
+                <!-- Danger Zone -->
+                <div class="mb-6 border border-red-600 rounded-2xl p-6 bg-red-950/30">
+                    <h4 class="font-semibold text-lg mb-2 text-red-400">Danger Zone</h4>
+                    <p class="text-sm text-slate-400 mb-4">This will permanently delete ALL products from inventory.</p>
+                    <button onclick="deleteAllProducts()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-3xl text-sm">DELETE ALL PRODUCTS</button>
+                </div>
+
+                <!-- Change Password -->
                 <div class="mb-6 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Change Admin Password</h4>
                     <input type="password" id="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="New Password">
                     <button onclick="changePassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
                 </div>
 
+                <!-- Add Single Product -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -218,6 +227,7 @@
                     <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
+                <!-- CSV Import -->
                 <div class="border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
                     <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
@@ -231,7 +241,7 @@
         </div>
     </div>
 
-    <!-- PRODUCT DETAIL MODAL (with Compare To strikethrough) -->
+    <!-- PRODUCT DETAIL MODAL -->
     <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
             <div class="relative">
@@ -247,7 +257,6 @@
                     <div id="modal-status" class="text-sm font-semibold px-4 py-1 rounded-full"></div>
                 </div>
 
-                <!-- Price with Compare To strikethrough -->
                 <div class="flex items-baseline gap-x-3 mb-6">
                     <div class="text-4xl font-bold" id="modal-price"></div>
                     <div id="modal-compare-price" class="compare-price text-xl"></div>
@@ -406,7 +415,6 @@
             document.getElementById('modal-price').textContent = `$${(product.price || 0).toFixed(2)}`;
             document.getElementById('modal-description').textContent = product.description || 'No description available.';
             
-            // Compare To with strikethrough
             const compareEl = document.getElementById('modal-compare-price');
             if (product.compare_to && product.compare_to > product.price) {
                 compareEl.textContent = `$${(product.compare_to || 0).toFixed(2)}`;
@@ -537,6 +545,18 @@
             localStorage.setItem('nubz_admin_password', newPass);
             alert("Password updated successfully!");
             document.getElementById('new-password').value = "";
+        }
+
+        // === DELETE ALL PRODUCTS ===
+        function deleteAllProducts() {
+            if (!confirm("Are you sure you want to DELETE ALL products? This cannot be undone.")) {
+                return;
+            }
+            products = [];
+            localStorage.removeItem('nubz_products');
+            alert("All products have been deleted.");
+            closeAdmin();
+            loadProducts();
         }
 
         async function addManualProduct() {
@@ -681,7 +701,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Final version with Compare To strikethrough loaded', 'color:#22d3ee');
+            console.log('%c✅ Version with Delete All Products ready', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
