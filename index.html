@@ -19,6 +19,7 @@
         .page { display: none; }
         .page.active { display: block; }
         .status-badge { font-size: 0.7rem; padding: 2px 10px; font-weight: 600; letter-spacing: 0.5px; border-radius: 9999px; }
+        .compare-price { text-decoration: line-through; color: #64748b; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200">
@@ -28,7 +29,7 @@
         <div class="max-w-7xl mx-auto px-6">
             <div class="flex items-center justify-between h-20">
                 <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
-                    <img src="nubs-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
+                    <img src="nubz-logoA.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
                 </div>
 
                 <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
@@ -74,7 +75,7 @@
         <section class="min-h-[100dvh] flex items-center bg-gradient-to-br from-slate-950 to-slate-900">
             <div class="max-w-5xl mx-auto px-6 text-center">
                 <div class="hidden md:flex justify-center mb-8">
-                    <img src="nub-logoA.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
+                    <img src="nubz-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-32 md:h-40 w-auto drop-shadow-2xl">
                 </div>
                 <div class="inline-flex items-center gap-x-2 px-4 py-1.5 bg-white/10 rounded-full mb-6 border border-white/20">
                     <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
@@ -157,7 +158,12 @@
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
             <h2 class="section-header">Contact Us</h2>
         </div>
-        <form class="space-y-6">
+        <form id="contact-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="text" id="contact-name" placeholder="Your Name" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm">
+                <input type="email" id="contact-email" placeholder="Your Email" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm">
+            </div>
+            <textarea id="contact-message" placeholder="Your Message" rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-3xl px-5 py-4 text-sm"></textarea>
             <button type="button" onclick="submitContactForm()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">SEND MESSAGE</button>
         </form>
     </div>
@@ -189,14 +195,12 @@
             </div>
 
             <div id="admin-panel" class="hidden">
-                <!-- Change Password -->
                 <div class="mb-6 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Change Admin Password</h4>
                     <input type="password" id="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="New Password">
                     <button onclick="changePassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
                 </div>
 
-                <!-- Add Single Product -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,7 +218,6 @@
                     <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
-                <!-- CSV Import -->
                 <div class="border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
                     <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
@@ -224,6 +227,34 @@
                     <button onclick="importCSV()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Import Products</button>
                     <div id="csv-result" class="mt-3 text-sm"></div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL MODAL (with Compare To strikethrough) -->
+    <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
+            <div class="relative">
+                <img id="modal-image" class="w-full h-80 object-cover">
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/60 rounded-full flex items-center justify-center text-2xl">×</button>
+            </div>
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 id="modal-title" class="text-3xl font-bold"></h3>
+                        <p id="modal-brand-category" class="text-slate-400"></p>
+                    </div>
+                    <div id="modal-status" class="text-sm font-semibold px-4 py-1 rounded-full"></div>
+                </div>
+
+                <!-- Price with Compare To strikethrough -->
+                <div class="flex items-baseline gap-x-3 mb-6">
+                    <div class="text-4xl font-bold" id="modal-price"></div>
+                    <div id="modal-compare-price" class="compare-price text-xl"></div>
+                </div>
+
+                <p id="modal-description" class="text-slate-300 mb-8"></p>
+                <button onclick="addCurrentProductToCart()" class="w-full py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
             </div>
         </div>
     </div>
@@ -241,6 +272,7 @@
         let cart = [];
         let isAdminLoggedIn = false;
         let adminPassword = localStorage.getItem('nubz_admin_password') || "nubz2026";
+        let currentProductId = null;
 
         window.supabaseInstance = window.supabaseInstance || null;
         try {
@@ -353,13 +385,54 @@
                     <div class="font-semibold text-lg">${product.name}</div>
                     <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
                     <div class="flex justify-between items-center mt-4">
-                        <div class="text-3xl font-bold">$${product.price}</div>
+                        <div>
+                            <div class="text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
+                            ${product.compare_to && product.compare_to > product.price ? 
+                                `<div class="compare-price text-sm">$${(product.compare_to || 0).toFixed(2)}</div>` : ''}
+                        </div>
                         <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
                     </div>
                 </div>
             `;
             card.onclick = () => showProductModal(product);
             return card;
+        }
+
+        function showProductModal(product) {
+            currentProductId = product.id;
+            document.getElementById('modal-image').src = product.image || 'https://picsum.photos/id/106/600/400';
+            document.getElementById('modal-title').textContent = product.name || 'Untitled';
+            document.getElementById('modal-brand-category').textContent = `${product.brand || 'Unknown'} • ${product.mainCategory || 'Toys'}`;
+            document.getElementById('modal-price').textContent = `$${(product.price || 0).toFixed(2)}`;
+            document.getElementById('modal-description').textContent = product.description || 'No description available.';
+            
+            // Compare To with strikethrough
+            const compareEl = document.getElementById('modal-compare-price');
+            if (product.compare_to && product.compare_to > product.price) {
+                compareEl.textContent = `$${(product.compare_to || 0).toFixed(2)}`;
+                compareEl.style.display = 'inline';
+            } else {
+                compareEl.style.display = 'none';
+            }
+            
+            const statusEl = document.getElementById('modal-status');
+            statusEl.textContent = product.status || 'In Stock';
+            statusEl.className = `text-sm font-semibold px-4 py-1 rounded-full ${product.status === 'In Stock' ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
+            
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.getElementById('product-modal').classList.add('flex');
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('flex');
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function addCurrentProductToCart() {
+            if (currentProductId) {
+                addToCart(currentProductId);
+                closeProductModal();
+            }
         }
 
         function addToCart(productId) {
@@ -378,7 +451,7 @@
 
         function showCart() {
             if (cart.length === 0) return alert("Your cart is empty!");
-            let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            let total = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
             showStripeCheckout(total);
         }
 
@@ -497,6 +570,9 @@
                 mainCategory: category || "Toys",
                 price: price,
                 quantity: quantity,
+                shipping_weight: 0,
+                cost: 0,
+                compare_to: 0,
                 status: status,
                 image: imageUrl,
                 created_at: new Date().toISOString()
@@ -518,7 +594,6 @@
             loadProducts();
         }
 
-        // === IMPROVED CSV IMPORT (More Robust) ===
         async function importCSV() {
             const fileInput = document.getElementById('csv-file');
             const resultDiv = document.getElementById('csv-result');
@@ -534,32 +609,27 @@
             reader.onload = async function(e) {
                 const csv = e.target.result;
                 const lines = csv.trim().split('\n');
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
                 
-                // Get headers and normalize them (lowercase + trim)
-                const rawHeaders = lines[0].split(',').map(h => h.trim());
-                const headers = rawHeaders.map(h => h.toLowerCase());
-
                 let success = 0;
 
                 for (let i = 1; i < lines.length; i++) {
                     const values = lines[i].split(',').map(v => v.trim());
                     const row = {};
-                    
-                    // Build row object with both original and lowercase keys for flexibility
-                    headers.forEach((h, idx) => {
-                        row[h] = values[idx] || '';
-                        row[rawHeaders[idx]] = values[idx] || ''; // keep original casing too
-                    });
+                    headers.forEach((h, idx) => row[h] = values[idx] || '');
 
                     const newProduct = {
                         id: Date.now() + i,
-                        name: row.title || row.Title || row.name || 'Untitled',
-                        brand: row.brand || row.Brand || 'Unknown',
-                        mainCategory: row.category || row.Category || 'Toys',
-                        price: parseFloat(row['sales price'] || row['Sales Price'] || row.price || row.PricePrice || 0),
-                        quantity: parseInt(row.quantity || row.Quantity || 10),
-                        status: row.status || row.Status || 'In Stock',
-                        image: row['image url'] || row['Image URL'] || row.image || 'https://picsum.photos/id/106/600/400',
+                        name: row.title || row.name || 'Untitled',
+                        brand: row.brand || 'Unknown',
+                        mainCategory: row.category || 'Toys',
+                        price: parseFloat(row['sales price'] || row.price || row['salesprice'] || 0),
+                        quantity: parseInt(row.quantity || 10),
+                        shipping_weight: parseFloat(row['shipping weight'] || row['shippingweight'] || 0),
+                        cost: parseFloat(row.cost || 0),
+                        compare_to: parseFloat(row['compare to'] || row['compareto'] || 0),
+                        status: row.status || 'In Stock',
+                        image: row['image url'] || row.image || 'https://picsum.photos/id/106/600/400',
                         created_at: new Date().toISOString()
                     };
 
@@ -587,12 +657,18 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             window.URL.revokeObjectURL(url);
         }
 
-        function showProductModal(product) {
-            alert(`Product: ${product.name}\nPrice: $${product.price}\nStatus: ${product.status}`);
-        }
-
         function submitContactForm() {
-            alert("Message sent!");
+            const name = document.getElementById('contact-name').value;
+            const email = document.getElementById('contact-email').value;
+            const message = document.getElementById('contact-message').value;
+            
+            if (!name || !email || !message) {
+                alert("Please fill out all fields");
+                return;
+            }
+            
+            alert(`Thank you, ${name}! Your message has been sent.`);
+            document.getElementById('contact-form').reset();
         }
 
         function toggleMobileMenu() {
@@ -605,7 +681,7 @@ Funko Pop,Spider-Man Funko Pop,SP-001,123456789012,Action Figures,Marvel,Classic
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Clean version with improved CSV import loaded', 'color:#22d3ee');
+            console.log('%c✅ Final version with Compare To strikethrough loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
