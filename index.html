@@ -20,6 +20,7 @@
         .page.active { display: block; }
         .status-badge { font-size: 0.7rem; padding: 2px 10px; font-weight: 600; letter-spacing: 0.5px; border-radius: 9999px; }
         .compare-price { text-decoration: line-through; color: #64748b; }
+        img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200">
@@ -119,7 +120,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">COMPLETE CATALOG</div>
-                <h2 class="section-header">All Inventory</h2>
+                <h2 id="inventory-header" class="section-header">All Inventory</h2>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <input type="text" id="search-input" placeholder="Search products..." onkeyup="filterInventory()" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-2.5 text-sm w-full md:w-72">
@@ -134,7 +135,7 @@
         <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- ABOUT US PAGE -->
+    <!-- ABOUT US + CONTACT + FOOTER -->
     <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <div class="text-center mb-16">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
@@ -152,7 +153,6 @@
         </div>
     </div>
 
-    <!-- CONTACT US PAGE -->
     <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
@@ -168,7 +168,6 @@
         </form>
     </div>
 
-    <!-- FOOTER -->
     <footer class="bg-black border-t border-slate-800 py-10 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-sm text-slate-400 flex flex-col md:flex-row justify-between items-center gap-y-6">
             <div>© 2026 Nubz Toys &amp; Collectibles. All rights reserved.</div>
@@ -223,16 +222,31 @@
                         <input id="manual-quantity" type="number" placeholder="Quantity" value="10" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-shipping-weight" type="number" step="0.01" placeholder="Shipping Weight (lbs)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         
-                        <input id="manual-category" placeholder="Category" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-status" placeholder="Status" value="In Stock" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Categories (select all that apply)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-action" class="accent-emerald-500"> Action Figures</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-model" class="accent-emerald-500"> Model Sets</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-funko" class="accent-emerald-500"> Funko Pop</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-blind" class="accent-emerald-500"> Blind Bag & Mini Figures</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-toys" class="accent-emerald-500"> Toys</label>
+                            </div>
+                        </div>
                         
                         <div class="md:col-span-2">
                             <textarea id="manual-description" placeholder="Description" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm"></textarea>
                         </div>
                         
                         <div class="md:col-span-2">
-                            <label class="block text-sm text-slate-400 mb-2">Product Image</label>
+                            <label class="block text-sm text-slate-400 mb-2">Main Product Image</label>
                             <input type="file" id="manual-image-upload" accept="image/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Additional Image URLs (comma separated)</label>
+                            <input id="manual-extra-images" placeholder="https://example.com/img2.jpg, https://example.com/img3.jpg" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         </div>
                     </div>
 
@@ -253,13 +267,20 @@
         </div>
     </div>
 
-    <!-- PRODUCT MODAL -->
+    <!-- PRODUCT MODAL WITH EDIT BUTTON -->
     <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
             <div class="relative">
                 <img id="modal-image" class="w-full h-80 object-cover bg-slate-800">
+                
+                <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">←</button>
+                <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">→</button>
+                
                 <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">×</button>
+                
+                <div id="modal-image-counter" class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-1 rounded-full"></div>
             </div>
+            
             <div class="p-8">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -276,18 +297,26 @@
 
                 <div id="modal-description" class="text-slate-300 mb-8 max-h-48 overflow-y-auto pr-2 text-[15px] leading-relaxed"></div>
 
-                <button onclick="addCurrentProductToCart()" class="w-full py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
+                <div class="flex gap-3">
+                    <button onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
+                    
+                    <!-- Edit Button (only shows when admin is logged in) -->
+                    <button id="edit-product-btn" onclick="editCurrentProduct()" 
+                            class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">
+                        EDIT
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const categories = [
-            { name: "Action Figures",           icon: "fa-dragon",           color: "cyan-400" },
-            { name: "Model Sets",               icon: "fa-cube",             color: "emerald-400" },
-            { name: "Funko Pop",                icon: "fa-head-side",        color: "purple-400" },
-            { name: "Blind Bag & Mini Figures", icon: "fa-question-circle",  color: "fuchsia-400" },
-            { name: "Toys",                     icon: "fa-gamepad",          color: "amber-400" }
+            { name: "Action Figures", icon: "fa-dragon", color: "cyan-400" },
+            { name: "Model Sets", icon: "fa-cube", color: "emerald-400" },
+            { name: "Funko Pop", icon: "fa-head-side", color: "purple-400" },
+            { name: "Blind Bag & Mini Figures", icon: "fa-question-circle", color: "fuchsia-400" },
+            { name: "Toys", icon: "fa-gamepad", color: "amber-400" }
         ];
 
         let products = [];
@@ -295,7 +324,11 @@
         let isAdminLoggedIn = false;
         let adminPassword = localStorage.getItem('nubz_admin_password') || "nubz2026";
         let currentProductId = null;
+        let currentCategoryFilter = null;
+        let currentModalImages = [];
+        let currentModalImageIndex = 0;
 
+        // Supabase
         window.supabaseInstance = window.supabaseInstance || null;
         try {
             if (typeof Supabase !== 'undefined') {
@@ -374,13 +407,30 @@
 
         function filterAndGoToInventory(category) {
             showPage('inventory');
-            setTimeout(() => filterInventory(category), 100);
+            setTimeout(() => filterInventory(category), 80);
         }
 
         function filterInventory(preSelectedCategory = '') {
+            currentCategoryFilter = preSelectedCategory || null;
+            
+            const header = document.getElementById('inventory-header');
+            
+            if (currentCategoryFilter) {
+                header.innerHTML = `<span class="bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 bg-clip-text text-transparent">${currentCategoryFilter}</span>`;
+            } else {
+                header.innerHTML = 'All Inventory';
+            }
+
             const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
             let filtered = products;
-            if (preSelectedCategory) filtered = filtered.filter(p => p.mainCategory === preSelectedCategory);
+
+            if (currentCategoryFilter) {
+                filtered = filtered.filter(p => {
+                    const prodCategories = p.categories || (p.mainCategory ? [p.mainCategory] : []);
+                    return prodCategories.some(cat => cat.toLowerCase() === currentCategoryFilter.toLowerCase());
+                });
+            }
+
             if (search) {
                 filtered = filtered.filter(p =>
                     (p.name && p.name.toLowerCase().includes(search)) ||
@@ -388,6 +438,7 @@
                     (p.description && p.description.toLowerCase().includes(search))
                 );
             }
+
             const container = document.getElementById('inventory-grid');
             container.innerHTML = '';
             filtered.forEach(product => container.appendChild(createProductCard(product)));
@@ -396,16 +447,22 @@
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
+            
+            const firstImage = (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'https://picsum.photos/id/106/600/400');
+            
             let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
             let lowQtyHTML = (product.quantity && product.quantity <= 2) ? `<span class="status-badge bg-red-500 text-white ml-2">LOW QUANTITY</span>` : '';
+            
+            const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
+            
             card.innerHTML = `
                 <div class="relative">
-                    <img src="${product.image}" class="w-full h-56 object-cover" loading="lazy" onerror="this.src='https://picsum.photos/id/106/600/400'">
+                    <img src="${firstImage}" class="w-full h-56 object-cover" loading="lazy" onerror="this.src='https://picsum.photos/id/106/600/400'">
                     <div class="absolute top-4 right-4 flex gap-1">${statusHTML}${lowQtyHTML}</div>
                 </div>
                 <div class="p-6">
                     <div class="font-semibold text-lg line-clamp-2">${product.name}</div>
-                    <div class="text-xs text-slate-400">${product.brand} • ${product.mainCategory}</div>
+                    <div class="text-xs text-slate-400">${product.brand} • ${catDisplay}</div>
                     <div class="flex justify-between items-center mt-4">
                         <div>
                             <div class="text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
@@ -422,9 +479,21 @@
 
         function showProductModal(product) {
             currentProductId = product.id;
-            document.getElementById('modal-image').src = product.image || 'https://picsum.photos/id/106/600/400';
+            
+            currentModalImages = [];
+            if (product.images && product.images.length > 0) {
+                currentModalImages = product.images;
+            } else if (product.image) {
+                currentModalImages = [product.image];
+            } else {
+                currentModalImages = ['https://picsum.photos/id/106/600/400'];
+            }
+            
+            currentModalImageIndex = 0;
+            updateModalImage();
+            
             document.getElementById('modal-title').textContent = product.name || 'Untitled';
-            document.getElementById('modal-brand-category').textContent = `${product.brand || 'Unknown'} • ${product.mainCategory || 'Toys'}`;
+            document.getElementById('modal-brand-category').textContent = `${product.brand || 'Unknown'} • ${(product.categories || [product.mainCategory || 'Toys']).join(', ')}`;
             document.getElementById('modal-price').textContent = `$${(product.price || 0).toFixed(2)}`;
             document.getElementById('modal-description').innerHTML = product.description || 'No description available.';
             
@@ -440,13 +509,144 @@
             statusEl.textContent = product.status || 'In Stock';
             statusEl.className = `text-sm font-semibold px-4 py-1 rounded-full ${product.status === 'In Stock' ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
             
+            // Show/hide Edit button based on admin login
+            const editBtn = document.getElementById('edit-product-btn');
+            if (isAdminLoggedIn) {
+                editBtn.classList.remove('hidden');
+                editBtn.classList.add('flex');
+            } else {
+                editBtn.classList.add('hidden');
+                editBtn.classList.remove('flex');
+            }
+            
             document.getElementById('product-modal').classList.remove('hidden');
             document.getElementById('product-modal').classList.add('flex');
+        }
+
+        function updateModalImage() {
+            const img = document.getElementById('modal-image');
+            img.src = currentModalImages[currentModalImageIndex];
+            
+            const counter = document.getElementById('modal-image-counter');
+            if (currentModalImages.length > 1) {
+                counter.textContent = `${currentModalImageIndex + 1} / ${currentModalImages.length}`;
+                counter.style.display = 'block';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        function prevImage() {
+            currentModalImageIndex = (currentModalImageIndex - 1 + currentModalImages.length) % currentModalImages.length;
+            updateModalImage();
+        }
+
+        function nextImage() {
+            currentModalImageIndex = (currentModalImageIndex + 1) % currentModalImages.length;
+            updateModalImage();
         }
 
         function closeProductModal() {
             document.getElementById('product-modal').classList.remove('flex');
             document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function editCurrentProduct() {
+            if (!currentProductId || !isAdminLoggedIn) return;
+            
+            const product = products.find(p => p.id === currentProductId);
+            if (!product) return;
+
+            closeProductModal();
+
+            // Pre-fill the admin add form with current values (simple reuse)
+            document.getElementById('manual-brand').value = product.brand || '';
+            document.getElementById('manual-title').value = product.name || '';
+            document.getElementById('manual-price').value = product.price || '';
+            document.getElementById('manual-compare-to').value = product.compare_to || '';
+            document.getElementById('manual-quantity').value = product.quantity || 10;
+            document.getElementById('manual-shipping-weight').value = product.shipping_weight || 0;
+            document.getElementById('manual-status').value = product.status || 'In Stock';
+            document.getElementById('manual-description').value = product.description || '';
+
+            // Pre-check categories
+            const prodCats = product.categories || (product.mainCategory ? [product.mainCategory] : []);
+            document.getElementById('cat-action').checked = prodCats.includes("Action Figures");
+            document.getElementById('cat-model').checked = prodCats.includes("Model Sets");
+            document.getElementById('cat-funko').checked = prodCats.includes("Funko Pop");
+            document.getElementById('cat-blind').checked = prodCats.includes("Blind Bag & Mini Figures");
+            document.getElementById('cat-toys').checked = prodCats.includes("Toys");
+
+            // Show admin modal
+            showAdmin();
+            
+            // Change the button text temporarily to "Update Product"
+            const addBtn = document.querySelector('#admin-panel button[onclick="addManualProduct()"]');
+            if (addBtn) {
+                addBtn.textContent = "Update Product";
+                addBtn.onclick = () => updateExistingProduct(currentProductId);
+            }
+        }
+
+        function updateExistingProduct(productId) {
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex === -1) return;
+
+            const brand = document.getElementById('manual-brand').value.trim();
+            const title = document.getElementById('manual-title').value.trim();
+            const price = parseFloat(document.getElementById('manual-price').value);
+            const compareTo = parseFloat(document.getElementById('manual-compare-to').value) || 0;
+            const quantity = parseInt(document.getElementById('manual-quantity').value) || 10;
+            const shippingWeight = parseFloat(document.getElementById('manual-shipping-weight').value) || 0;
+            const status = document.getElementById('manual-status').value.trim() || "In Stock";
+            const description = document.getElementById('manual-description').value.trim();
+            const extraImagesInput = document.getElementById('manual-extra-images').value.trim();
+
+            const selectedCategories = [];
+            if (document.getElementById('cat-action').checked) selectedCategories.push("Action Figures");
+            if (document.getElementById('cat-model').checked) selectedCategories.push("Model Sets");
+            if (document.getElementById('cat-funko').checked) selectedCategories.push("Funko Pop");
+            if (document.getElementById('cat-blind').checked) selectedCategories.push("Blind Bag & Mini Figures");
+            if (document.getElementById('cat-toys').checked) selectedCategories.push("Toys");
+
+            if (!title || !price || selectedCategories.length === 0) {
+                alert("Title, Sales Price, and at least one Category are required");
+                return;
+            }
+
+            let newImages = products[productIndex].images || [];
+            if (extraImagesInput) {
+                const extraUrls = extraImagesInput.split(',').map(url => url.trim()).filter(url => url);
+                newImages = newImages.concat(extraUrls);
+            }
+
+            // Update the product
+            products[productIndex] = {
+                ...products[productIndex],
+                name: title,
+                brand: brand || "Unknown",
+                categories: selectedCategories,
+                price: price,
+                quantity: quantity,
+                shipping_weight: shippingWeight,
+                compare_to: compareTo,
+                status: status,
+                images: newImages.length > 0 ? newImages : products[productIndex].images,
+                description: description
+            };
+
+            saveToLocalStorage();
+            alert("Product updated successfully!");
+
+            // Reset form and button
+            closeAdmin();
+            const addBtn = document.querySelector('#admin-panel button');
+            if (addBtn) {
+                addBtn.textContent = "Add Product";
+                addBtn.onclick = () => addManualProduct();
+            }
+
+            loadProducts();
         }
 
         function addCurrentProductToCart() {
@@ -576,38 +776,55 @@
             const compareTo = parseFloat(document.getElementById('manual-compare-to').value) || 0;
             const quantity = parseInt(document.getElementById('manual-quantity').value) || 10;
             const shippingWeight = parseFloat(document.getElementById('manual-shipping-weight').value) || 0;
-            const category = document.getElementById('manual-category').value.trim();
             const status = document.getElementById('manual-status').value.trim() || "In Stock";
             const description = document.getElementById('manual-description').value.trim();
+            const extraImagesInput = document.getElementById('manual-extra-images').value.trim();
             const fileInput = document.getElementById('manual-image-upload');
 
-            if (!title || !price) {
-                alert("Title and Sales Price are required");
+            const selectedCategories = [];
+            if (document.getElementById('cat-action').checked) selectedCategories.push("Action Figures");
+            if (document.getElementById('cat-model').checked) selectedCategories.push("Model Sets");
+            if (document.getElementById('cat-funko').checked) selectedCategories.push("Funko Pop");
+            if (document.getElementById('cat-blind').checked) selectedCategories.push("Blind Bag & Mini Figures");
+            if (document.getElementById('cat-toys').checked) selectedCategories.push("Toys");
+
+            if (!title || !price || selectedCategories.length === 0) {
+                alert("Title, Sales Price, and at least one Category are required");
                 return;
             }
 
-            let imageUrl = "https://picsum.photos/id/106/600/400";
+            let images = [];
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                imageUrl = await new Promise((resolve) => {
+                const base64 = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onload = (e) => resolve(e.target.result);
                     reader.readAsDataURL(file);
                 });
+                images.push(base64);
+            }
+
+            if (extraImagesInput) {
+                const extraUrls = extraImagesInput.split(',').map(url => url.trim()).filter(url => url);
+                images = images.concat(extraUrls);
+            }
+
+            if (images.length === 0) {
+                images = ['https://picsum.photos/id/106/600/400'];
             }
 
             const newProduct = {
                 id: Date.now(),
                 name: title,
                 brand: brand || "Unknown",
-                mainCategory: category || "Toys",
+                categories: selectedCategories,
                 price: price,
                 quantity: quantity,
                 shipping_weight: shippingWeight,
                 cost: 0,
                 compare_to: compareTo,
                 status: status,
-                image: imageUrl,
+                images: images,
                 description: description,
                 created_at: new Date().toISOString()
             };
@@ -617,16 +834,20 @@
 
             alert("Product added successfully!");
 
+            // Clear form
             document.getElementById('manual-brand').value = "";
             document.getElementById('manual-title').value = "";
             document.getElementById('manual-price').value = "";
             document.getElementById('manual-compare-to').value = "";
             document.getElementById('manual-quantity').value = "10";
             document.getElementById('manual-shipping-weight').value = "";
-            document.getElementById('manual-category').value = "";
             document.getElementById('manual-status').value = "In Stock";
             document.getElementById('manual-description').value = "";
+            document.getElementById('manual-extra-images').value = "";
             document.getElementById('manual-image-upload').value = "";
+            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys'].forEach(id => {
+                document.getElementById(id).checked = false;
+            });
 
             loadProducts();
         }
@@ -653,8 +874,6 @@
                 }
 
                 const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
-                console.log('%c[CSV DEBUG] Headers found:', 'color:#22d3ee; font-weight:bold', headers);
-
                 let success = 0;
 
                 for (let i = 1; i < lines.length; i++) {
@@ -671,18 +890,24 @@
 
                     const cleanPrice = (val) => parseFloat((val || '').toString().replace(/[$,\s]/g, '')) || 0;
 
+                    const categoriesStr = get('category', 'categories');
+                    const categoriesList = categoriesStr ? categoriesStr.split(',').map(c => c.trim()).filter(Boolean) : ['Toys'];
+
+                    const imagesStr = get('image url', 'image', 'images');
+                    const imagesList = imagesStr ? imagesStr.split(',').map(i => i.trim()).filter(Boolean) : ['https://picsum.photos/id/106/600/400'];
+
                     const newProduct = {
                         id: Date.now() + i,
                         name: get('title', 'name') || 'Untitled',
                         brand: get('brand') || 'Unknown',
-                        mainCategory: get('category') || 'Toys',
+                        categories: categoriesList,
                         price: cleanPrice(get('sales price', 'price', 'sale price')),
                         quantity: parseInt(get('quantity', 'qty')) || 10,
                         shipping_weight: parseFloat(get('shipping weight', 'weight')) || 0,
                         cost: cleanPrice(get('cost')),
                         compare_to: cleanPrice(get('compare to', 'compare price')),
                         status: get('status', 'availability') || 'In Stock',
-                        image: get('image url', 'image', 'img') || 'https://picsum.photos/id/106/600/400',
+                        images: imagesList,
                         description: get('description', 'desc') || '',
                         created_at: new Date().toISOString()
                     };
@@ -724,8 +949,8 @@
         }
 
         function downloadSampleCSV() {
-            const csvContent = `Brand,Title,SKU,UPC,Category,Sub Category,Description,Shipping Weight,Quantity,Cost,Sales Price,Compare To,Image URL,Status
-BLOKEES,Blokees Transformers Darkest Hour Galaxy Version 09,BLK-009,123456789012,Model Sets,Transformers,"Complete your collection with Version 09, includes 3 mystery figures",0.8,9,4.50,12.00,15.00,https://picsum.photos/id/106/600/400,In Stock`;
+            const csvContent = `Brand,Title,SKU,UPC,Categories,Description,Shipping Weight,Quantity,Cost,Sales Price,Compare To,Image URLs,Status
+BLOKEES,Blokees Transformers Darkest Hour Galaxy Version 09,BLK-009,123456789012,"Model Sets, Action Figures","Complete your collection with Version 09, includes 3 mystery figures",0.8,9,4.50,12.00,15.00,"https://picsum.photos/id/106/600/400,https://picsum.photos/id/29/600/400",In Stock`;
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -750,7 +975,7 @@ BLOKEES,Blokees Transformers Darkest Hour Galaxy Version 09,BLK-009,123456789012
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Clean version loaded - nav should work now', 'color:#22d3ee');
+            console.log('%c✅ Final complete version with Edit feature loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
