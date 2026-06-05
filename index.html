@@ -21,6 +21,11 @@
         .status-badge { font-size: 0.7rem; padding: 2px 10px; font-weight: 600; letter-spacing: 0.5px; border-radius: 9999px; }
         .compare-price { text-decoration: line-through; color: #64748b; }
         img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+        .gradient-title {
+            background: linear-gradient(to right, #22d3ee, #e879f9, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200">
@@ -84,7 +89,7 @@
                 </div>
                 <h1 class="text-6xl md:text-7xl font-display font-black tracking-tighter leading-none mb-6">
                     RARE FINDS.<br>
-                    <span class="bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 bg-clip-text text-transparent">REAL FUN.</span>
+                    <span class="gradient-title">REAL FUN.</span>
                 </h1>
                 <p class="max-w-xl mx-auto text-2xl text-slate-300 mb-10">Premium toys, collectibles &amp; figures for every generation.</p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -98,7 +103,7 @@
             <div class="flex justify-between items-end mb-10">
                 <div>
                     <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">JUST LANDED</div>
-                    <h2 class="section-header">Newest Arrivals</h2>
+                    <h2 class="section-header gradient-title">Newest Arrivals</h2>
                 </div>
                 <button onclick="showPage('inventory')" class="text-sm font-medium text-cyan-400 hover:text-cyan-300 flex items-center gap-x-2">VIEW ALL <i class="fa-solid fa-arrow-right"></i></button>
             </div>
@@ -110,7 +115,7 @@
     <div id="categories" class="page pt-20 max-w-7xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">SHOP BY CATEGORY</div>
-            <h2 class="section-header">Find What You're Looking For</h2>
+            <h2 class="section-header gradient-title">Find What You're Looking For</h2>
         </div>
         <div id="category-grid" class="flex flex-wrap justify-center gap-6"></div>
     </div>
@@ -120,7 +125,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
                 <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">COMPLETE CATALOG</div>
-                <h2 id="inventory-header" class="section-header">All Inventory</h2>
+                <h2 id="inventory-header" class="section-header gradient-title">All Inventory</h2>
             </div>
             <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <input type="text" id="search-input" placeholder="Search products..." onkeyup="filterInventory()" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-2.5 text-sm w-full md:w-72">
@@ -135,11 +140,11 @@
         <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 
-    <!-- ABOUT US + CONTACT + FOOTER -->
+    <!-- ABOUT US PAGE -->
     <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <div class="text-center mb-16">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
-            <h2 class="section-header">About Nubz Toys &amp; Collectibles</h2>
+            <h2 class="section-header gradient-title">About Nubz Toys &amp; Collectibles</h2>
         </div>
         <div class="prose prose-invert max-w-none text-lg text-slate-300">
             <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to just keep it simple. Remember when we used to just play? We owned the dialogue. We wrote the scenes. We defined the storyline — it didn't define us. Well, maybe it did, and we just got away from it for a while. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises — we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys &amp; collectibles, but you're never too old for them.</p>
@@ -153,10 +158,11 @@
         </div>
     </div>
 
+    <!-- CONTACT US PAGE -->
     <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
             <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
-            <h2 class="section-header">Contact Us</h2>
+            <h2 class="section-header gradient-title">Contact Us</h2>
         </div>
         <form id="contact-form" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -168,13 +174,133 @@
         </form>
     </div>
 
+    <!-- PRIVACY POLICY PAGE -->
+    <div id="privacy" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <h2 class="section-header gradient-title mb-8">Privacy Policy</h2>
+        <div class="prose prose-invert text-slate-300">
+            <p>PRIVACY POLICY
+Last updated: June 5, 2026
+Wilderness Dealz LLC dab Nubz Toys & Collectibles operates this store and website, including all related information, content, features, tools, products and services, in order to provide you, the customer, with a curated shopping experience (the "Services"). Nubz Toys & Collectibles is powered by Wilderness Dealz LLC which enables us to provide the Services to you. This Privacy Policy describes how we collect, use, and disclose your personal information when you visit, use, or make a purchase or other transaction using the Services or otherwise communicate with us. If there is a conflict between our Terms of Service and this Privacy Policy, this Privacy Policy controls with respect to the collection, processing, and disclosure of your personal information.
+Please read this Privacy Policy carefully. By using and accessing any of the Services, you acknowledge that you have read this Privacy Policy and understand the collection, use, and disclosure of your information as described in this Privacy Policy.
+Personal Information We Collect or Process
+When we use the term "personal information," we are referring to information that identifies or can reasonably be linked to you or another person. Personal information does not include information that is collected anonymously or that has been de-identified, so that it cannot identify or be reasonably linked to you. We may collect or process the following categories of personal information, including inferences drawn from this personal information, depending on how you interact with the Services, where you live, and as permitted or required by applicable law:
+* Contact details including your name, address, billing address, shipping address, phone number, and email address.
+* Financial information including credit card, debit card, and financial account numbers, payment card information, financial account information, transaction details, form of payment, payment confirmation and other payment details.
+* Account information including your username, password, security questions, preferences and settings.
+* Transaction information including the items you view, put in your cart, add to your wishlist, or purchase, return, exchange or cancel and your past transactions.
+* Communications with us including the information you include in communications with us, for example, when sending a customer support inquiry.
+* Device information including information about your device, browser, or network connection, your IP address, and other unique identifiers.
+* Usage information including information regarding your interaction with the Services, including how and when you interact with or navigate the Services.
+Personal Information Sources
+We may collect personal information from the following sources:
+* Directly from you including when you create an account, visit or use the Services, communicate with us, or otherwise provide us with your personal information;
+* Automatically through the Services including from your device when you use our products or services or visit our websites, and through the use of cookies and similar technologies;
+* From our service providers including when we engage them to enable certain technology and when they collect or process your personal information on our behalf;
+* From our partners or other third parties.
+
+How We Use Your Personal Information
+Depending on how you interact with us or which of the Services you use, we may use personal information for the following purposes:
+* Provide, Tailor, and Improve the Services. We use your personal information to provide you with the Services, including to perform our contract with you, to process your payments, to fulfill your orders, to remember your preferences and items you are interested in, to send notifications to you related to your account, to process purchases, returns, exchanges or other transactions, to create, maintain and otherwise manage your account, to arrange for shipping, to facilitate any returns and exchanges, to enable you to post reviews, and to create a customized shopping experience for you, such as recommending products related to your purchases. This may include using your personal information to better tailor and improve the Services.
+* Marketing and Advertising. We use your personal information for marketing and promotional purposes, such as to send marketing, advertising and promotional communications by email, text message or postal mail, and to show you online advertisements for products or services on the Services or other websites, including based on items you previously have purchased or added to your cart and other activity on the Services.
+* Security and Fraud Prevention. We use your personal information to authenticate your account, to provide a secure payment and shopping experience, detect, investigate or take action regarding possible fraudulent, illegal, unsafe, or malicious activity, protect public safety, and to secure our services. If you choose to use the Services and register an account, you are responsible for keeping your account credentials safe. We highly recommend that you do not share your username, password or other access details with anyone else.
+* Communicating with You. We use your personal information to provide you with customer support, to be responsive to you, to provide effective services to you and to maintain our business relationship with you.
+* Legal Reasons. We use your personal information to comply with applicable law or respond to valid legal process, including requests from law enforcement or government agencies, to investigate or participate in civil discovery, potential or actual litigation, or other adversarial legal proceedings, and to enforce or investigate potential violations of our terms or policies.
+How We Disclose Personal Information
+In certain circumstances, we may disclose your personal information to third parties for legitimate purposes subject to this Privacy Policy. Such circumstances may include:
+* With vendors and other third parties who perform services on our behalf (e.g. IT management, payment processing, data analytics, customer support, cloud storage, fulfillment and shipping).
+* With business and marketing partners to provide marketing services and advertise to you. For example, we use cookies to support personalized advertising with third-party services based on your online activity with different merchants and websites. Our business and marketing partners will use your information in accordance with their own privacy notices. Depending on where you reside, you may have a right to direct us not to share information about you to show you targeted advertisements and marketing based on your online activity with different merchants and websites. You can exercise your rights to opt-out of those uses here .
+* When you direct, request us or otherwise consent to our disclosure of certain information to third parties, such as to ship you products or through your use of social media widgets or login integrations.
+* With our affiliates or otherwise within our corporate group.
+* In connection with a business transaction such as a merger or bankruptcy, to comply with any applicable legal obligations (including to respond to subpoenas, search warrants and similar requests), to enforce any applicable terms of service or policies, and to protect or defend the Services, our rights, and the rights of our users or others.
+
+Third Party Websites and Links
+The Services may provide links to websites or other online platforms operated by third parties. If you follow links to sites not affiliated or controlled by us, you should review their privacy and security policies and other terms and conditions. We do not guarantee and are not responsible for the privacy or security of such sites, including the accuracy, completeness, or reliability of information found on these sites. Information you provide on public or semi-public venues, including information you share on third-party social networking platforms may also be viewable by other users of the Services and/or users of those third-party platforms without limitation as to its use by us or by a third party. Our inclusion of such links does not, by itself, imply any endorsement of the content on such platforms or of their owners or operators, except as disclosed on the Services.
+Children's Data
+The Services are not intended to be used by children, and we do not knowingly collect any personal information about children under the age of majority in your jurisdiction. If you are the parent or guardian of a child who has provided us with their personal information, you may contact us using the contact details set out below to request that it be deleted.As of the Effective Date of this Privacy Policy, we do not have actual knowledge that we "share" or "sell" (as those terms are defined in applicable law) personal information of individuals under 16 years of age.
+Security and Retention of Your Information
+Please be aware that no security measures are perfect or impenetrable, and we cannot guarantee "perfect security." In addition, any information you send to us may not be secure while in transit. We recommend that you do not use unsecure channels to communicate sensitive or confidential information to us.
+How long we retain your personal information depends on different factors, such as whether we need the information to maintain your account, to provide you with Services, comply with legal obligations, resolve disputes or enforce other applicable contracts and policies.
+Your Rights and Choices
+Depending on where you live, you may have some or all of the rights listed below in relation to your personal information. However, these rights are not absolute, may apply only in certain circumstances and, in certain cases, we may decline your request as permitted by law.
+* Right to Access / Know. You may have a right to request access to personal information that we hold about you.
+* Right to Delete. You may have a right to request that we delete personal information we maintain about you.
+* Right to Correct. You may have a right to request that we correct inaccurate personal information we maintain about you.
+* Right of Portability. You may have a right to receive a copy of the personal information we hold about you and to request that we transfer it to a third party, in certain circumstances and with certain exceptions.
+* Right to Opt out of Sale or Sharing for Targeted Advertising. Depending on where you reside, you may have a right to opt out of the "sale" or "share" of your personal information or to opt out of the processing of your personal information for purposes considered to be "targeted advertising", as defined in applicable privacy laws. You can exercise your rights to opt-out of those uses here. Please note that if you visit our website with the Global Privacy Control opt-out preference signal enabled, depending on where you are, we will automatically treat this as a request to opt-out for the device and browser that you use to visit the website. If we are able to associate the device sending the signal to a Shopify account, we will apply the opt out request to the account as well. To learn more about Global Privacy Control, you can visit https://globalprivacycontrol.org/. Other than the Global Privacy Control, we do not recognize other "Do Not Track" signals that may be sent from your web browser or device.
+* Managing Communication Preferences. We may send you promotional emails, and you may opt out of receiving these at any time by using the unsubscribe option displayed in our emails to you. If you opt out, we may still send you non-promotional emails, such as those about your account or orders that you have made.
+
+You may exercise any of these rights where indicated on the Services or by contacting us using the contact details provided below. To learn more about how Shopify uses your personal information and any rights you may have, including rights related to data processed by Shopify, you can visit https://privacy.shopify.com/en.
+We will not discriminate against you for exercising any of these rights. We may need to verify your identity before we can process your requests, as permitted or required under applicable law. In accordance with applicable laws, you may designate an authorized agent to make requests on your behalf to exercise your rights. Before accepting such a request from an agent, we will require that the agent provide proof you have authorized them to act on your behalf, and we may need you to verify your identity directly with us. We will respond to your request in a timely manner as required under applicable law.
+Complaints
+If you have complaints about how we process your personal information, please contact us using the contact details provided below. Depending on where you live, you may have the right to appeal our decision by contacting us using the contact details set out below, or lodge your complaint with your local data protection authority.
+International Transfers
+Please note that we may transfer, store and process your personal information outside the country you live in.
+If we transfer your personal information out of the European Economic Area or the United Kingdom, we will rely on recognized transfer mechanisms like the European Commission's Standard Contractual Clauses, or any equivalent contracts issued by the relevant competent authority of the UK, as relevant, unless the data transfer is to a country that has been determined to provide an adequate level of protection.
+Changes to This Privacy Policy
+We may update this Privacy Policy from time to time, including to reflect changes to our practices or for other operational, legal, or regulatory reasons. We will post the revised Privacy Policy on this website, update the "Last updated" date and provide notice as required by applicable law.
+Contact
+Should you have any questions about our privacy practices or this Privacy Policy, or if you would like to exercise any of the rights available to you, please call or email us at nubz@wildernessdealz.com 
+</p>
+        </div>
+    </div>
+
+    <!-- RETURNS PAGE -->
+    <div id="returns" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <h2 class="section-header gradient-title mb-8">Returns &amp; Exchanges</h2>
+        <div class="prose prose-invert text-slate-300">
+            <p>You can return your orders of New items within 30 days of purchase provided it is unopened, you pay the shipping and the process here-in is followed Like-new/preowned merchandise is as-is & not refundable. For new items, please make sure the item you received is in unused and un-open condition with the tags and packaging intact. If you've opened the item, it cannot be returned. If the item was a clearance item, it cannot be returned. If the item is a seasonal/holiday themed item, it cannot be returned within 5 days before or at any point after that particular holiday.Start your return by emailing us at nubz@wildernessdealz.com. You will receive a response back with instructions and a form to submit. Upon receiving and inspecting your item, a refund will be processed within 10 business days according to the original method of payment.
+Customer is responsible for return shipping costs. We recommend using a trackable service; we are not liable for lost or delayed packages.
+A restocking and handling fee (typically 15%–30% of order value, subject to actual costs) will be deducted from your refund.
+Please note that original shipping charges are non-refundable, and all items must be returned in their original, unopened, and sealed packaging to be eligible for a refund</p>
+        </div>
+    </div>
+
+    <!-- SITEMAP PAGE -->
+    <div id="sitemap" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <h2 class="section-header gradient-title mb-8">Sitemap</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 text-slate-300">
+            <div>
+                <h3 class="font-semibold text-lg mb-4 text-white">Main Pages</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="showPage('home')" class="hover:text-cyan-400">Home</a></li>
+                    <li><a href="#" onclick="showPage('categories')" class="hover:text-cyan-400">Categories</a></li>
+                    <li><a href="#" onclick="showPage('inventory')" class="hover:text-cyan-400">All Inventory</a></li>
+                    <li><a href="#" onclick="showPage('about')" class="hover:text-cyan-400">About Us</a></li>
+                    <li><a href="#" onclick="showPage('contact')" class="hover:text-cyan-400">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-4 text-white">Categories</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="filterAndGoToInventory('Action Figures')" class="hover:text-cyan-400">Action Figures</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Model Sets')" class="hover:text-cyan-400">Model Sets</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Funko Pop')" class="hover:text-cyan-400">Funko Pop</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Blind Bag & Mini Figures')" class="hover:text-cyan-400">Blind Bag & Mini Figures</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Toys')" class="hover:text-cyan-400">Toys</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-4 text-white">Legal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="showPage('privacy')" class="hover:text-cyan-400">Privacy Policy</a></li>
+                    <li><a href="#" onclick="showPage('returns')" class="hover:text-cyan-400">Returns &amp; Exchanges</a></li>
+                    <li><a href="#" onclick="showPage('sitemap')" class="hover:text-cyan-400">Sitemap</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
     <footer class="bg-black border-t border-slate-800 py-10 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-sm text-slate-400 flex flex-col md:flex-row justify-between items-center gap-y-6">
             <div>© 2026 Nubz Toys &amp; Collectibles. All rights reserved.</div>
             <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
                 <a href="#" onclick="event.preventDefault(); showPage('about')" class="hover:text-white">About Us</a>
                 <a href="#" onclick="event.preventDefault(); showPage('contact')" class="hover:text-white">Contact Us</a>
-                <a href="#" onclick="event.preventDefault(); showAdmin()" class="hover:text-white font-semibold">Admin Panel</a>
+                <a href="#" onclick="event.preventDefault(); showPage('privacy')" class="hover:text-white">Privacy</a>
+                <a href="#" onclick="event.preventDefault(); showPage('returns')" class="hover:text-white">Returns</a>
+                <a href="#" onclick="event.preventDefault(); showPage('sitemap')" class="hover:text-white">Sitemap</a>
+                <a href="#" onclick="event.preventDefault(); showAdmin()" class="hover:text-white font-semibold">Admin</a>
             </div>
         </div>
     </footer>
@@ -194,21 +320,18 @@
             </div>
 
             <div id="admin-panel" class="hidden">
-                <!-- Danger Zone -->
                 <div class="mb-6 border border-red-600 rounded-2xl p-6 bg-red-950/30">
                     <h4 class="font-semibold text-lg mb-2 text-red-400">Danger Zone</h4>
                     <p class="text-sm text-slate-400 mb-4">This will permanently delete ALL products.</p>
                     <button onclick="deleteAllProducts()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-3xl text-sm">DELETE ALL PRODUCTS</button>
                 </div>
 
-                <!-- Change Password -->
                 <div class="mb-6 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Change Admin Password</h4>
                     <input type="password" id="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="New Password">
                     <button onclick="changePassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
                 </div>
 
-                <!-- Add Single Product -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
                     
@@ -253,7 +376,6 @@
                     <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
-                <!-- CSV Import -->
                 <div class="border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
                     <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
@@ -267,17 +389,14 @@
         </div>
     </div>
 
-    <!-- PRODUCT MODAL WITH EDIT BUTTON -->
+    <!-- PRODUCT MODAL WITH CAROUSEL -->
     <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
             <div class="relative">
                 <img id="modal-image" class="w-full h-80 object-cover bg-slate-800">
-                
                 <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">←</button>
                 <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">→</button>
-                
                 <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">×</button>
-                
                 <div id="modal-image-counter" class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-1 rounded-full"></div>
             </div>
             
@@ -299,12 +418,7 @@
 
                 <div class="flex gap-3">
                     <button onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
-                    
-                    <!-- Edit Button (only shows when admin is logged in) -->
-                    <button id="edit-product-btn" onclick="editCurrentProduct()" 
-                            class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">
-                        EDIT
-                    </button>
+                    <button id="edit-product-btn" onclick="editCurrentProduct()" class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">EDIT</button>
                 </div>
             </div>
         </div>
@@ -328,7 +442,6 @@
         let currentModalImages = [];
         let currentModalImageIndex = 0;
 
-        // Supabase
         window.supabaseInstance = window.supabaseInstance || null;
         try {
             if (typeof Supabase !== 'undefined') {
@@ -338,7 +451,7 @@
                 );
             }
         } catch (e) {
-            console.warn("Supabase not available — using localStorage");
+            console.warn("Supabase not available — using localStorage fallback");
         }
         window.supabase = window.supabaseInstance;
 
@@ -354,17 +467,22 @@
         async function loadProducts() {
             if (window.supabase) {
                 try {
-                    const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
+                    const { data, error } = await window.supabase
+                        .from('products')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
                     if (error) throw error;
-                    products = data || [];
+                    if (data && data.length > 0) {
+                        products = data;
+                        console.log('%c[Supabase] Products loaded from Supabase', 'color:#22d3ee');
+                        return;
+                    }
                 } catch (e) {
-                    loadFromLocalStorage();
+                    console.warn('%c[Supabase] Failed — falling back to localStorage', 'color:#f59e0b');
                 }
-            } else {
-                loadFromLocalStorage();
             }
-            renderFeatured();
-            renderInventory();
+            loadFromLocalStorage();
         }
 
         function renderFeatured() {
@@ -416,7 +534,7 @@
             const header = document.getElementById('inventory-header');
             
             if (currentCategoryFilter) {
-                header.innerHTML = `<span class="bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-amber-400 bg-clip-text text-transparent">${currentCategoryFilter}</span>`;
+                header.innerHTML = `<span class="gradient-title">${currentCategoryFilter}</span>`;
             } else {
                 header.innerHTML = 'All Inventory';
             }
@@ -449,11 +567,10 @@
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
             
             const firstImage = (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'https://picsum.photos/id/106/600/400');
+            const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
             
             let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
             let lowQtyHTML = (product.quantity && product.quantity <= 2) ? `<span class="status-badge bg-red-500 text-white ml-2">LOW QUANTITY</span>` : '';
-            
-            const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
             
             card.innerHTML = `
                 <div class="relative">
@@ -480,15 +597,7 @@
         function showProductModal(product) {
             currentProductId = product.id;
             
-            currentModalImages = [];
-            if (product.images && product.images.length > 0) {
-                currentModalImages = product.images;
-            } else if (product.image) {
-                currentModalImages = [product.image];
-            } else {
-                currentModalImages = ['https://picsum.photos/id/106/600/400'];
-            }
-            
+            currentModalImages = (product.images && product.images.length > 0) ? product.images : (product.image ? [product.image] : ['https://picsum.photos/id/106/600/400']);
             currentModalImageIndex = 0;
             updateModalImage();
             
@@ -509,7 +618,6 @@
             statusEl.textContent = product.status || 'In Stock';
             statusEl.className = `text-sm font-semibold px-4 py-1 rounded-full ${product.status === 'In Stock' ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
             
-            // Show/hide Edit button based on admin login
             const editBtn = document.getElementById('edit-product-btn');
             if (isAdminLoggedIn) {
                 editBtn.classList.remove('hidden');
@@ -553,13 +661,11 @@
 
         function editCurrentProduct() {
             if (!currentProductId || !isAdminLoggedIn) return;
-            
             const product = products.find(p => p.id === currentProductId);
             if (!product) return;
 
             closeProductModal();
 
-            // Pre-fill the admin add form with current values (simple reuse)
             document.getElementById('manual-brand').value = product.brand || '';
             document.getElementById('manual-title').value = product.name || '';
             document.getElementById('manual-price').value = product.price || '';
@@ -569,7 +675,6 @@
             document.getElementById('manual-status').value = product.status || 'In Stock';
             document.getElementById('manual-description').value = product.description || '';
 
-            // Pre-check categories
             const prodCats = product.categories || (product.mainCategory ? [product.mainCategory] : []);
             document.getElementById('cat-action').checked = prodCats.includes("Action Figures");
             document.getElementById('cat-model').checked = prodCats.includes("Model Sets");
@@ -577,10 +682,8 @@
             document.getElementById('cat-blind').checked = prodCats.includes("Blind Bag & Mini Figures");
             document.getElementById('cat-toys').checked = prodCats.includes("Toys");
 
-            // Show admin modal
             showAdmin();
             
-            // Change the button text temporarily to "Update Product"
             const addBtn = document.querySelector('#admin-panel button[onclick="addManualProduct()"]');
             if (addBtn) {
                 addBtn.textContent = "Update Product";
@@ -600,7 +703,6 @@
             const shippingWeight = parseFloat(document.getElementById('manual-shipping-weight').value) || 0;
             const status = document.getElementById('manual-status').value.trim() || "In Stock";
             const description = document.getElementById('manual-description').value.trim();
-            const extraImagesInput = document.getElementById('manual-extra-images').value.trim();
 
             const selectedCategories = [];
             if (document.getElementById('cat-action').checked) selectedCategories.push("Action Figures");
@@ -614,13 +716,6 @@
                 return;
             }
 
-            let newImages = products[productIndex].images || [];
-            if (extraImagesInput) {
-                const extraUrls = extraImagesInput.split(',').map(url => url.trim()).filter(url => url);
-                newImages = newImages.concat(extraUrls);
-            }
-
-            // Update the product
             products[productIndex] = {
                 ...products[productIndex],
                 name: title,
@@ -631,15 +726,13 @@
                 shipping_weight: shippingWeight,
                 compare_to: compareTo,
                 status: status,
-                images: newImages.length > 0 ? newImages : products[productIndex].images,
                 description: description
             };
 
             saveToLocalStorage();
             alert("Product updated successfully!");
-
-            // Reset form and button
             closeAdmin();
+            
             const addBtn = document.querySelector('#admin-panel button');
             if (addBtn) {
                 addBtn.textContent = "Add Product";
@@ -672,31 +765,80 @@
 
         function showCart() {
             if (cart.length === 0) return alert("Your cart is empty!");
-            let total = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
-            showStripeCheckout(total);
+            showStripeCheckout();
         }
 
-        function showStripeCheckout(total) {
+        function showStripeCheckout() {
+            let itemsHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = (item.price || 0) * item.quantity;
+                total += itemTotal;
+                itemsHTML += `
+                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl mb-3">
+                        <div>
+                            <div class="font-semibold">${item.name}</div>
+                            <div class="text-sm text-slate-400">${item.quantity} × $${(item.price || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="font-bold">$${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
             const modalHTML = `
                 <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-[120]">
-                    <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4">
+                    <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
                         <h3 class="text-2xl font-bold mb-2">Checkout</h3>
                         <p class="text-yellow-400 mb-6">TEST MODE</p>
-                        <div class="flex justify-between text-xl mb-6"><span>Total</span><span class="font-bold">$${total}</span></div>
-                        <h4 class="font-semibold mb-4">Add-ons customers also bought:</h4>
-                        <div class="space-y-3 mb-8">
-                            <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
-                                <span>Blind Bag Mystery ($8)</span>
-                                <button onclick="addToCart(99); this.innerHTML='Added!'" class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">+ $8</button>
-                            </div>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-semibold mb-3">Your Items</h4>
+                            ${itemsHTML}
                         </div>
+                        
+                        <div class="flex justify-between text-xl mb-6 border-t border-slate-700 pt-4">
+                            <span>Total</span>
+                            <span class="font-bold">$${total.toFixed(2)}</span>
+                        </div>
+                        
+                        <h4 class="font-semibold mb-4">Recommended Add-ons</h4>
+                        <div class="space-y-3 mb-8">
+                            ${getUpsellHTML()}
+                        </div>
+                        
                         <button onclick="completeOrder(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order</button>
                         <button onclick="this.closest('.fixed').remove()" class="mt-4 text-sm text-slate-400 w-full">Cancel</button>
                     </div>
                 </div>`;
+            
             const temp = document.createElement('div');
             temp.innerHTML = modalHTML;
             document.body.appendChild(temp.firstElementChild);
+        }
+
+        function getUpsellHTML() {
+            const cartIds = cart.map(item => item.id);
+            const upsells = products
+                .filter(p => !cartIds.includes(p.id) && p.price < 20)
+                .slice(0, 3);
+            
+            if (upsells.length === 0) {
+                return `<div class="text-sm text-slate-400">No add-ons available right now.</div>`;
+            }
+            
+            return upsells.map(product => `
+                <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
+                    <div>
+                        <div class="font-semibold">${product.name}</div>
+                        <div class="text-sm text-slate-400">$${(product.price || 0).toFixed(2)}</div>
+                    </div>
+                    <button onclick="addToCart(${product.id}); this.closest('.fixed').remove(); showCart();" 
+                            class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">
+                        + Add
+                    </button>
+                </div>
+            `).join('');
         }
 
         function completeOrder(total) {
@@ -834,7 +976,6 @@
 
             alert("Product added successfully!");
 
-            // Clear form
             document.getElementById('manual-brand').value = "";
             document.getElementById('manual-title').value = "";
             document.getElementById('manual-price').value = "";
@@ -975,7 +1116,7 @@ BLOKEES,Blokees Transformers Darkest Hour Galaxy Version 09,BLK-009,123456789012
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Final complete version with Edit feature loaded', 'color:#22d3ee');
+            console.log('%c✅ Final complete Vercel-ready version loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
