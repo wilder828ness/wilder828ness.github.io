@@ -99,6 +99,7 @@
             </div>
         </section>
 
+        <!-- NEW ARRIVALS - Now shows last 6 In-Stock products -->
         <section class="max-w-7xl mx-auto px-6 py-20">
             <div class="flex justify-between items-end mb-10">
                 <div>
@@ -282,9 +283,9 @@ Please note that original shipping charges are non-refundable, and all items mus
             <div>
                 <h3 class="font-semibold text-lg mb-4 text-white">Legal</h3>
                 <ul class="space-y-2">
-                    <li><a href="#" onclick="showPage('privacy')" class="hover:text-cyan-400">Privacy Policy</a></li>
-                    <li><a href="#" onclick="showPage('returns')" class="hover:text-cyan-400">Returns &amp; Exchanges</a></li>
-                    <li><a href="#" onclick="showPage('sitemap')" class="hover:text-cyan-400">Sitemap</a></li>
+                    <li><a href="#" onclick="showPage('privacy')" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="#" onclick="showPage('returns')" class="hover:text-white">Returns &amp; Exchanges</a></li>
+                    <li><a href="#" onclick="showPage('sitemap')" class="hover:text-white">Sitemap</a></li>
                 </ul>
             </div>
         </div>
@@ -389,11 +390,12 @@ Please note that original shipping charges are non-refundable, and all items mus
         </div>
     </div>
 
-    <!-- PRODUCT MODAL WITH CAROUSEL -->
+    <!-- PRODUCT MODAL -->
     <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
         <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
             <div class="relative">
-                <img id="modal-image" class="w-full h-80 object-cover bg-slate-800">
+                <!-- FIXED: Proper proportional image -->
+                <img id="modal-image" class="w-full h-80 object-contain bg-slate-800" style="max-height: 320px;">
                 <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">←</button>
                 <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">→</button>
                 <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">×</button>
@@ -467,19 +469,14 @@ Please note that original shipping charges are non-refundable, and all items mus
         async function loadProducts() {
             if (window.supabase) {
                 try {
-                    const { data, error } = await window.supabase
-                        .from('products')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-
+                    const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
                     if (error) throw error;
                     if (data && data.length > 0) {
                         products = data;
-                        console.log('%c[Supabase] Products loaded from Supabase', 'color:#22d3ee');
                         return;
                     }
                 } catch (e) {
-                    console.warn('%c[Supabase] Failed — falling back to localStorage', 'color:#f59e0b');
+                    console.warn("Supabase failed — using localStorage");
                 }
             }
             loadFromLocalStorage();
@@ -489,7 +486,14 @@ Please note that original shipping charges are non-refundable, and all items mus
             const container = document.getElementById('featured-grid');
             if (!container) return;
             container.innerHTML = '';
-            products.slice(0, 6).forEach(product => container.appendChild(createProductCard(product)));
+
+            // NEW: Show last 6 In-Stock products (most recently added)
+            const inStock = products
+                .filter(p => p.status === "In Stock")
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 6);
+
+            inStock.forEach(product => container.appendChild(createProductCard(product)));
         }
 
         function renderInventory() {
@@ -555,6 +559,19 @@ Please note that original shipping charges are non-refundable, and all items mus
                     (p.brand && p.brand.toLowerCase().includes(search)) ||
                     (p.description && p.description.toLowerCase().includes(search))
                 );
+            }
+
+            // NEW: Apply sorting based on dropdown
+            const sortMode = document.getElementById('sort-select').value;
+            if (sortMode === 'price-low') {
+                filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+            } else if (sortMode === 'price-high') {
+                filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+            } else if (sortMode === 'name') {
+                filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            } else {
+                // newest first (default)
+                filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
             }
 
             const container = document.getElementById('inventory-grid');
@@ -1116,7 +1133,7 @@ BLOKEES,Blokees Transformers Darkest Hour Galaxy Version 09,BLK-009,123456789012
             document.getElementById('home').classList.add('active');
             updateCartCount();
             renderCategoryCards();
-            console.log('%c✅ Final complete Vercel-ready version loaded', 'color:#22d3ee');
+            console.log('%c✅ Final version with all requested fixes loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
