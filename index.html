@@ -940,7 +940,7 @@
                             + Add
                         </button>
                     </div>`).join('')
-                : '<p class="text-sm text-slate-500">No add-ons available for this order.</p>';
+                : '';
 
             const overlay = document.createElement('div');
             overlay.id    = 'checkout-overlay';
@@ -948,16 +948,20 @@
             overlay.innerHTML = `
                 <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
                     <h3 class="text-2xl font-bold mb-2">Checkout</h3>
-                    <p class="text-yellow-400 text-xs mb-6 font-semibold">⚠ TEST MODE</p>
                     <h4 class="font-semibold mb-3">Your Items</h4>
                     ${itemsHTML}
                     <div class="flex justify-between text-xl mb-6 border-t border-slate-700 pt-4">
                         <span>Total</span>
                         <span class="font-bold" id="checkout-total">$${total.toFixed(2)}</span>
                     </div>
-                    ${upsells.length ? `<h4 class="font-semibold mb-3 text-cyan-400">🎁 Recommended Add-ons</h4>` : ''}
-                    <div class="space-y-3 mb-8">${upsellHTML}</div>
-                    <button onclick="completeOrder()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">Complete Order</button>
+                    ${upsells.length ? `
+                    <h4 class="font-semibold mb-3 text-cyan-400">🎁 Recommended Add-ons</h4>
+                    <div class="space-y-3 mb-6">${upsellHTML}</div>` : ''}
+                    <button onclick="proceedToStripe()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 flex items-center justify-center gap-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        Proceed to Secure Checkout
+                    </button>
+                    <p class="text-xs text-slate-500 text-center mt-3">🔒 Powered by Stripe — we never see your card details</p>
                     <button onclick="document.getElementById('checkout-overlay').remove()" class="mt-4 text-sm text-slate-400 w-full text-center">Cancel</button>
                 </div>`;
             document.body.appendChild(overlay);
@@ -965,7 +969,6 @@
 
         function addUpsellToCart(productId) {
             addToCart(productId);
-            // Recalculate total shown in overlay
             const totalEl = document.getElementById('checkout-total');
             if (totalEl) {
                 const newTotal = cart.reduce((s, i) => s + (i.price || 0) * i.quantity, 0);
@@ -973,14 +976,60 @@
             }
         }
 
+        async function proceedToStripe() {
+            const btn = document.querySelector('#checkout-overlay button[onclick="proceedToStripe()"]');
+            if (btn) { btn.textContent = 'Redirecting to Stripe...'; btn.disabled = true; }
+
+            try {
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cartItems: cart })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Checkout failed');
+                }
+
+                // Redirect to Stripe hosted checkout
+                window.location.href = data.url;
+
+            } catch (e) {
+                console.error('Stripe failed:', e);
+                if (btn) { btn.textContent = 'Proceed to Secure Checkout'; btn.disabled = false; }
+                alert('Unable to connect to checkout. Please try again.');
+            }
+        }
+
         function completeOrder() {
-            const total = cart.reduce((s, i) => s + (i.price || 0) * i.quantity, 0);
             const overlay = document.getElementById('checkout-overlay');
             if (overlay) overlay.remove();
-            alert(`✅ Order complete!\nTotal: $${total.toFixed(2)}\n\n📧 Notification sent to shipping@wildernessdealz.com`);
             cart = [];
             updateCartCount();
             showPage('home');
+        }
+
+        function handleOrderReturn() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('order') === 'success') {
+                cart = [];
+                updateCartCount();
+                const banner = document.createElement('div');
+                banner.className = 'fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-emerald-500 text-black font-bold px-8 py-4 rounded-3xl shadow-2xl text-center';
+                banner.innerHTML = '✅ Order placed successfully! Thank you for shopping at Nubz Toys!';
+                document.body.appendChild(banner);
+                setTimeout(() => banner.remove(), 6000);
+                window.history.replaceState({}, '', '/');
+            } else if (params.get('order') === 'cancelled') {
+                const banner = document.createElement('div');
+                banner.className = 'fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-slate-700 text-white font-bold px-8 py-4 rounded-3xl shadow-2xl text-center';
+                banner.innerHTML = 'Checkout cancelled — your cart is still saved.';
+                document.body.appendChild(banner);
+                setTimeout(() => banner.remove(), 4000);
+                window.history.replaceState({}, '', '/');
+            }
         }
 
         // ─── ADMIN ───────────────────────────────────────────────────────────
@@ -1444,6 +1493,7 @@
             loadUpsellGroups();
             await loadProducts();
             updateCartCount();
+            handleOrderReturn();
             console.log('%c✅ Nubz Toys loaded successfully', 'color:#22d3ee; font-weight:bold;');
         }
 
