@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/create-checkout.js": {
+    "api/*.js": {
       "memory": 128,
       "maxDuration": 10
     }
