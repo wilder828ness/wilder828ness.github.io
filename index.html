@@ -1185,9 +1185,23 @@
             // Also save to Supabase if connected
             if (window.supabaseInstance) {
                 try {
+                    const supabaseProduct = {
+                        id:              newProduct.id,
+                        name:            newProduct.name,
+                        brand:           newProduct.brand,
+                        categories:      Array.isArray(newProduct.categories) ? newProduct.categories.join(', ') : '',
+                        price:           newProduct.price,
+                        compare_to:      newProduct.compare_to || 0,
+                        quantity:        newProduct.quantity,
+                        shipping_weight: newProduct.shipping_weight || 0,
+                        status:          newProduct.status,
+                        images:          Array.isArray(newProduct.images) ? newProduct.images.join(', ') : '',
+                        description:     newProduct.description,
+                        created_at:      newProduct.created_at
+                    };
                     const { error } = await window.supabaseInstance
                         .from('products')
-                        .upsert([newProduct], { onConflict: 'id' });
+                        .upsert([supabaseProduct], { onConflict: 'id' });
                     if (error) console.error('Supabase save error:', error.message);
                     else console.log('%c✅ Product saved to Supabase', 'color:#22d3ee');
                 } catch(e) {
@@ -1327,7 +1341,20 @@
                 // Also save to Supabase if connected
                 if (window.supabaseInstance && products.length > 0) {
                     try {
-                        const newProducts = products.slice(0, success);
+                        const newProducts = products.slice(0, success).map(p => ({
+                            id:              p.id,
+                            name:            p.name,
+                            brand:           p.brand,
+                            categories:      Array.isArray(p.categories) ? p.categories.join(', ') : (p.categories || ''),
+                            price:           p.price,
+                            compare_to:      p.compare_to || 0,
+                            quantity:        p.quantity,
+                            shipping_weight: p.shipping_weight || 0,
+                            status:          p.status,
+                            images:          Array.isArray(p.images) ? p.images.join(', ') : (p.images || ''),
+                            description:     p.description,
+                            created_at:      p.created_at
+                        }));
                         const { error } = await window.supabaseInstance
                             .from('products')
                             .upsert(newProducts, { onConflict: 'id' });
