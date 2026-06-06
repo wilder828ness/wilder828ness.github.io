@@ -464,7 +464,20 @@
             if (typeof supabase !== 'undefined' && supabase.createClient) {
                 window.supabaseInstance = supabase.createClient(
                     'https://vdkjjyjfwfndrksruisn.supabase.co',
-                    'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
+                    'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr',
+                    {
+                        auth: {
+                            persistSession: false,
+                            autoRefreshToken: false,
+                            detectSessionInUrl: false
+                        },
+                        realtime: {
+                            params: { eventsPerSecond: 0 }
+                        },
+                        global: {
+                            headers: { 'X-Client-Info': 'nubztoys-web' }
+                        }
+                    }
                 );
             }
         } catch (e) {
@@ -484,13 +497,23 @@
         async function loadProducts() {
             if (window.supabaseInstance) {
                 try {
+                    console.log('%c🔌 Attempting Supabase connection...', 'color:#a855f7');
                     const { data, error } = await window.supabaseInstance
                         .from('products').select('*').order('created_at', { ascending: false });
-                    if (error) throw error;
-                    if (data && data.length > 0) { products = data; renderAll(); return; }
+                    if (error) {
+                        console.error('❌ Supabase error:', error.message, '| Code:', error.code, '| Details:', error.details, '| Hint:', error.hint);
+                        throw error;
+                    }
+                    console.log('%c✅ Supabase connected! Products loaded: ' + (data ? data.length : 0), 'color:#22d3ee');
+                    products = data || [];
+                    renderAll();
+                    return;
                 } catch (e) {
-                    console.warn("Supabase load failed — using localStorage");
+                    console.error('❌ Supabase connection failed:', e.message || e);
+                    console.warn('⚠️ Falling back to localStorage');
                 }
+            } else {
+                console.warn('⚠️ Supabase instance not initialized');
             }
             loadFromLocalStorage();
             renderAll();
