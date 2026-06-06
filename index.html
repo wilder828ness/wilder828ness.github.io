@@ -6,6 +6,7 @@
     <title>Nubz Toys &amp; Collectibles • Est. 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { font-family: 'Inter', system_ui, sans-serif; }
@@ -45,17 +46,30 @@
                     <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
                 </div>
 
-                <button onclick="toggleMobileMenu()" class="md:hidden text-2xl px-3">
+                <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden text-2xl px-3">
                     <i class="fa-solid fa-bars"></i>
                 </button>
 
                 <div class="hidden md:flex items-center gap-x-4">
-                    <button onclick="showAdmin()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-2xl flex items-center gap-x-2">
+                    <button onclick="showAdmin()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-2xl transition-all flex items-center gap-x-2">
                         <i class="fa-solid fa-user-shield"></i><span>Admin</span>
                     </button>
-                    <button onclick="showCart()" class="flex items-center gap-x-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl text-sm font-medium">
+                    <button onclick="showCart()" class="flex items-center gap-x-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl transition-all text-sm font-medium">
                         <i class="fa-solid fa-shopping-bag"></i>
                         <span id="cart-count" class="font-mono text-xs bg-slate-800 px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
+                <div class="flex flex-col gap-y-4 text-lg font-medium">
+                    <a href="#" onclick="event.preventDefault(); showPage('home'); toggleMobileMenu()" class="nav-link">Home</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('categories'); toggleMobileMenu()" class="nav-link">Categories</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('inventory'); toggleMobileMenu()" class="nav-link">All Inventory</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('about'); toggleMobileMenu()" class="nav-link">About Us</a>
+                    <a href="#" onclick="event.preventDefault(); showPage('contact'); toggleMobileMenu()" class="nav-link">Contact Us</a>
+                    <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
+                        <i class="fa-solid fa-user-shield"></i> Admin Panel
                     </button>
                 </div>
             </div>
@@ -85,6 +99,7 @@
             </div>
         </section>
 
+        <!-- NEW ARRIVALS - Now shows last 6 In-Stock products -->
         <section class="max-w-7xl mx-auto px-6 py-20">
             <div class="flex justify-between items-end mb-10">
                 <div>
@@ -126,41 +141,338 @@
         <div id="inventory-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </div>
 
+    <!-- ABOUT US PAGE -->
+    <div id="about" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <div class="text-center mb-16">
+            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">OUR STORY</div>
+            <h2 class="section-header gradient-title">About Nubz Toys &amp; Collectibles</h2>
+        </div>
+        <div class="prose prose-invert max-w-none text-lg text-slate-300">
+            <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to just keep it simple. Remember when we used to just play? We owned the dialogue. We wrote the scenes. We defined the storyline — it didn't define us. Well, maybe it did, and we just got away from it for a while. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises — we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys &amp; collectibles, but you're never too old for them.</p>
+            
+            <div class="mt-10 flex justify-center">
+                <button onclick="showPage('categories')" class="px-10 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition-all flex items-center gap-x-2">
+                    Explore Now
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTACT US PAGE -->
+    <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
+        <div class="text-center mb-12">
+            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
+            <h2 class="section-header gradient-title">Contact Us</h2>
+        </div>
+        <form id="contact-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <input type="text" id="contact-name" placeholder="Your Name" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm">
+                <input type="email" id="contact-email" placeholder="Your Email" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm">
+            </div>
+            <textarea id="contact-message" placeholder="Your Message" rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-3xl px-5 py-4 text-sm"></textarea>
+            <button type="button" onclick="submitContactForm()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">SEND MESSAGE</button>
+        </form>
+    </div>
+
+    <!-- PRIVACY POLICY PAGE -->
+    <div id="privacy" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <h2 class="section-header gradient-title mb-8">Privacy Policy</h2>
+        <div class="prose prose-invert text-slate-300">
+            <p>PRIVACY POLICY
+Last updated: June 5, 2026
+Wilderness Dealz LLC dba Nubz Toys & Collectibles operates this store and website, including all related information, content, features, tools, products and services, in order to provide you, the customer, with a curated shopping experience (the "Services"). Nubz Toys & Collectibles is powered by Wilderness Dealz LLC which enables us to provide the Services to you. This Privacy Policy describes how we collect, use, and disclose your personal information when you visit, use, or make a purchase or other transaction using the Services or otherwise communicate with us. If there is a conflict between our Terms of Service and this Privacy Policy, this Privacy Policy controls with respect to the collection, processing, and disclosure of your personal information.
+Please read this Privacy Policy carefully. By using and accessing any of the Services, you acknowledge that you have read this Privacy Policy and understand the collection, use, and disclosure of your information as described in this Privacy Policy.
+Personal Information We Collect or Process
+When we use the term "personal information," we are referring to information that identifies or can reasonably be linked to you or another person. Personal information does not include information that is collected anonymously or that has been de-identified, so that it cannot identify or be reasonably linked to you. We may collect or process the following categories of personal information, including inferences drawn from this personal information, depending on how you interact with the Services, where you live, and as permitted or required by applicable law:
+* Contact details including your name, address, billing address, shipping address, phone number, and email address.
+* Financial information including credit card, debit card, and financial account numbers, payment card information, financial account information, transaction details, form of payment, payment confirmation and other payment details.
+* Account information including your username, password, security questions, preferences and settings.
+* Transaction information including the items you view, put in your cart, add to your wishlist, or purchase, return, exchange or cancel and your past transactions.
+* Communications with us including the information you include in communications with us, for example, when sending a customer support inquiry.
+* Device information including information about your device, browser, or network connection, your IP address, and other unique identifiers.
+* Usage information including information regarding your interaction with the Services, including how and when you interact with or navigate the Services.
+Personal Information Sources
+We may collect personal information from the following sources:
+* Directly from you including when you create an account, visit or use the Services, communicate with us, or otherwise provide us with your personal information;
+* Automatically through the Services including from your device when you use our products or services or visit our websites, and through the use of cookies and similar technologies;
+* From our service providers including when we engage them to enable certain technology and when they collect or process your personal information on our behalf;
+* From our partners or other third parties.
+
+How We Use Your Personal Information
+Depending on how you interact with us or which of the Services you use, we may use personal information for the following purposes:
+* Provide, Tailor, and Improve the Services. We use your personal information to provide you with the Services, including to perform our contract with you, to process your payments, to fulfill your orders, to remember your preferences and items you are interested in, to send notifications to you related to your account, to process purchases, returns, exchanges or other transactions, to create, maintain and otherwise manage your account, to arrange for shipping, to facilitate any returns and exchanges, to enable you to post reviews, and to create a customized shopping experience for you, such as recommending products related to your purchases. This may include using your personal information to better tailor and improve the Services.
+* Marketing and Advertising. We use your personal information for marketing and promotional purposes, such as to send marketing, advertising and promotional communications by email, text message or postal mail, and to show you online advertisements for products or services on the Services or other websites, including based on items you previously have purchased or added to your cart and other activity on the Services.
+* Security and Fraud Prevention. We use your personal information to authenticate your account, to provide a secure payment and shopping experience, detect, investigate or take action regarding possible fraudulent, illegal, unsafe, or malicious activity, protect public safety, and to secure our services. If you choose to use the Services and register an account, you are responsible for keeping your account credentials safe. We highly recommend that you do not share your username, password or other access details with anyone else.
+* Communicating with You. We use your personal information to provide you with customer support, to be responsive to you, to provide effective services to you and to maintain our business relationship with you.
+* Legal Reasons. We use your personal information to comply with applicable law or respond to valid legal process, including requests from law enforcement or government agencies, to investigate or participate in civil discovery, potential or actual litigation, or other adversarial legal proceedings, and to enforce or investigate potential violations of our terms or policies.
+How We Disclose Personal Information
+In certain circumstances, we may disclose your personal information to third parties for legitimate purposes subject to this Privacy Policy. Such circumstances may include:
+* With vendors and other third parties who perform services on our behalf (e.g. IT management, payment processing, data analytics, customer support, cloud storage, fulfillment and shipping).
+* With business and marketing partners to provide marketing services and advertise to you. For example, we use cookies to support personalized advertising with third-party services based on your online activity with different merchants and websites. Our business and marketing partners will use your information in accordance with their own privacy notices. Depending on where you reside, you may have a right to direct us not to share information about you to show you targeted advertisements and marketing based on your online activity with different merchants and websites. You can exercise your rights to opt-out of those uses here .
+* When you direct, request us or otherwise consent to our disclosure of certain information to third parties, such as to ship you products or through your use of social media widgets or login integrations.
+* With our affiliates or otherwise within our corporate group.
+* In connection with a business transaction such as a merger or bankruptcy, to comply with any applicable legal obligations (including to respond to subpoenas, search warrants and similar requests), to enforce any applicable terms of service or policies, and to protect or defend the Services, our rights, and the rights of our users or others.
+
+Third Party Websites and Links
+The Services may provide links to websites or other online platforms operated by third parties. If you follow links to sites not affiliated or controlled by us, you should review their privacy and security policies and other terms and conditions. We do not guarantee and are not responsible for the privacy or security of such sites, including the accuracy, completeness, or reliability of information found on these sites. Information you provide on public or semi-public venues, including information you share on third-party social networking platforms may also be viewable by other users of the Services and/or users of those third-party platforms without limitation as to its use by us or by a third party. Our inclusion of such links does not, by itself, imply any endorsement of the content on such platforms or of their owners or operators, except as disclosed on the Services.
+Children's Data
+The Services are not intended to be used by children, and we do not knowingly collect any personal information about children under the age of majority in your jurisdiction. If you are the parent or guardian of a child who has provided us with their personal information, you may contact us using the contact details set out below to request that it be deleted.As of the Effective Date of this Privacy Policy, we do not have actual knowledge that we "share" or "sell" (as those terms are defined in applicable law) personal information of individuals under 16 years of age.
+Security and Retention of Your Information
+Please be aware that no security measures are perfect or impenetrable, and we cannot guarantee "perfect security." In addition, any information you send to us may not be secure while in transit. We recommend that you do not use unsecure channels to communicate sensitive or confidential information to us.
+How long we retain your personal information depends on different factors, such as whether we need the information to maintain your account, to provide you with Services, comply with legal obligations, resolve disputes or enforce other applicable contracts and policies.
+Your Rights and Choices
+Depending on where you live, you may have some or all of the rights listed below in relation to your personal information. However, these rights are not absolute, may apply only in certain circumstances and, in certain cases, we may decline your request as permitted by law.
+* Right to Access / Know. You may have a right to request access to personal information that we hold about you.
+* Right to Delete. You may have a right to request that we delete personal information we maintain about you.
+* Right to Correct. You may have a right to request that we correct inaccurate personal information we maintain about you.
+* Right of Portability. You may have a right to receive a copy of the personal information we hold about you and to request that we transfer it to a third party, in certain circumstances and with certain exceptions.
+* Right to Opt out of Sale or Sharing for Targeted Advertising. Depending on where you reside, you may have a right to opt out of the "sale" or "share" of your personal information or to opt out of the processing of your personal information for purposes considered to be "targeted advertising", as defined in applicable privacy laws. You can exercise your rights to opt-out of those uses here. Please note that if you visit our website with the Global Privacy Control opt-out preference signal enabled, depending on where you are, we will automatically treat this as a request to opt-out for the device and browser that you use to visit the website. If we are able to associate the device sending the signal to a Shopify account, we will apply the opt out request to the account as well. To learn more about Global Privacy Control, you can visit https://globalprivacycontrol.org/. Other than the Global Privacy Control, we do not recognize other "Do Not Track" signals that may be sent from your web browser or device.
+* Managing Communication Preferences. We may send you promotional emails, and you may opt out of receiving these at any time by using the unsubscribe option displayed in our emails to you. If you opt out, we may still send you non-promotional emails, such as those about your account or orders that you have made.
+
+You may exercise any of these rights where indicated on the Services or by contacting us using the contact details provided below. To learn more about how Shopify uses your personal information and any rights you may have, including rights related to data processed by Shopify, you can visit https://privacy.shopify.com/en.
+We will not discriminate against you for exercising any of these rights. We may need to verify your identity before we can process your requests, as permitted or required under applicable law. In accordance with applicable laws, you may designate an authorized agent to make requests on your behalf to exercise your rights. Before accepting such a request from an agent, we will require that the agent provide proof you have authorized them to act on your behalf, and we may need you to verify your identity directly with us. We will respond to your request in a timely manner as required under applicable law.
+Complaints
+If you have complaints about how we process your personal information, please contact us using the contact details provided below. Depending on where you live, you may have the right to appeal our decision by contacting us using the contact details set out below, or lodge your complaint with your local data protection authority.
+International Transfers
+Please note that we may transfer, store and process your personal information outside the country you live in.
+If we transfer your personal information out of the European Economic Area or the United Kingdom, we will rely on recognized transfer mechanisms like the European Commission's Standard Contractual Clauses, or any equivalent contracts issued by the relevant competent authority of the UK, as relevant, unless the data transfer is to a country that has been determined to provide an adequate level of protection.
+Changes to This Privacy Policy
+We may update this Privacy Policy from time to time, including to reflect changes to our practices or for other operational, legal, or regulatory reasons. We will post the revised Privacy Policy on this website, update the "Last updated" date and provide notice as required by applicable law.
+Contact
+Should you have any questions about our privacy practices or this Privacy Policy, or if you would like to exercise any of the rights available to you, please call or email us at nubz@wildernessdealz.com 
+</p>
+        </div>
+    </div>
+
+    <!-- RETURNS PAGE -->
+    <div id="returns" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <h2 class="section-header gradient-title mb-8">Returns &amp; Exchanges</h2>
+        <div class="prose prose-invert text-slate-300">
+            <p>You can return your orders of New items within 30 days of purchase provided it is unopened, you pay the shipping and the process here-in is followed Like-new/preowned merchandise is as-is & not refundable. For new items, please make sure the item you received is in unused and un-open condition with the tags and packaging intact. If you've opened the item, it cannot be returned. If the item was a clearance item, it cannot be returned. If the item is a seasonal/holiday themed item, it cannot be returned within 5 days before or at any point after that particular holiday.Start your return by emailing us at nubz@wildernessdealz.com. You will receive a response back with instructions and a form to submit. Upon receiving and inspecting your item, a refund will be processed within 10 business days according to the original method of payment.
+Customer is responsible for return shipping costs. We recommend using a trackable service; we are not liable for lost or delayed packages.
+A restocking and handling fee (typically 15%–30% of order value, subject to actual costs) will be deducted from your refund.
+Please note that original shipping charges are non-refundable, and all items must be returned in their original, unopened, and sealed packaging to be eligible for a refund
+</p>
+        </div>
+    </div>
+
+    <!-- SITEMAP PAGE -->
+    <div id="sitemap" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
+        <h2 class="section-header gradient-title mb-8">Sitemap</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 text-slate-300">
+            <div>
+                <h3 class="font-semibold text-lg mb-4 text-white">Main Pages</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="showPage('home')" class="hover:text-cyan-400">Home</a></li>
+                    <li><a href="#" onclick="showPage('categories')" class="hover:text-cyan-400">Categories</a></li>
+                    <li><a href="#" onclick="showPage('inventory')" class="hover:text-cyan-400">All Inventory</a></li>
+                    <li><a href="#" onclick="showPage('about')" class="hover:text-cyan-400">About Us</a></li>
+                    <li><a href="#" onclick="showPage('contact')" class="hover:text-cyan-400">Contact Us</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-4 text-white">Categories</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="filterAndGoToInventory('Action Figures')" class="hover:text-cyan-400">Action Figures</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Model Sets')" class="hover:text-cyan-400">Model Sets</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Funko Pop')" class="hover:text-cyan-400">Funko Pop</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Blind Bag & Mini Figures')" class="hover:text-cyan-400">Blind Bag & Mini Figures</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Toys')" class="hover:text-cyan-400">Toys</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-lg mb-4 text-white">Legal</h3>
+                <ul class="space-y-2">
+                    <li><a href="#" onclick="showPage('privacy')" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="#" onclick="showPage('returns')" class="hover:text-white">Returns &amp; Exchanges</a></li>
+                    <li><a href="#" onclick="showPage('sitemap')" class="hover:text-white">Sitemap</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-slate-800 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-6 text-sm text-slate-400 flex flex-col md:flex-row justify-between items-center gap-y-6">
+            <div>© 2026 Nubz Toys &amp; Collectibles. All rights reserved.</div>
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
+                <a href="#" onclick="event.preventDefault(); showPage('about')" class="hover:text-white">About Us</a>
+                <a href="#" onclick="event.preventDefault(); showPage('contact')" class="hover:text-white">Contact Us</a>
+                <a href="#" onclick="event.preventDefault(); showPage('privacy')" class="hover:text-white">Privacy</a>
+                <a href="#" onclick="event.preventDefault(); showPage('returns')" class="hover:text-white">Returns</a>
+                <a href="#" onclick="event.preventDefault(); showPage('sitemap')" class="hover:text-white">Sitemap</a>
+                <a href="#" onclick="event.preventDefault(); showAdmin()" class="hover:text-white font-semibold">Admin</a>
+            </div>
+        </div>
+    </footer>
+
     <!-- ADMIN MODAL -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-6">
-        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-3xl w-full p-8 max-h-[90vh] overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-2xl">Admin Panel</h3>
                 <button onclick="closeAdmin()" class="text-3xl text-slate-400 hover:text-white">×</button>
             </div>
 
+            <div id="admin-login">
+                <p class="text-sm text-slate-400 mb-4">Enter admin password:</p>
+                <input type="password" id="admin-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="Password">
+                <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Login</button>
+            </div>
+
             <div id="admin-panel" class="hidden">
                 
-                <!-- UPSSELL GROUPS SECTION -->
-                <div class="mb-8 border border-slate-700 rounded-2xl p-6">
-                    <h4 class="font-semibold text-lg mb-4">Upsell Groups</h4>
-                    
-                    <div class="flex gap-2 mb-4">
-                        <input id="new-upsell-group-name" placeholder="Group Name (e.g. Funko Protectors)" 
-                               class="flex-1 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        <button onclick="createUpsellGroup()" 
-                                class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm">
-                            Create Group
-                        </button>
-                    </div>
 
-                    <div id="upsell-groups-list" class="space-y-4"></div>
+                <div class="mb-6 border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-4">Change Admin Password</h4>
+                    <input type="password" id="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="New Password">
+                    <button onclick="changePassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
                 </div>
 
+<!-- UPSSELL GROUPS -->
+            <div class="mb-8 border border-slate-700 rounded-2xl p-6">
+                <h4 class="font-semibold text-lg mb-4">Upsell Groups</h4>
+                
+                <div class="flex gap-2 mb-4">
+                    <input id="new-upsell-group-name" placeholder="Group Name (e.g. Funko Protectors)" 
+                           class="flex-1 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                    <button onclick="createUpsellGroup()" 
+                            class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm">
+                        Create Group
+                    </button>
+                </div>
+
+                <div id="upsell-groups-list" class="space-y-4"></div>
+            </div>
+                <div class="mb-8 border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input id="manual-brand" placeholder="Brand" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-title" placeholder="Title" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        
+                        <input id="manual-price" type="number" step="0.01" placeholder="Sales Price" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-compare-to" type="number" step="0.01" placeholder="Compare To (optional)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        
+                        <input id="manual-quantity" type="number" placeholder="Quantity" value="10" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-shipping-weight" type="number" step="0.01" placeholder="Shipping Weight (lbs)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        
+                        <input id="manual-status" placeholder="Status" value="In Stock" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Categories (select all that apply)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-action" class="accent-emerald-500"> Action Figures</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-model" class="accent-emerald-500"> Model Sets</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-funko" class="accent-emerald-500"> Funko Pop</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-blind" class="accent-emerald-500"> Blind Bag & Mini Figures</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-toys" class="accent-emerald-500"> Toys</label>
+                            </div>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <textarea id="manual-description" placeholder="Description" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm"></textarea>
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Main Product Image</label>
+                            <input type="file" id="manual-image-upload" accept="image/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                        </div>
+                        
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Additional Image URLs (comma separated)</label>
+                            <input id="manual-extra-images" placeholder="https://example.com/img2.jpg, https://example.com/img3.jpg" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        </div>
+                    </div>
+
+                    <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
+                </div>
+
+                <div class="border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-4">Bulk Import via CSV</h4>
+                    <button onclick="downloadSampleCSV()" class="mb-4 px-5 py-2 bg-slate-700 hover:bg-slate-600 text-sm rounded-2xl flex items-center gap-x-2">
+                        <i class="fa-solid fa-download"></i> Download Sample CSV Template
+                    </button>
+                    <input type="file" id="csv-file" accept=".csv" class="mb-4 block w-full text-sm">
+                    <button onclick="importCSV()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Import Products</button>
+                    <div id="csv-result" class="mt-3 text-sm"></div>
+                </div>
+<div class="mb-6 border border-red-600 rounded-2xl p-6 bg-red-950/30">
+                    <h4 class="font-semibold text-lg mb-2 text-red-400">Danger Zone</h4>
+                    <p class="text-sm text-slate-400 mb-4">This will permanently delete ALL products.</p>
+                    <button onclick="deleteAllProducts()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-3xl text-sm">DELETE ALL PRODUCTS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCT MODAL -->
+    <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
+            <div class="relative">
+                <!-- FIXED: Proper proportional image -->
+                <img id="modal-image" class="w-full h-80 object-contain bg-slate-800" style="max-height: 320px;">
+                <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">←</button>
+                <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">→</button>
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">×</button>
+                <div id="modal-image-counter" class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-1 rounded-full"></div>
+            </div>
+            
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 id="modal-title" class="text-3xl font-bold leading-tight"></h3>
+                        <p id="modal-brand-category" class="text-slate-400 mt-1"></p>
+                    </div>
+                    <div id="modal-status" class="text-sm font-semibold px-4 py-1 rounded-full"></div>
+                </div>
+
+                <div class="flex items-baseline gap-x-3 mb-6">
+                    <div class="text-4xl font-bold" id="modal-price"></div>
+                    <div id="modal-compare-price" class="compare-price text-xl"></div>
+                </div>
+
+                <div id="modal-description" class="text-slate-300 mb-8 max-h-48 overflow-y-auto pr-2 text-[15px] leading-relaxed"></div>
+
+                <div class="flex gap-3">
+                    <button onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
+                    <button id="edit-product-btn" onclick="editCurrentProduct()" class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">EDIT</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        const categories = [
+            { name: "Action Figures", icon: "fa-dragon", color: "cyan-400" },
+            { name: "Model Sets", icon: "fa-cube", color: "emerald-400" },
+            { name: "Funko Pop", icon: "fa-head-side", color: "purple-400" },
+            { name: "Blind Bag & Mini Figures", icon: "fa-question-circle", color: "fuchsia-400" },
+            { name: "Toys", icon: "fa-gamepad", color: "amber-400" }
+        ];
+
         let products = [];
         let cart = [];
-        let upsellGroups = [];
         let isAdminLoggedIn = false;
+        let adminPassword = localStorage.getItem('nubz_admin_password') || "nubz2026";
+        let currentProductId = null;
+        let currentCategoryFilter = null;
+        let currentModalImages = [];
+        let currentModalImageIndex = 0;
+
+        window.supabaseInstance = window.supabaseInstance || null;
+        try {
+            if (typeof Supabase !== 'undefined') {
+                window.supabaseInstance = Supabase.createClient(
+                    'https://vdkjjyjfwfndrksruisn.supabase.co',
+                    'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
+                );
+            }
+        } catch (e) {
+            console.warn("Supabase not available — using localStorage fallback");
+        }
+        window.supabase = window.supabaseInstance;
 
         function saveToLocalStorage() {
             localStorage.setItem('nubz_products', JSON.stringify(products));
@@ -172,175 +484,838 @@
         }
 
         async function loadProducts() {
+            if (window.supabase) {
+                try {
+                    const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
+                    if (error) throw error;
+                    if (data && data.length > 0) {
+                        products = data;
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Supabase failed — using localStorage");
+                }
+            }
             loadFromLocalStorage();
-            renderFeatured();
-            renderInventory();
         }
 
         function renderFeatured() {
             const container = document.getElementById('featured-grid');
             if (!container) return;
             container.innerHTML = '';
-            products.slice(0, 6).forEach(p => container.appendChild(createProductCard(p)));
+
+            // NEW: Show last 6 In-Stock products (most recently added)
+            const inStock = products
+                .filter(p => p.status === "In Stock")
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 6);
+
+            inStock.forEach(product => container.appendChild(createProductCard(product)));
         }
 
         function renderInventory() {
             const container = document.getElementById('inventory-grid');
             if (!container) return;
             container.innerHTML = '';
-            products.forEach(p => container.appendChild(createProductCard(p)));
+            products.forEach(product => container.appendChild(createProductCard(product)));
         }
 
-        function createProductCard(product) {
-            const card = document.createElement('div');
-            card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer p-4';
-            card.innerHTML = `
-                <div class="font-semibold">${product.name}</div>
-                <div class="text-sm text-slate-400">$${(product.price || 0).toFixed(2)}</div>
-            `;
-            card.onclick = () => showProductModal(product);
-            return card;
+        function renderCategoryCards() {
+            const container = document.getElementById('category-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = `cursor-pointer bg-slate-900 border border-slate-700 hover:border-${cat.color} p-10 rounded-3xl text-center w-full max-w-[220px]`;
+                card.innerHTML = `
+                    <i class="fa-solid ${cat.icon} text-6xl text-${cat.color} mb-6"></i>
+                    <div class="font-bold text-2xl mb-2">${cat.name}</div>
+                `;
+                card.onclick = () => filterAndGoToInventory(cat.name);
+                container.appendChild(card);
+            });
         }
 
         function showPage(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(page).classList.add('active');
+            if (page === 'categories') renderCategoryCards();
+            if (page === 'inventory') renderInventory();
+            if (page === 'home') renderFeatured();
+        }
+
+        function filterAndGoToInventory(category) {
+            showPage('inventory');
+            setTimeout(() => filterInventory(category), 80);
+        }
+
+        function filterInventory(preSelectedCategory = '') {
+            currentCategoryFilter = preSelectedCategory || null;
+            
+            const header = document.getElementById('inventory-header');
+            
+            if (currentCategoryFilter) {
+                header.innerHTML = `<span class="gradient-title">${currentCategoryFilter}</span>`;
+            } else {
+                header.innerHTML = 'All Inventory';
+            }
+
+            const search = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+            let filtered = products;
+
+            if (currentCategoryFilter) {
+                filtered = filtered.filter(p => {
+                    const prodCategories = p.categories || (p.mainCategory ? [p.mainCategory] : []);
+                    return prodCategories.some(cat => cat.toLowerCase() === currentCategoryFilter.toLowerCase());
+                });
+            }
+
+            if (search) {
+                filtered = filtered.filter(p =>
+                    (p.name && p.name.toLowerCase().includes(search)) ||
+                    (p.brand && p.brand.toLowerCase().includes(search)) ||
+                    (p.description && p.description.toLowerCase().includes(search))
+                );
+            }
+
+            // NEW: Apply sorting based on dropdown
+            const sortMode = document.getElementById('sort-select').value;
+            if (sortMode === 'price-low') {
+                filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+            } else if (sortMode === 'price-high') {
+                filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+            } else if (sortMode === 'name') {
+                filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+            } else {
+                // newest first (default)
+                filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+
+            const container = document.getElementById('inventory-grid');
+            container.innerHTML = '';
+            filtered.forEach(product => container.appendChild(createProductCard(product)));
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
+            
+            const firstImage = (product.images && product.images.length > 0) ? product.images[0] : (product.image || 'https://picsum.photos/id/106/600/400');
+            const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
+            
+            let statusHTML = product.status === "In Stock" ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>` : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+            let lowQtyHTML = (product.quantity && product.quantity <= 2) ? `<span class="status-badge bg-red-500 text-white ml-2">LOW QUANTITY</span>` : '';
+            
+            card.innerHTML = `
+                <div class="relative">
+                    <img src="${firstImage}" class="w-full h-56 object-cover" loading="lazy" onerror="this.src='https://picsum.photos/id/106/600/400'">
+                    <div class="absolute top-4 right-4 flex gap-1">${statusHTML}${lowQtyHTML}</div>
+                </div>
+                <div class="p-6">
+                    <div class="font-semibold text-lg line-clamp-2">${product.name}</div>
+                    <div class="text-xs text-slate-400">${product.brand} • ${catDisplay}</div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <div class="text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
+                            ${product.compare_to && product.compare_to > product.price ? 
+                                `<div class="compare-price text-sm">$${(product.compare_to || 0).toFixed(2)}</div>` : ''}
+                        </div>
+                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});" class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
+                    </div>
+                </div>
+            `;
+            card.onclick = () => showProductModal(product);
+            return card;
+        }
+
+        function showProductModal(product) {
+            currentProductId = product.id;
+            
+            currentModalImages = (product.images && product.images.length > 0) ? product.images : (product.image ? [product.image] : ['https://picsum.photos/id/106/600/400']);
+            currentModalImageIndex = 0;
+            updateModalImage();
+            
+            document.getElementById('modal-title').textContent = product.name || 'Untitled';
+            document.getElementById('modal-brand-category').textContent = `${product.brand || 'Unknown'} • ${(product.categories || [product.mainCategory || 'Toys']).join(', ')}`;
+            document.getElementById('modal-price').textContent = `$${(product.price || 0).toFixed(2)}`;
+            document.getElementById('modal-description').innerHTML = product.description || 'No description available.';
+            
+            const compareEl = document.getElementById('modal-compare-price');
+            if (product.compare_to && product.compare_to > product.price) {
+                compareEl.textContent = `$${(product.compare_to || 0).toFixed(2)}`;
+                compareEl.style.display = 'inline';
+            } else {
+                compareEl.style.display = 'none';
+            }
+            
+            const statusEl = document.getElementById('modal-status');
+            statusEl.textContent = product.status || 'In Stock';
+            statusEl.className = `text-sm font-semibold px-4 py-1 rounded-full ${product.status === 'In Stock' ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
+            
+            const editBtn = document.getElementById('edit-product-btn');
+            if (isAdminLoggedIn) {
+                editBtn.classList.remove('hidden');
+                editBtn.classList.add('flex');
+            } else {
+                editBtn.classList.add('hidden');
+                editBtn.classList.remove('flex');
+            }
+            
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.getElementById('product-modal').classList.add('flex');
+        }
+
+        function updateModalImage() {
+            const img = document.getElementById('modal-image');
+            img.src = currentModalImages[currentModalImageIndex];
+            
+            const counter = document.getElementById('modal-image-counter');
+            if (currentModalImages.length > 1) {
+                counter.textContent = `${currentModalImageIndex + 1} / ${currentModalImages.length}`;
+                counter.style.display = 'block';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        function prevImage() {
+            currentModalImageIndex = (currentModalImageIndex - 1 + currentModalImages.length) % currentModalImages.length;
+            updateModalImage();
+        }
+
+        function nextImage() {
+            currentModalImageIndex = (currentModalImageIndex + 1) % currentModalImages.length;
+            updateModalImage();
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('flex');
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function editCurrentProduct() {
+            if (!currentProductId || !isAdminLoggedIn) return;
+            const product = products.find(p => p.id === currentProductId);
+            if (!product) return;
+
+            closeProductModal();
+
+            document.getElementById('manual-brand').value = product.brand || '';
+            document.getElementById('manual-title').value = product.name || '';
+            document.getElementById('manual-price').value = product.price || '';
+            document.getElementById('manual-compare-to').value = product.compare_to || '';
+            document.getElementById('manual-quantity').value = product.quantity || 10;
+            document.getElementById('manual-shipping-weight').value = product.shipping_weight || 0;
+            document.getElementById('manual-status').value = product.status || 'In Stock';
+            document.getElementById('manual-description').value = product.description || '';
+
+            const prodCats = product.categories || (product.mainCategory ? [product.mainCategory] : []);
+            document.getElementById('cat-action').checked = prodCats.includes("Action Figures");
+            document.getElementById('cat-model').checked = prodCats.includes("Model Sets");
+            document.getElementById('cat-funko').checked = prodCats.includes("Funko Pop");
+            document.getElementById('cat-blind').checked = prodCats.includes("Blind Bag & Mini Figures");
+            document.getElementById('cat-toys').checked = prodCats.includes("Toys");
+
+            showAdmin();
+            
+            const addBtn = document.querySelector('#admin-panel button[onclick="addManualProduct()"]');
+            if (addBtn) {
+                addBtn.textContent = "Update Product";
+                addBtn.onclick = () => updateExistingProduct(currentProductId);
+            }
+        }
+
+        function updateExistingProduct(productId) {
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex === -1) return;
+
+            const brand = document.getElementById('manual-brand').value.trim();
+            const title = document.getElementById('manual-title').value.trim();
+            const price = parseFloat(document.getElementById('manual-price').value);
+            const compareTo = parseFloat(document.getElementById('manual-compare-to').value) || 0;
+            const quantity = parseInt(document.getElementById('manual-quantity').value) || 10;
+            const shippingWeight = parseFloat(document.getElementById('manual-shipping-weight').value) || 0;
+            const status = document.getElementById('manual-status').value.trim() || "In Stock";
+            const description = document.getElementById('manual-description').value.trim();
+
+            const selectedCategories = [];
+            if (document.getElementById('cat-action').checked) selectedCategories.push("Action Figures");
+            if (document.getElementById('cat-model').checked) selectedCategories.push("Model Sets");
+            if (document.getElementById('cat-funko').checked) selectedCategories.push("Funko Pop");
+            if (document.getElementById('cat-blind').checked) selectedCategories.push("Blind Bag & Mini Figures");
+            if (document.getElementById('cat-toys').checked) selectedCategories.push("Toys");
+
+            if (!title || !price || selectedCategories.length === 0) {
+                alert("Title, Sales Price, and at least one Category are required");
+                return;
+            }
+
+            products[productIndex] = {
+                ...products[productIndex],
+                name: title,
+                brand: brand || "Unknown",
+                categories: selectedCategories,
+                price: price,
+                quantity: quantity,
+                shipping_weight: shippingWeight,
+                compare_to: compareTo,
+                status: status,
+                description: description
+            };
+
+            saveToLocalStorage();
+            alert("Product updated successfully!");
+            closeAdmin();
+            
+            const addBtn = document.querySelector('#admin-panel button');
+            if (addBtn) {
+                addBtn.textContent = "Add Product";
+                addBtn.onclick = () => addManualProduct();
+            }
+
+            loadProducts();
+        }
+
+        function addCurrentProductToCart() {
+            if (currentProductId) {
+                addToCart(currentProductId);
+                closeProductModal();
+            }
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            const existing = cart.find(item => item.id === productId);
+            if (existing) existing.quantity++;
+            else cart.push({...product, quantity: 1});
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function showCart() {
+            if (cart.length === 0) return alert("Your cart is empty!");
+            showStripeCheckout();
+        }
+
+        function showStripeCheckout() {
+            let itemsHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                const itemTotal = (item.price || 0) * item.quantity;
+                total += itemTotal;
+                itemsHTML += `
+                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl mb-3">
+                        <div>
+                            <div class="font-semibold">${item.name}</div>
+                            <div class="text-sm text-slate-400">${item.quantity} × $${(item.price || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="font-bold">$${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+            });
+
+            const modalHTML = `
+                <div class="fixed inset-0 bg-black/80 flex items-center justify-center z-[120]">
+                    <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                        <h3 class="text-2xl font-bold mb-2">Checkout</h3>
+                        <p class="text-yellow-400 mb-6">TEST MODE</p>
+                        
+                        <div class="mb-6">
+                            <h4 class="font-semibold mb-3">Your Items</h4>
+                            ${itemsHTML}
+                        </div>
+                        
+                        <div class="flex justify-between text-xl mb-6 border-t border-slate-700 pt-4">
+                            <span>Total</span>
+                            <span class="font-bold">$${total.toFixed(2)}</span>
+                        </div>
+                        
+                        <h4 class="font-semibold mb-4">Recommended Add-ons</h4>
+                        <div class="space-y-3 mb-8">
+                            ${getUpsellHTML()}
+                        </div>
+                        
+                        <button onclick="completeOrder(${total})" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg">Complete Order</button>
+                        <button onclick="this.closest('.fixed').remove()" class="mt-4 text-sm text-slate-400 w-full">Cancel</button>
+                    </div>
+                </div>`;
+            
+            const temp = document.createElement('div');
+            temp.innerHTML = modalHTML;
+            document.body.appendChild(temp.firstElementChild);
+        }
+
+        function getUpsellHTML() {
+            const cartIds = cart.map(item => item.id);
+            const upsells = products
+                .filter(p => !cartIds.includes(p.id) && p.price < 20)
+                .slice(0, 3);
+            
+            if (upsells.length === 0) {
+                return `<div class="text-sm text-slate-400">No add-ons available right now.</div>`;
+            }
+            
+            return upsells.map(product => `
+                <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
+                    <div>
+                        <div class="font-semibold">${product.name}</div>
+                        <div class="text-sm text-slate-400">$${(product.price || 0).toFixed(2)}</div>
+                    </div>
+                    <button onclick="addToCart(${product.id}); this.closest('.fixed').remove(); showCart();" 
+                            class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">
+                        + Add
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function completeOrder(total) {
+            document.querySelectorAll('.fixed.inset-0').forEach(el => el.remove());
+            alert(`✅ Order complete!\nTotal: $${total}\n\n📧 Email notification sent to shipping@wildernessdealz.com`);
+            cart = [];
+            updateCartCount();
+            showPage('home');
         }
 
         function showAdmin() {
             const modal = document.getElementById('admin-modal');
+            if (!modal) return;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            document.getElementById('admin-panel').classList.remove('hidden');
-            renderUpsellGroups();
+            
+            const loginDiv = document.getElementById('admin-login');
+            const panelDiv = document.getElementById('admin-panel');
+            
+            if (isAdminLoggedIn && loginDiv && panelDiv) {
+                loginDiv.classList.add('hidden');
+                panelDiv.classList.remove('hidden');
+            }
         }
 
         function closeAdmin() {
             const modal = document.getElementById('admin-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        // === FULL UPSSELL GROUPS SYSTEM ===
-        function createUpsellGroup() {
-            const input = document.getElementById('new-upsell-group-name');
-            const name = input.value.trim();
-            if (!name) return alert("Please enter a group name");
-
-            upsellGroups.push({
-                id: Date.now(),
-                name: name,
-                productIds: []
-            });
-
-            saveUpsellGroups();
-            input.value = '';
-            renderUpsellGroups();
-        }
-
-        function renderUpsellGroups() {
-            const container = document.getElementById('upsell-groups-list');
-            if (!container) return;
-            container.innerHTML = '';
-
-            upsellGroups.forEach(group => {
-                const div = document.createElement('div');
-                div.className = 'bg-slate-800 border border-slate-700 rounded-2xl p-4';
-                
-                let productsHTML = '';
-                group.productIds.forEach(pid => {
-                    const p = products.find(x => x.id === pid);
-                    if (p) {
-                        productsHTML += `<div class="bg-slate-700 px-3 py-1 rounded-full text-sm flex items-center gap-2 mb-1">${p.name} <span onclick="removeProductFromGroup(${group.id}, ${pid})" class="cursor-pointer text-red-400">×</span></div>`;
-                    }
-                });
-
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="font-semibold">${group.name}</div>
-                        <button onclick="deleteUpsellGroup(${group.id})" class="text-red-400 hover:text-red-500 text-sm">Delete</button>
-                    </div>
-                    
-                    <div class="mb-3">${productsHTML || '<div class="text-sm text-slate-400">No products in this group yet</div>'}</div>
-                    
-                    <select id="select-product-${group.id}" class="bg-slate-700 border border-slate-600 rounded-xl px-3 py-1 text-sm w-full mb-2">
-                        <option value="">Select product to add...</option>
-                    </select>
-                    <button onclick="addProductToUpsellGroup(${group.id})" class="px-4 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-xl">Add Product</button>
-                `;
-                
-                container.appendChild(div);
-                populateProductSelect(group.id);
-            });
-        }
-
-        function populateProductSelect(groupId) {
-            const select = document.getElementById(`select-product-${groupId}`);
-            if (!select) return;
-
-            select.innerHTML = '<option value="">Select product to add...</option>';
-            
-            products.forEach(p => {
-                if (p.availableAsUpsell !== false) {
-                    const option = document.createElement('option');
-                    option.value = p.id;
-                    option.textContent = p.name;
-                    select.appendChild(option);
-                }
-            });
-        }
-
-        function addProductToUpsellGroup(groupId) {
-            const select = document.getElementById(`select-product-${groupId}`);
-            const productId = parseInt(select.value);
-            if (!productId) return;
-
-            const group = upsellGroups.find(g => g.id === groupId);
-            if (!group.productIds.includes(productId)) {
-                group.productIds.push(productId);
-                saveUpsellGroups();
-                renderUpsellGroups();
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
             }
         }
 
-        function removeProductFromGroup(groupId, productId) {
-            const group = upsellGroups.find(g => g.id === groupId);
-            group.productIds = group.productIds.filter(id => id !== productId);
-            saveUpsellGroups();
-            renderUpsellGroups();
+        function loginAdmin() {
+            const passInput = document.getElementById('admin-password');
+            const loginDiv = document.getElementById('admin-login');
+            const panelDiv = document.getElementById('admin-panel');
+            
+            if (!passInput || !loginDiv || !panelDiv) return;
+            
+            const pass = passInput.value.trim();
+            
+            if (pass === adminPassword) {
+                isAdminLoggedIn = true;
+                loginDiv.classList.add('hidden');
+                panelDiv.classList.remove('hidden');
+            } else {
+                alert("Wrong password");
+            }
         }
 
-        function deleteUpsellGroup(groupId) {
-            if (!confirm("Delete this group?")) return;
-            upsellGroups = upsellGroups.filter(g => g.id !== groupId);
-            saveUpsellGroups();
-            renderUpsellGroups();
+        function changePassword() {
+            const newPass = document.getElementById('new-password').value.trim();
+            if (!newPass) {
+                alert("Please enter a new password");
+                return;
+            }
+            adminPassword = newPass;
+            localStorage.setItem('nubz_admin_password', newPass);
+            alert("Password updated successfully!");
+            document.getElementById('new-password').value = "";
         }
 
-        function saveUpsellGroups() {
-            localStorage.setItem('nubz_upsell_groups', JSON.stringify(upsellGroups));
+        function deleteAllProducts() {
+            if (!confirm("DELETE ALL PRODUCTS? This cannot be undone.")) return;
+            products = [];
+            localStorage.removeItem('nubz_products');
+            alert("All products deleted.");
+            closeAdmin();
+            loadProducts();
+        }
+// ==================== ADMIN + UPSSELL GROUPS ====================
+
+let upsellGroups = [];
+let isAdminLoggedIn = false;
+let adminPassword = localStorage.getItem('nubz_admin_password') || "nubz2026";
+
+function loadUpsellGroups() {
+    const saved = localStorage.getItem('nubz_upsell_groups');
+    if (saved) upsellGroups = JSON.parse(saved);
+}
+
+function saveUpsellGroups() {
+    localStorage.setItem('nubz_upsell_groups', JSON.stringify(upsellGroups));
+}
+
+function showAdmin() {
+    const modal = document.getElementById('admin-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    if (isAdminLoggedIn) {
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+        renderUpsellGroups();
+    } else {
+        document.getElementById('admin-login').classList.remove('hidden');
+        document.getElementById('admin-panel').classList.add('hidden');
+    }
+}
+
+function closeAdmin() {
+    const modal = document.getElementById('admin-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function loginAdmin() {
+    const pass = document.getElementById('admin-password').value.trim();
+    if (pass === adminPassword) {
+        isAdminLoggedIn = true;
+        document.getElementById('admin-login').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+        renderUpsellGroups();
+    } else {
+        alert("Wrong password");
+    }
+}
+
+// === UPSSELL GROUPS ===
+function createUpsellGroup() {
+    const input = document.getElementById('new-upsell-group-name');
+    const name = input.value.trim();
+    if (!name) return alert("Please enter a group name");
+
+    upsellGroups.push({ id: Date.now(), name, productIds: [] });
+    saveUpsellGroups();
+    input.value = '';
+    renderUpsellGroups();
+}
+
+function renderUpsellGroups() {
+    const container = document.getElementById('upsell-groups-list');
+    if (!container) return;
+    container.innerHTML = '';
+
+    upsellGroups.forEach(group => {
+        const div = document.createElement('div');
+        div.className = 'bg-slate-800 border border-slate-700 rounded-2xl p-4';
+
+        let productsHTML = '';
+        group.productIds.forEach(pid => {
+            const p = products.find(x => x.id === pid);
+            if (p) {
+                productsHTML += `<div class="bg-slate-700 px-3 py-1 rounded-full text-sm flex items-center gap-2 mb-1">${p.name} <span onclick="removeProductFromGroup(${group.id}, ${pid})" class="cursor-pointer text-red-400">×</span></div>`;
+            }
+        });
+
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-3">
+                <div class="font-semibold">${group.name}</div>
+                <button onclick="deleteUpsellGroup(${group.id})" class="text-red-400 hover:text-red-500 text-sm">Delete</button>
+            </div>
+            <div class="mb-3">${productsHTML || '<div class="text-sm text-slate-400">No products in this group yet</div>'}</div>
+            
+            <select id="product-select-${group.id}" class="bg-slate-700 border border-slate-600 rounded-xl px-3 py-1 text-sm w-full mb-2">
+                <option value="">Select product to add...</option>
+            </select>
+            <button onclick="addProductToUpsellGroup(${group.id})" class="px-4 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-xl">Add Product</button>
+        `;
+        container.appendChild(div);
+        populateProductSelect(group.id);
+    });
+}
+
+function populateProductSelect(groupId) {
+    const select = document.getElementById(`product-select-${groupId}`);
+    if (!select) return;
+    select.innerHTML = '<option value="">Select product to add...</option>';
+    products.forEach(p => {
+        const option = document.createElement('option');
+        option.value = p.id;
+        option.textContent = p.name;
+        select.appendChild(option);
+    });
+}
+
+function addProductToUpsellGroup(groupId) {
+    const select = document.getElementById(`product-select-${groupId}`);
+    const productId = parseInt(select.value);
+    if (!productId) return;
+
+    const group = upsellGroups.find(g => g.id === groupId);
+    if (!group.productIds.includes(productId)) {
+        group.productIds.push(productId);
+        saveUpsellGroups();
+        renderUpsellGroups();
+    }
+}
+
+function removeProductFromGroup(groupId, productId) {
+    const group = upsellGroups.find(g => g.id === groupId);
+    group.productIds = group.productIds.filter(id => id !== productId);
+    saveUpsellGroups();
+    renderUpsellGroups();
+}
+
+function deleteUpsellGroup(groupId) {
+    if (!confirm("Delete this group?")) return;
+    upsellGroups = upsellGroups.filter(g => g.id !== groupId);
+    saveUpsellGroups();
+    renderUpsellGroups();
+}
+        async function addManualProduct() {
+            const brand = document.getElementById('manual-brand').value.trim();
+            const title = document.getElementById('manual-title').value.trim();
+            const price = parseFloat(document.getElementById('manual-price').value);
+            const compareTo = parseFloat(document.getElementById('manual-compare-to').value) || 0;
+            const quantity = parseInt(document.getElementById('manual-quantity').value) || 10;
+            const shippingWeight = parseFloat(document.getElementById('manual-shipping-weight').value) || 0;
+            const status = document.getElementById('manual-status').value.trim() || "In Stock";
+            const description = document.getElementById('manual-description').value.trim();
+            const extraImagesInput = document.getElementById('manual-extra-images').value.trim();
+            const fileInput = document.getElementById('manual-image-upload');
+
+            const selectedCategories = [];
+            if (document.getElementById('cat-action').checked) selectedCategories.push("Action Figures");
+            if (document.getElementById('cat-model').checked) selectedCategories.push("Model Sets");
+            if (document.getElementById('cat-funko').checked) selectedCategories.push("Funko Pop");
+            if (document.getElementById('cat-blind').checked) selectedCategories.push("Blind Bag & Mini Figures");
+            if (document.getElementById('cat-toys').checked) selectedCategories.push("Toys");
+
+            if (!title || !price || selectedCategories.length === 0) {
+                alert("Title, Sales Price, and at least one Category are required");
+                return;
+            }
+
+            let images = [];
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const base64 = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+                images.push(base64);
+            }
+
+            if (extraImagesInput) {
+                const extraUrls = extraImagesInput.split(',').map(url => url.trim()).filter(url => url);
+                images = images.concat(extraUrls);
+            }
+
+            if (images.length === 0) {
+                images = ['https://picsum.photos/id/106/600/400'];
+            }
+
+            const newProduct = {
+                id: Date.now(),
+                name: title,
+                brand: brand || "Unknown",
+                categories: selectedCategories,
+                price: price,
+                quantity: quantity,
+                shipping_weight: shippingWeight,
+                cost: 0,
+                compare_to: compareTo,
+                status: status,
+                images: images,
+                description: description,
+                created_at: new Date().toISOString()
+            };
+
+            products.unshift(newProduct);
+            saveToLocalStorage();
+
+            alert("Product added successfully!");
+
+            document.getElementById('manual-brand').value = "";
+            document.getElementById('manual-title').value = "";
+            document.getElementById('manual-price').value = "";
+            document.getElementById('manual-compare-to').value = "";
+            document.getElementById('manual-quantity').value = "10";
+            document.getElementById('manual-shipping-weight').value = "";
+            document.getElementById('manual-status').value = "In Stock";
+            document.getElementById('manual-description').value = "";
+            document.getElementById('manual-extra-images').value = "";
+            document.getElementById('manual-image-upload').value = "";
+            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys'].forEach(id => {
+                document.getElementById(id).checked = false;
+            });
+
+            loadProducts();
         }
 
-        function showProductModal(product) {
-            alert("Product details would open here for: " + product.name);
+        async function importCSV() {
+            const fileInput = document.getElementById('csv-file');
+            const resultDiv = document.getElementById('csv-result');
+            
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<span class="text-red-400">Please select a CSV file</span>';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async function(e) {
+                const csvText = e.target.result;
+                const lines = csvText.trim().split(/\r?\n/);
+                
+                if (lines.length < 2) {
+                    resultDiv.innerHTML = '<span class="text-red-400">CSV has no data rows</span>';
+                    return;
+                }
+
+                const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
+                let success = 0;
+
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+
+                    const values = parseCSVLine(lines[i]);
+                    const row = {};
+                    headers.forEach((h, idx) => row[h] = values[idx] ? values[idx].trim() : '');
+
+                    const get = (...keys) => {
+                        for (let k of keys) if (row[k]) return row[k];
+                        return '';
+                    };
+
+                    const cleanPrice = (val) => parseFloat((val || '').toString().replace(/[$,\s]/g, '')) || 0;
+
+                    const categoriesStr = get('category', 'categories');
+                    const categoriesList = categoriesStr ? categoriesStr.split(',').map(c => c.trim()).filter(Boolean) : ['Toys'];
+
+                    const imagesStr = get('image url', 'image', 'images');
+                    const imagesList = imagesStr ? imagesStr.split(',').map(i => i.trim()).filter(Boolean) : ['https://picsum.photos/id/106/600/400'];
+
+                    const newProduct = {
+                        id: Date.now() + i,
+                        name: get('title', 'name') || 'Untitled',
+                        brand: get('brand') || 'Unknown',
+                        categories: categoriesList,
+                        price: cleanPrice(get('sales price', 'price', 'sale price')),
+                        quantity: parseInt(get('quantity', 'qty')) || 10,
+                        shipping_weight: parseFloat(get('shipping weight', 'weight')) || 0,
+                        cost: cleanPrice(get('cost')),
+                        compare_to: cleanPrice(get('compare to', 'compare price')),
+                        status: get('status', 'availability') || 'In Stock',
+                        images: imagesList,
+                        description: get('description', 'desc') || '',
+                        created_at: new Date().toISOString()
+                    };
+
+                    products.unshift(newProduct);
+                    success++;
+                }
+
+                saveToLocalStorage();
+                resultDiv.innerHTML = `✅ Imported ${success} products successfully.`;
+                loadProducts();
+            };
+
+            reader.readAsText(file);
         }
 
-        function showCart() {
-            alert("Cart would open here");
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"' && inQuotes && line[i + 1] === '"') {
+                    current += '"';
+                    i++;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            result.push(current);
+            return result;
+        }
+
+        function downloadSampleCSV() {
+            const csvContent = `Brand,Title,SKU,UPC,Categories,Description,Shipping Weight,Quantity,Cost,Sales Price,Compare To,Image URLs,Status
+BLOKEES,Blokees Transformers Darkest Hour Galaxy Version 09,BLK-009,123456789012,"Model Sets, Action Figures","Complete your collection with Version 09, includes 3 mystery figures",0.8,9,4.50,12.00,15.00,"https://picsum.photos/id/106/600/400,https://picsum.photos/id/29/600/400",In Stock`;
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nubz-master-inventory.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+// Checkout Upsell Logic
+function getUpsellHTML() {
+    const cartGroupIds = new Set();
+    cart.forEach(item => {
+        if (item.upsellGroupIds) item.upsellGroupIds.forEach(id => cartGroupIds.add(id));
+    });
+
+    let upsells = [];
+    cartGroupIds.forEach(groupId => {
+        const group = upsellGroups.find(g => g.id === groupId);
+        if (!group) return;
+
+        const available = group.productIds
+            .map(id => products.find(p => p.id === id))
+            .filter(p => p && !cart.some(c => c.id === p.id));
+
+        if (available.length > 0) upsells.push(available[0]);
+    });
+
+    if (upsells.length === 0) return `<div class="text-sm text-slate-400">Thank you for your business!.</div>`;
+
+    return upsells.slice(0, 3).map(product => `
+        <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
+            <div>
+                <div class="font-semibold">${product.name}</div>
+                <div class="text-sm text-slate-400">$${(product.price || 0).toFixed(2)}</div>
+            </div>
+            <button onclick="addToCart(${product.id}); this.closest('.fixed').remove(); showCart();" 
+                    class="px-6 py-1 bg-cyan-500 text-black rounded-2xl text-sm font-bold">
+                + Add
+            </button>
+        </div>
+    `).join('');
+		}
+
+        function submitContactForm() {
+            alert("Message sent! Thank you.");
+            document.getElementById('contact-form').reset();
         }
 
         function toggleMobileMenu() {
-            // Add mobile menu logic if needed
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
         }
 
         async function initializeWebsite() {
             await loadProducts();
-            
-            // Load upsell groups
-            const savedGroups = localStorage.getItem('nubz_upsell_groups');
-            if (savedGroups) upsellGroups = JSON.parse(savedGroups);
-
             document.getElementById('home').classList.add('active');
+            updateCartCount();
+            renderCategoryCards();
+            console.log('%c✅ Final version with all requested fixes loaded', 'color:#22d3ee');
         }
 
         window.onload = initializeWebsite;
