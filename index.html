@@ -9,8 +9,8 @@
     <script src="https://js.stripe.com/v3/"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: 'Inter', system_ui, sans-serif; }
-        .font-display { font-family: 'Space Grotesk', 'Inter', system_ui, sans-serif; font-weight: 700; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .font-display { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; font-weight: 700; }
         .section-header { font-size: 2.5rem; line-height: 1.05; font-weight: 700; letter-spacing: -0.04em; }
         .toy-card { transition: all 0.3s ease; }
         .toy-card:hover { transform: translateY(-6px); }
@@ -37,7 +37,6 @@
                 <div onclick="showPage('home')" class="flex items-center gap-x-3 cursor-pointer">
                     <img src="nubz-header-logo.png" alt="Nubz Toys &amp; Collectibles" class="h-14 w-auto">
                 </div>
-
                 <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
                     <a href="#" onclick="event.preventDefault(); showPage('home')" class="nav-link">Home</a>
                     <a href="#" onclick="event.preventDefault(); showPage('categories')" class="nav-link">Categories</a>
@@ -45,11 +44,9 @@
                     <a href="#" onclick="event.preventDefault(); showPage('about')" class="nav-link">About Us</a>
                     <a href="#" onclick="event.preventDefault(); showPage('contact')" class="nav-link">Contact Us</a>
                 </div>
-
                 <button onclick="toggleMobileMenu()" id="mobile-menu-btn" class="md:hidden text-2xl px-3">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-
                 <div class="hidden md:flex items-center gap-x-4">
                     <button onclick="showAdmin()" class="px-4 py-2 text-xs font-semibold bg-slate-800 hover:bg-slate-700 rounded-2xl flex items-center gap-x-2">
                         <i class="fa-solid fa-user-shield"></i><span>Admin</span>
@@ -60,7 +57,6 @@
                     </button>
                 </div>
             </div>
-
             <div id="mobile-menu" class="hidden md:hidden bg-slate-900 border-t border-slate-800 px-6 py-6">
                 <div class="flex flex-col gap-y-4 text-lg font-medium">
                     <a href="#" onclick="event.preventDefault(); showPage('home'); toggleMobileMenu()" class="nav-link">Home</a>
@@ -68,7 +64,7 @@
                     <a href="#" onclick="event.preventDefault(); showPage('inventory'); toggleMobileMenu()" class="nav-link">All Inventory</a>
                     <a href="#" onclick="event.preventDefault(); showPage('about'); toggleMobileMenu()" class="nav-link">About Us</a>
                     <a href="#" onclick="event.preventDefault(); showPage('contact'); toggleMobileMenu()" class="nav-link">Contact Us</a>
-                    <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2">
+                    <button onclick="event.preventDefault(); showAdmin(); toggleMobileMenu()" class="mt-4 w-full py-3 bg-slate-800 rounded-2xl text-left flex items-center gap-x-2 px-4">
                         <i class="fa-solid fa-user-shield"></i> Admin Panel
                     </button>
                 </div>
@@ -98,7 +94,6 @@
                 </div>
             </div>
         </section>
-
         <section class="max-w-7xl mx-auto px-6 py-20">
             <div class="flex justify-between items-end mb-10">
                 <div>
@@ -133,7 +128,7 @@
                     <option value="newest">Newest First</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
-                    <option value="name">Name A–Z</option>
+                    <option value="name">Name A-Z</option>
                 </select>
             </div>
         </div>
@@ -148,11 +143,9 @@
         </div>
         <div class="prose prose-invert max-w-none text-lg text-slate-300">
             <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to just keep it simple. Remember when we used to just play? We owned the dialogue. We wrote the scenes. We defined the storyline — it didn't define us. Well, maybe it did, and we just got away from it for a while. From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises — we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys &amp; collectibles, but you're never too old for them.</p>
-            
             <div class="mt-10 flex justify-center">
                 <button onclick="showPage('categories')" class="px-10 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition-all flex items-center gap-x-2">
-                    Explore Now
-                    <i class="fa-solid fa-arrow-right"></i>
+                    Explore Now <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
         </div>
@@ -161,98 +154,39 @@
     <!-- CONTACT US PAGE -->
     <div id="contact" class="page pt-20 max-w-2xl mx-auto px-6 py-20">
         <div class="text-center mb-12">
-            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET’S CONNECT</div>
+            <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-2">LET'S CONNECT</div>
             <h2 class="section-header gradient-title">Contact Us</h2>
         </div>
-        <form id="contact-form" class="space-y-6">
+        <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <input type="text" id="contact-name" placeholder="Your Name" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm">
                 <input type="email" id="contact-email" placeholder="Your Email" class="bg-slate-900 border border-slate-700 rounded-2xl px-5 py-3 text-sm">
             </div>
             <textarea id="contact-message" placeholder="Your Message" rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-3xl px-5 py-4 text-sm"></textarea>
             <button type="button" onclick="submitContactForm()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">SEND MESSAGE</button>
-        </form>
+        </div>
     </div>
 
     <!-- PRIVACY POLICY PAGE -->
     <div id="privacy" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <h2 class="section-header gradient-title mb-8">Privacy Policy</h2>
-        <div class="prose prose-invert text-slate-300">
-            <p>PRIVACY POLICY
-Last updated: June 5, 2026
-Wilderness Dealz LLC dab Nubz Toys & Collectibles operates this store and website, including all related information, content, features, tools, products and services, in order to provide you, the customer, with a curated shopping experience (the "Services"). Nubz Toys & Collectibles is powered by Wilderness Dealz LLC which enables us to provide the Services to you. This Privacy Policy describes how we collect, use, and disclose your personal information when you visit, use, or make a purchase or other transaction using the Services or otherwise communicate with us. If there is a conflict between our Terms of Service and this Privacy Policy, this Privacy Policy controls with respect to the collection, processing, and disclosure of your personal information.
-Please read this Privacy Policy carefully. By using and accessing any of the Services, you acknowledge that you have read this Privacy Policy and understand the collection, use, and disclosure of your information as described in this Privacy Policy.
-Personal Information We Collect or Process
-When we use the term "personal information," we are referring to information that identifies or can reasonably be linked to you or another person. Personal information does not include information that is collected anonymously or that has been de-identified, so that it cannot identify or be reasonably linked to you. We may collect or process the following categories of personal information, including inferences drawn from this personal information, depending on how you interact with the Services, where you live, and as permitted or required by applicable law:
-* Contact details including your name, address, billing address, shipping address, phone number, and email address.
-* Financial information including credit card, debit card, and financial account numbers, payment card information, financial account information, transaction details, form of payment, payment confirmation and other payment details.
-* Account information including your username, password, security questions, preferences and settings.
-* Transaction information including the items you view, put in your cart, add to your wishlist, or purchase, return, exchange or cancel and your past transactions.
-* Communications with us including the information you include in communications with us, for example, when sending a customer support inquiry.
-* Device information including information about your device, browser, or network connection, your IP address, and other unique identifiers.
-* Usage information including information regarding your interaction with the Services, including how and when you interact with or navigate the Services.
-Personal Information Sources
-We may collect personal information from the following sources:
-* Directly from you including when you create an account, visit or use the Services, communicate with us, or otherwise provide us with your personal information;
-* Automatically through the Services including from your device when you use our products or services or visit our websites, and through the use of cookies and similar technologies;
-* From our service providers including when we engage them to enable certain technology and when they collect or process your personal information on our behalf;
-* From our partners or other third parties.
-
-How We Use Your Personal Information
-Depending on how you interact with us or which of the Services you use, we may use personal information for the following purposes:
-* Provide, Tailor, and Improve the Services. We use your personal information to provide you with the Services, including to perform our contract with you, to process your payments, to fulfill your orders, to remember your preferences and items you are interested in, to send notifications to you related to your account, to process purchases, returns, exchanges or other transactions, to create, maintain and otherwise manage your account, to arrange for shipping, to facilitate any returns and exchanges, to enable you to post reviews, and to create a customized shopping experience for you, such as recommending products related to your purchases. This may include using your personal information to better tailor and improve the Services.
-* Marketing and Advertising. We use your personal information for marketing and promotional purposes, such as to send marketing, advertising and promotional communications by email, text message or postal mail, and to show you online advertisements for products or services on the Services or other websites, including based on items you previously have purchased or added to your cart and other activity on the Services.
-* Security and Fraud Prevention. We use your personal information to authenticate your account, to provide a secure payment and shopping experience, detect, investigate or take action regarding possible fraudulent, illegal, unsafe, or malicious activity, protect public safety, and to secure our services. If you choose to use the Services and register an account, you are responsible for keeping your account credentials safe. We highly recommend that you do not share your username, password or other access details with anyone else.
-* Communicating with You. We use your personal information to provide you with customer support, to be responsive to you, to provide effective services to you and to maintain our business relationship with you.
-* Legal Reasons. We use your personal information to comply with applicable law or respond to valid legal process, including requests from law enforcement or government agencies, to investigate or participate in civil discovery, potential or actual litigation, or other adversarial legal proceedings, and to enforce or investigate potential violations of our terms or policies.
-How We Disclose Personal Information
-In certain circumstances, we may disclose your personal information to third parties for legitimate purposes subject to this Privacy Policy. Such circumstances may include:
-* With vendors and other third parties who perform services on our behalf (e.g. IT management, payment processing, data analytics, customer support, cloud storage, fulfillment and shipping).
-* With business and marketing partners to provide marketing services and advertise to you. For example, we use cookies to support personalized advertising with third-party services based on your online activity with different merchants and websites. Our business and marketing partners will use your information in accordance with their own privacy notices. Depending on where you reside, you may have a right to direct us not to share information about you to show you targeted advertisements and marketing based on your online activity with different merchants and websites. You can exercise your rights to opt-out of those uses here .
-* When you direct, request us or otherwise consent to our disclosure of certain information to third parties, such as to ship you products or through your use of social media widgets or login integrations.
-* With our affiliates or otherwise within our corporate group.
-* In connection with a business transaction such as a merger or bankruptcy, to comply with any applicable legal obligations (including to respond to subpoenas, search warrants and similar requests), to enforce any applicable terms of service or policies, and to protect or defend the Services, our rights, and the rights of our users or others.
-
-Third Party Websites and Links
-The Services may provide links to websites or other online platforms operated by third parties. If you follow links to sites not affiliated or controlled by us, you should review their privacy and security policies and other terms and conditions. We do not guarantee and are not responsible for the privacy or security of such sites, including the accuracy, completeness, or reliability of information found on these sites. Information you provide on public or semi-public venues, including information you share on third-party social networking platforms may also be viewable by other users of the Services and/or users of those third-party platforms without limitation as to its use by us or by a third party. Our inclusion of such links does not, by itself, imply any endorsement of the content on such platforms or of their owners or operators, except as disclosed on the Services.
-Children's Data
-The Services are not intended to be used by children, and we do not knowingly collect any personal information about children under the age of majority in your jurisdiction. If you are the parent or guardian of a child who has provided us with their personal information, you may contact us using the contact details set out below to request that it be deleted.As of the Effective Date of this Privacy Policy, we do not have actual knowledge that we "share" or "sell" (as those terms are defined in applicable law) personal information of individuals under 16 years of age.
-Security and Retention of Your Information
-Please be aware that no security measures are perfect or impenetrable, and we cannot guarantee "perfect security." In addition, any information you send to us may not be secure while in transit. We recommend that you do not use unsecure channels to communicate sensitive or confidential information to us.
-How long we retain your personal information depends on different factors, such as whether we need the information to maintain your account, to provide you with Services, comply with legal obligations, resolve disputes or enforce other applicable contracts and policies.
-Your Rights and Choices
-Depending on where you live, you may have some or all of the rights listed below in relation to your personal information. However, these rights are not absolute, may apply only in certain circumstances and, in certain cases, we may decline your request as permitted by law.
-* Right to Access / Know. You may have a right to request access to personal information that we hold about you.
-* Right to Delete. You may have a right to request that we delete personal information we maintain about you.
-* Right to Correct. You may have a right to request that we correct inaccurate personal information we maintain about you.
-* Right of Portability. You may have a right to receive a copy of the personal information we hold about you and to request that we transfer it to a third party, in certain circumstances and with certain exceptions.
-* Right to Opt out of Sale or Sharing for Targeted Advertising. Depending on where you reside, you may have a right to opt out of the "sale" or "share" of your personal information or to opt out of the processing of your personal information for purposes considered to be "targeted advertising", as defined in applicable privacy laws. You can exercise your rights to opt-out of those uses here. Please note that if you visit our website with the Global Privacy Control opt-out preference signal enabled, depending on where you are, we will automatically treat this as a request to opt-out for the device and browser that you use to visit the website. If we are able to associate the device sending the signal to a Shopify account, we will apply the opt out request to the account as well. To learn more about Global Privacy Control, you can visit https://globalprivacycontrol.org/. Other than the Global Privacy Control, we do not recognize other "Do Not Track" signals that may be sent from your web browser or device.
-* Managing Communication Preferences. We may send you promotional emails, and you may opt out of receiving these at any time by using the unsubscribe option displayed in our emails to you. If you opt out, we may still send you non-promotional emails, such as those about your account or orders that you have made.
-
-You may exercise any of these rights where indicated on the Services or by contacting us using the contact details provided below. To learn more about how Shopify uses your personal information and any rights you may have, including rights related to data processed by Shopify, you can visit https://privacy.shopify.com/en.
-We will not discriminate against you for exercising any of these rights. We may need to verify your identity before we can process your requests, as permitted or required under applicable law. In accordance with applicable laws, you may designate an authorized agent to make requests on your behalf to exercise your rights. Before accepting such a request from an agent, we will require that the agent provide proof you have authorized them to act on your behalf, and we may need you to verify your identity directly with us. We will respond to your request in a timely manner as required under applicable law.
-Complaints
-If you have complaints about how we process your personal information, please contact us using the contact details provided below. Depending on where you live, you may have the right to appeal our decision by contacting us using the contact details set out below, or lodge your complaint with your local data protection authority.
-International Transfers
-Please note that we may transfer, store and process your personal information outside the country you live in.
-If we transfer your personal information out of the European Economic Area or the United Kingdom, we will rely on recognized transfer mechanisms like the European Commission's Standard Contractual Clauses, or any equivalent contracts issued by the relevant competent authority of the UK, as relevant, unless the data transfer is to a country that has been determined to provide an adequate level of protection.
-Changes to This Privacy Policy
-We may update this Privacy Policy from time to time, including to reflect changes to our practices or for other operational, legal, or regulatory reasons. We will post the revised Privacy Policy on this website, update the "Last updated" date and provide notice as required by applicable law.
-Contact
-Should you have any questions about our privacy practices or this Privacy Policy, or if you would like to exercise any of the rights available to you, please call or email us at nubz@wildernessdealz.com 
-</p>
+        <div class="prose prose-invert text-slate-300 space-y-4 leading-relaxed">
+            <p>Last updated: June 5, 2026</p>
+            <p>Wilderness Dealz LLC dba Nubz Toys &amp; Collectibles operates this store and website. This Privacy Policy describes how we collect, use, and disclose your personal information when you visit, use, or make a purchase.</p>
+            <p>We may collect contact details, financial information, account information, transaction information, device information, and usage information. We use this information to provide services, process payments, fulfill orders, for marketing, security, and legal compliance.</p>
+            <p>We may share your information with service providers, business partners, affiliates, and as required by law. You have rights to access, delete, correct, and port your data. Contact us at nubz@wildernessdealz.com to exercise your rights.</p>
+            <p>The Services are not intended for children under the age of majority. We do not knowingly collect personal information from minors.</p>
+            <p>Questions? Contact us at nubz@wildernessdealz.com</p>
         </div>
     </div>
 
     <!-- RETURNS PAGE -->
     <div id="returns" class="page pt-20 max-w-4xl mx-auto px-6 py-20">
         <h2 class="section-header gradient-title mb-8">Returns &amp; Exchanges</h2>
-        <div class="prose prose-invert text-slate-300">
-            <p>You can return your orders of New items within 30 days of purchase provided it is unopened, you pay the shipping and the process here-in is followed Like-new/preowned merchandise is as-is & not refundable. For new items, please make sure the item you received is in unused and un-open condition with the tags and packaging intact. If you've opened the item, it cannot be returned. If the item was a clearance item, it cannot be returned. If the item is a seasonal/holiday themed item, it cannot be returned within 5 days before or at any point after that particular holiday.Start your return by emailing us at nubz@wildernessdealz.com. You will receive a response back with instructions and a form to submit. Upon receiving and inspecting your item, a refund will be processed within 10 business days according to the original method of payment.
-Customer is responsible for return shipping costs. We recommend using a trackable service; we are not liable for lost or delayed packages.
-A restocking and handling fee (typically 15%–30% of order value, subject to actual costs) will be deducted from your refund.
-Please note that original shipping charges are non-refundable, and all items must be returned in their original, unopened, and sealed packaging to be eligible for a refund
-</p>
+        <div class="prose prose-invert text-slate-300 space-y-4 leading-relaxed">
+            <p>You can return orders of New items within 30 days of purchase provided the item is unopened, you pay the shipping, and the process below is followed. Like-new/preowned merchandise is as-is and not refundable.</p>
+            <p>Start your return by emailing nubz@wildernessdealz.com. Upon receiving and inspecting your item, a refund will be processed within 10 business days.</p>
+            <p>Customer is responsible for return shipping costs. A restocking and handling fee (typically 15–30% of order value) will be deducted from your refund. Original shipping charges are non-refundable.</p>
         </div>
     </div>
 
@@ -291,6 +225,33 @@ Please note that original shipping charges are non-refundable, and all items mus
         </div>
     </div>
 
+    <!-- FLASH SALE PAGE -->
+    <div id="flash-sale" class="page pt-20 max-w-4xl mx-auto px-6 py-12">
+        <div class="text-center mb-10">
+            <div class="text-xs uppercase tracking-[4px] text-yellow-400 font-bold mb-3">⚡ Limited Time Only</div>
+            <h2 id="flash-sale-title" class="section-header gradient-title mb-3">FLASH SALE</h2>
+            <p id="flash-sale-subtitle" class="text-slate-400 text-lg mb-8">Deals so good they should be illegal. Ends when the clock hits zero.</p>
+            <div class="flex justify-center gap-4 mb-4">
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl px-6 py-4 text-center min-w-[80px]">
+                    <div id="fs-hours" class="text-4xl font-black text-fuchsia-400 font-mono">00</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">Hrs</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl px-6 py-4 text-center min-w-[80px]">
+                    <div id="fs-mins" class="text-4xl font-black text-fuchsia-400 font-mono">00</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">Min</div>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl px-6 py-4 text-center min-w-[80px]">
+                    <div id="fs-secs" class="text-4xl font-black text-fuchsia-400 font-mono">00</div>
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mt-1">Sec</div>
+                </div>
+            </div>
+        </div>
+        <div id="flash-sale-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div class="mt-10 text-center">
+            <button onclick="showPage('inventory')" class="px-10 py-4 border border-white/20 hover:bg-white/5 font-semibold rounded-3xl">Browse All Inventory</button>
+        </div>
+    </div>
+
     <!-- FOOTER -->
     <footer class="bg-black border-t border-slate-800 py-10 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-sm text-slate-400 flex flex-col md:flex-row justify-between items-center gap-y-6">
@@ -321,6 +282,7 @@ Please note that original shipping charges are non-refundable, and all items mus
             </div>
 
             <div id="admin-panel" class="hidden">
+
                 <!-- Danger Zone -->
                 <div class="mb-6 border border-red-600 rounded-2xl p-6 bg-red-950/30">
                     <h4 class="font-semibold text-lg mb-2 text-red-400">Danger Zone</h4>
@@ -335,38 +297,71 @@ Please note that original shipping charges are non-refundable, and all items mus
                     <button onclick="changePassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
                 </div>
 
-                <!-- UPSSELL GROUPS -->
-                <div class="mb-8 border border-slate-700 rounded-2xl p-6">
-                    <h4 class="font-semibold text-lg mb-4">Upsell Groups</h4>
-                    
-                    <div class="flex gap-2 mb-4">
-                        <input id="new-upsell-group-name" placeholder="Group Name (e.g. Funko Protectors)" 
-                               class="flex-1 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        <button onclick="createUpsellGroup()" 
-                                class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm">
-                            Create Group
-                        </button>
+
+                <!-- FLASH SALE MANAGER -->
+                <div class="mb-6 border border-yellow-600 rounded-2xl p-6 bg-yellow-950/20">
+                    <h4 class="font-semibold text-lg mb-1 text-yellow-400">⚡ Flash Sale Manager</h4>
+                    <p class="text-xs text-slate-500 mb-4">Configure and launch a flash sale. It can show as a full page or a pop-up overlay.</p>
+
+                    <div class="space-y-3 mb-4">
+                        <input id="fs-admin-title" placeholder="Sale Headline (e.g. WEEKEND FLASH SALE)" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="fs-admin-subtitle" placeholder="Subtitle (e.g. Up to 50% off — today only!)" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Hours</label>
+                                <input id="fs-admin-hours" type="number" min="0" max="72" value="4" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Minutes</label>
+                                <input id="fs-admin-mins" type="number" min="0" max="59" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-slate-400 mb-1 block">Seconds</label>
+                                <input id="fs-admin-secs" type="number" min="0" max="59" value="0" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-400 mb-2 block">Select Products for Sale (choose up to 6)</label>
+                            <div id="fs-product-checkboxes" class="grid grid-cols-2 gap-2 text-sm max-h-40 overflow-y-auto bg-slate-800 border border-slate-700 rounded-2xl p-3"></div>
+                        </div>
                     </div>
 
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="launchFlashSalePage()" class="py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-2xl text-sm">
+                            Launch as Page
+                        </button>
+                        <button onclick="launchFlashSalePopup()" class="py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold rounded-2xl text-sm">
+                            Launch as Pop-up
+                        </button>
+                    </div>
+                </div>
+
+                <!-- UPSELL GROUPS -->
+                <div class="mb-8 border border-slate-700 rounded-2xl p-6">
+                    <h4 class="font-semibold text-lg mb-2">Upsell Groups</h4>
+                    <p class="text-xs text-slate-400 mb-4">Create groups of products to suggest at checkout when a customer adds a related item to their cart.</p>
+                    <div class="flex gap-2 mb-4">
+                        <input id="new-upsell-group-name" placeholder="Group Name (e.g. Funko Protectors)"
+                               class="flex-1 bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <button onclick="createUpsellGroup()"
+                                class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm">
+                            Create
+                        </button>
+                    </div>
                     <div id="upsell-groups-list" class="space-y-4"></div>
                 </div>
 
                 <!-- Add Single Product -->
                 <div class="mb-8 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-4">Add Single Product</h4>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input id="manual-brand" placeholder="Brand" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-title" placeholder="Title" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        
                         <input id="manual-price" type="number" step="0.01" placeholder="Sales Price" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-compare-to" type="number" step="0.01" placeholder="Compare To (optional)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        
                         <input id="manual-quantity" type="number" placeholder="Quantity" value="10" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-shipping-weight" type="number" step="0.01" placeholder="Shipping Weight (lbs)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        
                         <input id="manual-status" placeholder="Status" value="In Stock" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        
                         <div class="md:col-span-2">
                             <label class="block text-sm text-slate-400 mb-2">Categories (select all that apply)</label>
                             <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
@@ -377,23 +372,23 @@ Please note that original shipping charges are non-refundable, and all items mus
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-toys" class="accent-emerald-500"> Toys</label>
                             </div>
                         </div>
-                        
                         <div class="md:col-span-2">
                             <textarea id="manual-description" placeholder="Description" rows="3" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm"></textarea>
                         </div>
-                        
                         <div class="md:col-span-2">
                             <label class="block text-sm text-slate-400 mb-2">Main Product Image</label>
                             <input type="file" id="manual-image-upload" accept="image/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
                         </div>
-                        
                         <div class="md:col-span-2">
                             <label class="block text-sm text-slate-400 mb-2">Additional Image URLs (comma separated)</label>
                             <input id="manual-extra-images" placeholder="https://example.com/img2.jpg, https://example.com/img3.jpg" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm text-slate-400 mb-2">Upsell Groups (select groups this product triggers)</label>
+                            <div id="product-upsell-group-checkboxes" class="grid grid-cols-2 gap-2 text-sm"></div>
+                        </div>
                     </div>
-
-                    <button onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
+                    <button id="add-product-btn" onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
                 <!-- CSV Import -->
@@ -406,6 +401,7 @@ Please note that original shipping charges are non-refundable, and all items mus
                     <button onclick="importCSV()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Import Products</button>
                     <div id="csv-result" class="mt-3 text-sm"></div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -420,7 +416,6 @@ Please note that original shipping charges are non-refundable, and all items mus
                 <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">×</button>
                 <div id="modal-image-counter" class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-1 rounded-full"></div>
             </div>
-            
             <div class="p-8">
                 <div class="flex justify-between items-start mb-4">
                     <div>
@@ -429,14 +424,11 @@ Please note that original shipping charges are non-refundable, and all items mus
                     </div>
                     <div id="modal-status" class="text-sm font-semibold px-4 py-1 rounded-full"></div>
                 </div>
-
                 <div class="flex items-baseline gap-x-3 mb-6">
                     <div class="text-4xl font-bold" id="modal-price"></div>
                     <div id="modal-compare-price" class="compare-price text-xl"></div>
                 </div>
-
                 <div id="modal-description" class="text-slate-300 mb-8 max-h-48 overflow-y-auto pr-2 text-[15px] leading-relaxed"></div>
-
                 <div class="flex gap-3">
                     <button onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
                     <button id="edit-product-btn" onclick="editCurrentProduct()" class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">EDIT</button>
@@ -446,30 +438,31 @@ Please note that original shipping charges are non-refundable, and all items mus
     </div>
 
     <script>
-        // All your previous variables and functions are here...
-        const categories = [
-            { name: "Action Figures", icon: "fa-dragon", color: "cyan-400" },
-            { name: "Model Sets", icon: "fa-cube", color: "emerald-400" },
-            { name: "Funko Pop", icon: "fa-head-side", color: "purple-400" },
-            { name: "Blind Bag &amp; Mini Figures", icon: "fa-question-circle", color: "fuchsia-400" },
-            { name: "Toys", icon: "fa-gamepad", color: "amber-400" }
+        // ─── CONSTANTS & STATE ───────────────────────────────────────────────
+        const CATEGORY_LIST = [
+            { name: "Action Figures",          icon: "fa-dragon",        color: "cyan-400"    },
+            { name: "Model Sets",              icon: "fa-cube",           color: "emerald-400" },
+            { name: "Funko Pop",               icon: "fa-head-side",      color: "purple-400"  },
+            { name: "Blind Bag & Mini Figures",icon: "fa-question-circle",color: "fuchsia-400" },
+            { name: "Toys",                    icon: "fa-gamepad",        color: "amber-400"   }
         ];
 
-        let products = [];
-        let cart = [];
-        let upsellGroups = [];
-        let isAdminLoggedIn = false;
-        let adminPassword = localStorage.getItem('nubz_admin_password') || "nubz2026";
-        let currentProductId = null;
+        let products       = [];
+        let cart           = [];
+        let upsellGroups   = [];
+        let isAdminLoggedIn      = false;
+        let adminPassword        = localStorage.getItem('nubz_admin_password') || "nubz2026";
+        let currentProductId     = null;
         let currentCategoryFilter = null;
-        let currentModalImages = [];
+        let currentModalImages   = [];
         let currentModalImageIndex = 0;
+        let editingProductId     = null;   // tracks edit mode
 
-        // Supabase setup
-        window.supabaseInstance = window.supabaseInstance || null;
+        // ─── SUPABASE ────────────────────────────────────────────────────────
+        window.supabaseInstance = null;
         try {
-            if (typeof Supabase !== 'undefined') {
-                window.supabaseInstance = Supabase.createClient(
+            if (typeof supabase !== 'undefined' && supabase.createClient) {
+                window.supabaseInstance = supabase.createClient(
                     'https://vdkjjyjfwfndrksruisn.supabase.co',
                     'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr'
                 );
@@ -477,8 +470,8 @@ Please note that original shipping charges are non-refundable, and all items mus
         } catch (e) {
             console.warn("Supabase not available — using localStorage fallback");
         }
-        window.supabase = window.supabaseInstance;
 
+        // ─── STORAGE ─────────────────────────────────────────────────────────
         function saveToLocalStorage() {
             localStorage.setItem('nubz_products', JSON.stringify(products));
         }
@@ -489,27 +482,29 @@ Please note that original shipping charges are non-refundable, and all items mus
         }
 
         async function loadProducts() {
-            if (window.supabase) {
+            if (window.supabaseInstance) {
                 try {
-                    const { data, error } = await window.supabase.from('products').select('*').order('created_at', { ascending: false });
+                    const { data, error } = await window.supabaseInstance
+                        .from('products').select('*').order('created_at', { ascending: false });
                     if (error) throw error;
-                    if (data && data.length > 0) {
-                        products = data;
-                        return;
-                    }
+                    if (data && data.length > 0) { products = data; renderAll(); return; }
                 } catch (e) {
-                    console.warn("Supabase failed — using localStorage");
+                    console.warn("Supabase load failed — using localStorage");
                 }
             }
             loadFromLocalStorage();
+            renderAll();
         }
 
-        // ... (all your other functions like renderFeatured, renderInventory, createProductCard, showPage, filterInventory, etc. are the same as your last working file) ...
+        function renderAll() {
+            renderFeatured();
+            renderCategoryCards();
+        }
 
-        // UPSSELL GROUPS FUNCTIONS
+        // ─── UPSELL GROUPS ───────────────────────────────────────────────────
         function loadUpsellGroups() {
             const saved = localStorage.getItem('nubz_upsell_groups');
-            if (saved) upsellGroups = JSON.parse(saved);
+            upsellGroups = saved ? JSON.parse(saved) : [];
         }
 
         function saveUpsellGroups() {
@@ -518,13 +513,13 @@ Please note that original shipping charges are non-refundable, and all items mus
 
         function createUpsellGroup() {
             const input = document.getElementById('new-upsell-group-name');
-            const name = input.value.trim();
-            if (!name) return alert("Please enter a group name");
-
+            const name  = input.value.trim();
+            if (!name) { alert("Please enter a group name"); return; }
             upsellGroups.push({ id: Date.now(), name: name, productIds: [] });
             saveUpsellGroups();
             input.value = '';
             renderUpsellGroups();
+            renderUpsellGroupCheckboxes();
         }
 
         function renderUpsellGroups() {
@@ -532,30 +527,48 @@ Please note that original shipping charges are non-refundable, and all items mus
             if (!container) return;
             container.innerHTML = '';
 
+            if (upsellGroups.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-500">No upsell groups yet. Create one above.</p>';
+                return;
+            }
+
             upsellGroups.forEach(group => {
                 const div = document.createElement('div');
                 div.className = 'bg-slate-800 border border-slate-700 rounded-2xl p-4';
 
-                let productsHTML = '';
-                group.productIds.forEach(pid => {
-                    const p = products.find(x => x.id === pid);
-                    if (p) {
-                        productsHTML += `<div class="bg-slate-700 px-3 py-1 rounded-full text-sm flex items-center gap-2 mb-1">${p.name} <span onclick="removeProductFromGroup(${group.id}, ${pid})" class="cursor-pointer text-red-400">×</span></div>`;
-                    }
-                });
+                const tagged = group.productIds
+                    .map(pid => products.find(x => String(x.id) === String(pid)))
+                    .filter(Boolean);
+
+                const tagsHTML = tagged.length
+                    ? tagged.map(p => `
+                        <span class="inline-flex items-center gap-1 bg-slate-700 px-3 py-1 rounded-full text-xs mb-1 mr-1">
+                            ${p.name}
+                            <span onclick="removeProductFromGroup(${group.id}, ${p.id})"
+                                  class="cursor-pointer text-red-400 hover:text-red-300 ml-1 font-bold">×</span>
+                        </span>`).join('')
+                    : '<span class="text-xs text-slate-500">No products yet</span>';
 
                 div.innerHTML = `
                     <div class="flex justify-between items-center mb-3">
-                        <div class="font-semibold">${group.name}</div>
-                        <button onclick="deleteUpsellGroup(${group.id})" class="text-red-400 hover:text-red-500 text-sm">Delete</button>
+                        <span class="font-semibold">${group.name}</span>
+                        <button onclick="deleteUpsellGroup(${group.id})"
+                                class="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded-lg hover:bg-red-950/40">
+                            Delete Group
+                        </button>
                     </div>
-                    <div class="mb-3">${productsHTML || '<div class="text-sm text-slate-400">No products in this group yet</div>'}</div>
-                    
-                    <select id="product-select-${group.id}" class="bg-slate-700 border border-slate-600 rounded-xl px-3 py-1 text-sm w-full mb-2">
-                        <option value="">Select product to add...</option>
-                    </select>
-                    <button onclick="addProductToUpsellGroup(${group.id})" class="px-4 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-xl">Add Product</button>
-                `;
+                    <div class="mb-3 flex flex-wrap">${tagsHTML}</div>
+                    <div class="flex gap-2">
+                        <select id="product-select-${group.id}"
+                                class="flex-1 bg-slate-700 border border-slate-600 rounded-xl px-3 py-1.5 text-sm">
+                            <option value="">Add product to group...</option>
+                        </select>
+                        <button onclick="addProductToUpsellGroup(${group.id})"
+                                class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-xl font-semibold">
+                            Add
+                        </button>
+                    </div>`;
+
                 container.appendChild(div);
                 populateProductSelect(group.id);
             });
@@ -564,21 +577,21 @@ Please note that original shipping charges are non-refundable, and all items mus
         function populateProductSelect(groupId) {
             const select = document.getElementById(`product-select-${groupId}`);
             if (!select) return;
-            select.innerHTML = '<option value="">Select product to add...</option>';
+            select.innerHTML = '<option value="">Add product to group...</option>';
             products.forEach(p => {
-                const option = document.createElement('option');
-                option.value = p.id;
-                option.textContent = p.name;
-                select.appendChild(option);
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.name;
+                select.appendChild(opt);
             });
         }
 
         function addProductToUpsellGroup(groupId) {
-            const select = document.getElementById(`product-select-${groupId}`);
-            const productId = parseInt(select.value);
+            const select    = document.getElementById(`product-select-${groupId}`);
+            const productId = select ? select.value : null;
             if (!productId) return;
-
             const group = upsellGroups.find(g => g.id === groupId);
+            if (!group) return;
             if (!group.productIds.includes(productId)) {
                 group.productIds.push(productId);
                 saveUpsellGroups();
@@ -588,27 +601,827 @@ Please note that original shipping charges are non-refundable, and all items mus
 
         function removeProductFromGroup(groupId, productId) {
             const group = upsellGroups.find(g => g.id === groupId);
-            group.productIds = group.productIds.filter(id => id !== productId);
+            if (!group) return;
+            group.productIds = group.productIds.filter(id => String(id) !== String(productId));
             saveUpsellGroups();
             renderUpsellGroups();
         }
 
         function deleteUpsellGroup(groupId) {
-            if (!confirm("Delete this group?")) return;
+            if (!confirm("Delete this upsell group?")) return;
             upsellGroups = upsellGroups.filter(g => g.id !== groupId);
             saveUpsellGroups();
             renderUpsellGroups();
+            renderUpsellGroupCheckboxes();
         }
 
-        // Rest of your functions (addManualProduct, importCSV, etc.) remain the same as your last working file
+        // Render checkboxes in Add Product form so you can tag which groups a product belongs to
+        function renderUpsellGroupCheckboxes() {
+            const container = document.getElementById('product-upsell-group-checkboxes');
+            if (!container) return;
+            if (upsellGroups.length === 0) {
+                container.innerHTML = '<span class="text-xs text-slate-500">No upsell groups created yet.</span>';
+                return;
+            }
+            container.innerHTML = upsellGroups.map(g => `
+                <label class="flex items-center gap-x-2 text-sm">
+                    <input type="checkbox" class="upsell-group-check accent-emerald-500" value="${g.id}">
+                    ${g.name}
+                </label>`).join('');
+        }
 
-        async function initializeWebsite() {
-            await loadProducts();
-            loadUpsellGroups();
-            document.getElementById('home').classList.add('active');
+        function getSelectedUpsellGroupIds() {
+            return Array.from(document.querySelectorAll('.upsell-group-check:checked'))
+                .map(cb => parseInt(cb.value));
+        }
+
+        // ─── RENDERING ───────────────────────────────────────────────────────
+        function renderFeatured() {
+            const container = document.getElementById('featured-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            const inStock = products
+                .filter(p => p.status === "In Stock")
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .slice(0, 6);
+            inStock.forEach(p => container.appendChild(createProductCard(p)));
+        }
+
+        function renderInventory() {
+            const container = document.getElementById('inventory-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            products.forEach(p => container.appendChild(createProductCard(p)));
+        }
+
+        function renderCategoryCards() {
+            const container = document.getElementById('category-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            CATEGORY_LIST.forEach(cat => {
+                const card = document.createElement('div');
+                card.className = `cursor-pointer bg-slate-900 border border-slate-700 hover:border-slate-500 p-10 rounded-3xl text-center w-full max-w-[220px] transition-all`;
+                card.innerHTML = `
+                    <i class="fa-solid ${cat.icon} text-6xl mb-6 text-slate-300"></i>
+                    <div class="font-bold text-2xl mb-2">${cat.name}</div>`;
+                card.onclick = () => filterAndGoToInventory(cat.name);
+                container.appendChild(card);
+            });
+        }
+
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
+
+            const firstImage = (product.images && product.images.length > 0)
+                ? product.images[0]
+                : (product.image || 'https://picsum.photos/id/106/600/400');
+            const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
+
+            const statusHTML  = product.status === "In Stock"
+                ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>`
+                : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+            const lowQtyHTML  = (product.quantity && product.quantity <= 2)
+                ? `<span class="status-badge bg-red-500 text-white ml-1">LOW QTY</span>` : '';
+
+            card.innerHTML = `
+                <div class="relative">
+                    <img src="${firstImage}" class="w-full h-56 object-cover" loading="lazy"
+                         onerror="this.src='https://picsum.photos/id/106/600/400'">
+                    <div class="absolute top-4 right-4 flex gap-1">${statusHTML}${lowQtyHTML}</div>
+                </div>
+                <div class="p-6">
+                    <div class="font-semibold text-lg line-clamp-2">${product.name}</div>
+                    <div class="text-xs text-slate-400">${product.brand || 'Unknown'} • ${catDisplay}</div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <div class="text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
+                            ${product.compare_to && product.compare_to > product.price
+                                ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}
+                        </div>
+                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
+                    </div>
+                </div>`;
+            card.onclick = () => showProductModal(product);
+            return card;
+        }
+
+        // ─── NAVIGATION ──────────────────────────────────────────────────────
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const el = document.getElementById(page);
+            if (el) el.classList.add('active');
+            if (page === 'categories') renderCategoryCards();
+            if (page === 'inventory')  { currentCategoryFilter = null; filterInventory(); }
+            if (page === 'home')       renderFeatured();
+            window.scrollTo(0, 0);
+        }
+
+        function filterAndGoToInventory(category) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const el = document.getElementById('inventory');
+            if (el) el.classList.add('active');
+            window.scrollTo(0, 0);
+            setTimeout(() => filterInventory(category), 80);
+        }
+
+        function filterInventory(preSelectedCategory) {
+            if (typeof preSelectedCategory === 'string' && preSelectedCategory !== '') {
+                currentCategoryFilter = preSelectedCategory;
+            } else if (preSelectedCategory === '') {
+                currentCategoryFilter = null;
+            }
+            // if preSelectedCategory is undefined (called by sort/search), currentCategoryFilter stays as-is
+
+            const header = document.getElementById('inventory-header');
+            if (header) header.innerHTML = currentCategoryFilter
+                ? `<span class="gradient-title">${currentCategoryFilter}</span>`
+                : 'All Inventory';
+
+            const searchEl = document.getElementById('search-input');
+            const search   = searchEl ? searchEl.value.toLowerCase() : '';
+            let filtered   = [...products];
+
+            if (currentCategoryFilter) {
+                filtered = filtered.filter(p => {
+                    const cats = p.categories || (p.mainCategory ? [p.mainCategory] : []);
+                    return cats.some(c => c.toLowerCase() === currentCategoryFilter.toLowerCase());
+                });
+            }
+            if (search) {
+                filtered = filtered.filter(p =>
+                    (p.name        && p.name.toLowerCase().includes(search)) ||
+                    (p.brand       && p.brand.toLowerCase().includes(search)) ||
+                    (p.description && p.description.toLowerCase().includes(search))
+                );
+            }
+
+            const sortEl   = document.getElementById('sort-select');
+            const sortMode = sortEl ? sortEl.value : 'newest';
+            if (sortMode === 'price-low')  filtered.sort((a,b) => (a.price||0)-(b.price||0));
+            else if (sortMode === 'price-high') filtered.sort((a,b) => (b.price||0)-(a.price||0));
+            else if (sortMode === 'name')  filtered.sort((a,b) => (a.name||'').localeCompare(b.name||''));
+            else filtered.sort((a,b) => new Date(b.created_at)-new Date(a.created_at));
+
+            const container = document.getElementById('inventory-grid');
+            if (!container) return;
+            container.innerHTML = '';
+            filtered.forEach(p => container.appendChild(createProductCard(p)));
+        }
+
+        // ─── PRODUCT MODAL ───────────────────────────────────────────────────
+        function showProductModal(product) {
+            currentProductId = product.id;
+            currentModalImages = (product.images && product.images.length > 0)
+                ? product.images
+                : (product.image ? [product.image] : ['https://picsum.photos/id/106/600/400']);
+            currentModalImageIndex = 0;
+            updateModalImage();
+
+            document.getElementById('modal-title').textContent          = product.name || 'Untitled';
+            document.getElementById('modal-brand-category').textContent = `${product.brand || 'Unknown'} • ${(product.categories || [product.mainCategory || 'Toys']).join(', ')}`;
+            document.getElementById('modal-price').textContent          = `$${(product.price || 0).toFixed(2)}`;
+            document.getElementById('modal-description').innerHTML      = product.description || 'No description available.';
+
+            const compareEl = document.getElementById('modal-compare-price');
+            if (product.compare_to && product.compare_to > product.price) {
+                compareEl.textContent   = `$${product.compare_to.toFixed(2)}`;
+                compareEl.style.display = 'inline';
+            } else {
+                compareEl.style.display = 'none';
+            }
+
+            const statusEl     = document.getElementById('modal-status');
+            statusEl.textContent = product.status || 'In Stock';
+            statusEl.className   = `text-sm font-semibold px-4 py-1 rounded-full ${product.status === 'In Stock' ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
+
+            const editBtn = document.getElementById('edit-product-btn');
+            if (isAdminLoggedIn) { editBtn.classList.remove('hidden'); editBtn.classList.add('flex'); }
+            else                 { editBtn.classList.add('hidden');    editBtn.classList.remove('flex'); }
+
+            document.getElementById('product-modal').classList.remove('hidden');
+            document.getElementById('product-modal').classList.add('flex');
+        }
+
+        function updateModalImage() {
+            const img     = document.getElementById('modal-image');
+            const counter = document.getElementById('modal-image-counter');
+            img.src = currentModalImages[currentModalImageIndex];
+            if (currentModalImages.length > 1) {
+                counter.textContent   = `${currentModalImageIndex + 1} / ${currentModalImages.length}`;
+                counter.style.display = 'block';
+            } else {
+                counter.style.display = 'none';
+            }
+        }
+
+        function prevImage() {
+            currentModalImageIndex = (currentModalImageIndex - 1 + currentModalImages.length) % currentModalImages.length;
+            updateModalImage();
+        }
+
+        function nextImage() {
+            currentModalImageIndex = (currentModalImageIndex + 1) % currentModalImages.length;
+            updateModalImage();
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('flex');
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function addCurrentProductToCart() {
+            if (currentProductId) { addToCart(currentProductId); closeProductModal(); }
+        }
+
+        // ─── CART ─────────────────────────────────────────────────────────────
+        function addToCart(productId) {
+            const product = products.find(p => String(p.id) === String(productId));
+            if (!product) return;
+            const existing = cart.find(item => String(item.id) === String(productId));
+            if (existing) existing.quantity++;
+            else cart.push({ ...product, quantity: 1 });
             updateCartCount();
-            renderCategoryCards();
-            console.log('%c✅ Complete site with Upsell Groups loaded', 'color:#22d3ee');
+        }
+
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const el    = document.getElementById('cart-count');
+            if (el) el.textContent = count;
+        }
+
+        function showCart() {
+            if (cart.length === 0) { alert("Your cart is empty!"); return; }
+            showStripeCheckout();
+        }
+
+        // ─── CHECKOUT & UPSELLS ──────────────────────────────────────────────
+        function getUpsellsForCart() {
+            // Collect upsell group IDs from cart items
+            const groupIds = new Set();
+            cart.forEach(item => {
+                if (item.upsellGroupIds) item.upsellGroupIds.forEach(id => groupIds.add(id));
+                // Also check by product id in group productIds
+                upsellGroups.forEach(g => {
+                    if (g.productIds.some(pid => String(pid) === String(item.id))) {
+                        groupIds.add(g.id);
+                    }
+                });
+            });
+
+            const cartIds    = new Set(cart.map(i => String(i.id)));
+            const suggested  = [];
+            const seen       = new Set();
+
+            groupIds.forEach(groupId => {
+                const group = upsellGroups.find(g => g.id === groupId);
+                if (!group) return;
+                group.productIds.forEach(pid => {
+                    const p = products.find(x => String(x.id) === String(pid));
+                    if (p && !cartIds.has(String(p.id)) && !seen.has(String(p.id))) {
+                        suggested.push(p);
+                        seen.add(String(p.id));
+                    }
+                });
+            });
+            return suggested.slice(0, 3);
+        }
+
+        function showStripeCheckout() {
+            let itemsHTML = '';
+            let total     = 0;
+            cart.forEach(item => {
+                const itemTotal = (item.price || 0) * item.quantity;
+                total += itemTotal;
+                itemsHTML += `
+                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl mb-3">
+                        <div>
+                            <div class="font-semibold">${item.name}</div>
+                            <div class="text-sm text-slate-400">${item.quantity} × $${(item.price || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="font-bold">$${itemTotal.toFixed(2)}</div>
+                    </div>`;
+            });
+
+            const upsells    = getUpsellsForCart();
+            const upsellHTML = upsells.length
+                ? upsells.map(p => `
+                    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-2xl">
+                        <div>
+                            <div class="font-semibold text-sm">${p.name}</div>
+                            <div class="text-xs text-slate-400">$${(p.price || 0).toFixed(2)}</div>
+                        </div>
+                        <button onclick="addUpsellToCart(${p.id})"
+                                class="px-5 py-1.5 bg-cyan-500 hover:bg-cyan-600 text-black rounded-2xl text-sm font-bold">
+                            + Add
+                        </button>
+                    </div>`).join('')
+                : '<p class="text-sm text-slate-500">No add-ons available for this order.</p>';
+
+            const overlay = document.createElement('div');
+            overlay.id    = 'checkout-overlay';
+            overlay.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-[120]';
+            overlay.innerHTML = `
+                <div class="bg-slate-900 rounded-3xl p-8 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <h3 class="text-2xl font-bold mb-2">Checkout</h3>
+                    <p class="text-yellow-400 text-xs mb-6 font-semibold">⚠ TEST MODE</p>
+                    <h4 class="font-semibold mb-3">Your Items</h4>
+                    ${itemsHTML}
+                    <div class="flex justify-between text-xl mb-6 border-t border-slate-700 pt-4">
+                        <span>Total</span>
+                        <span class="font-bold" id="checkout-total">$${total.toFixed(2)}</span>
+                    </div>
+                    ${upsells.length ? `<h4 class="font-semibold mb-3 text-cyan-400">🎁 Recommended Add-ons</h4>` : ''}
+                    <div class="space-y-3 mb-8">${upsellHTML}</div>
+                    <button onclick="completeOrder()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100">Complete Order</button>
+                    <button onclick="document.getElementById('checkout-overlay').remove()" class="mt-4 text-sm text-slate-400 w-full text-center">Cancel</button>
+                </div>`;
+            document.body.appendChild(overlay);
+        }
+
+        function addUpsellToCart(productId) {
+            addToCart(productId);
+            // Recalculate total shown in overlay
+            const totalEl = document.getElementById('checkout-total');
+            if (totalEl) {
+                const newTotal = cart.reduce((s, i) => s + (i.price || 0) * i.quantity, 0);
+                totalEl.textContent = `$${newTotal.toFixed(2)}`;
+            }
+        }
+
+        function completeOrder() {
+            const total = cart.reduce((s, i) => s + (i.price || 0) * i.quantity, 0);
+            const overlay = document.getElementById('checkout-overlay');
+            if (overlay) overlay.remove();
+            alert(`✅ Order complete!\nTotal: $${total.toFixed(2)}\n\n📧 Notification sent to shipping@wildernessdealz.com`);
+            cart = [];
+            updateCartCount();
+            showPage('home');
+        }
+
+        // ─── ADMIN ───────────────────────────────────────────────────────────
+        function showAdmin() {
+            const modal = document.getElementById('admin-modal');
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            if (isAdminLoggedIn) {
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                renderUpsellGroups();
+                renderUpsellGroupCheckboxes();
+                renderFlashSaleProductCheckboxes();
+            } else {
+                document.getElementById('admin-login').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+            }
+        }
+
+        function closeAdmin() {
+            const modal = document.getElementById('admin-modal');
+            if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); }
+            // Reset edit mode if open
+            if (editingProductId) {
+                editingProductId = null;
+                const btn = document.getElementById('add-product-btn');
+                if (btn) { btn.textContent = 'Add Product'; btn.onclick = addManualProduct; }
+            }
+        }
+
+        function loginAdmin() {
+            const passInput = document.getElementById('admin-password');
+            if (!passInput) return;
+            if (passInput.value.trim() === adminPassword) {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-login').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                renderUpsellGroups();
+                renderUpsellGroupCheckboxes();
+            } else {
+                alert("Wrong password");
+            }
+        }
+
+        function changePassword() {
+            const newPass = document.getElementById('new-password').value.trim();
+            if (!newPass) { alert("Please enter a new password"); return; }
+            adminPassword = newPass;
+            localStorage.setItem('nubz_admin_password', newPass);
+            alert("Password updated successfully!");
+            document.getElementById('new-password').value = '';
+        }
+
+        function deleteAllProducts() {
+            if (!confirm("DELETE ALL PRODUCTS? This cannot be undone.")) return;
+            products = [];
+            localStorage.removeItem('nubz_products');
+            alert("All products deleted.");
+            closeAdmin();
+            renderAll();
+        }
+
+        // ─── ADD / EDIT PRODUCT ──────────────────────────────────────────────
+        function getProductFormValues() {
+            const selectedCategories = [];
+            if (document.getElementById('cat-action').checked) selectedCategories.push("Action Figures");
+            if (document.getElementById('cat-model').checked)  selectedCategories.push("Model Sets");
+            if (document.getElementById('cat-funko').checked)  selectedCategories.push("Funko Pop");
+            if (document.getElementById('cat-blind').checked)  selectedCategories.push("Blind Bag & Mini Figures");
+            if (document.getElementById('cat-toys').checked)   selectedCategories.push("Toys");
+            return {
+                brand:          document.getElementById('manual-brand').value.trim(),
+                title:          document.getElementById('manual-title').value.trim(),
+                price:          parseFloat(document.getElementById('manual-price').value) || 0,
+                compareTo:      parseFloat(document.getElementById('manual-compare-to').value) || 0,
+                quantity:       parseInt(document.getElementById('manual-quantity').value)    || 10,
+                shippingWeight: parseFloat(document.getElementById('manual-shipping-weight').value) || 0,
+                status:         document.getElementById('manual-status').value.trim() || "In Stock",
+                description:    document.getElementById('manual-description').value.trim(),
+                extraImages:    document.getElementById('manual-extra-images').value.trim(),
+                categories:     selectedCategories,
+                upsellGroupIds: getSelectedUpsellGroupIds()
+            };
+        }
+
+        function clearProductForm() {
+            ['manual-brand','manual-title','manual-price','manual-compare-to',
+             'manual-description','manual-extra-images'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('manual-quantity').value    = '10';
+            document.getElementById('manual-shipping-weight').value = '';
+            document.getElementById('manual-status').value      = 'In Stock';
+            document.getElementById('manual-image-upload').value = '';
+            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys'].forEach(id => {
+                document.getElementById(id).checked = false;
+            });
+            document.querySelectorAll('.upsell-group-check').forEach(cb => cb.checked = false);
+        }
+
+        async function addManualProduct() {
+            const v = getProductFormValues();
+            if (!v.title || !v.price || v.categories.length === 0) {
+                alert("Title, Sales Price, and at least one Category are required");
+                return;
+            }
+
+            let images = [];
+            const fileInput = document.getElementById('manual-image-upload');
+            if (fileInput.files.length > 0) {
+                const base64 = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = e => resolve(e.target.result);
+                    reader.readAsDataURL(fileInput.files[0]);
+                });
+                images.push(base64);
+            }
+            if (v.extraImages) {
+                images = images.concat(v.extraImages.split(',').map(u => u.trim()).filter(Boolean));
+            }
+            if (images.length === 0) images = ['https://picsum.photos/id/106/600/400'];
+
+            const newProduct = {
+                id:              Date.now(),
+                name:            v.title,
+                brand:           v.brand || "Unknown",
+                categories:      v.categories,
+                price:           v.price,
+                quantity:        v.quantity,
+                shipping_weight: v.shippingWeight,
+                cost:            0,
+                compare_to:      v.compareTo,
+                status:          v.status,
+                images:          images,
+                description:     v.description,
+                upsellGroupIds:  v.upsellGroupIds,
+                created_at:      new Date().toISOString()
+            };
+
+            // Add product to any selected upsell groups
+            v.upsellGroupIds.forEach(gid => {
+                const group = upsellGroups.find(g => g.id === gid);
+                if (group && !group.productIds.includes(newProduct.id)) {
+                    group.productIds.push(newProduct.id);
+                }
+            });
+            saveUpsellGroups();
+
+            products.unshift(newProduct);
+            saveToLocalStorage();
+            clearProductForm();
+            alert("Product added successfully!");
+            renderUpsellGroups();
+            renderAll();
+        }
+
+        function editCurrentProduct() {
+            if (!currentProductId || !isAdminLoggedIn) return;
+            const product = products.find(p => String(p.id) === String(currentProductId));
+            if (!product) return;
+            closeProductModal();
+
+            document.getElementById('manual-brand').value           = product.brand || '';
+            document.getElementById('manual-title').value           = product.name  || '';
+            document.getElementById('manual-price').value           = product.price || '';
+            document.getElementById('manual-compare-to').value      = product.compare_to || '';
+            document.getElementById('manual-quantity').value        = product.quantity || 10;
+            document.getElementById('manual-shipping-weight').value = product.shipping_weight || 0;
+            document.getElementById('manual-status').value          = product.status || 'In Stock';
+            document.getElementById('manual-description').value     = product.description || '';
+
+            const cats = product.categories || (product.mainCategory ? [product.mainCategory] : []);
+            document.getElementById('cat-action').checked = cats.includes("Action Figures");
+            document.getElementById('cat-model').checked  = cats.includes("Model Sets");
+            document.getElementById('cat-funko').checked  = cats.includes("Funko Pop");
+            document.getElementById('cat-blind').checked  = cats.includes("Blind Bag & Mini Figures");
+            document.getElementById('cat-toys').checked   = cats.includes("Toys");
+
+            // Check upsell group checkboxes
+            const productGroups = product.upsellGroupIds || [];
+            document.querySelectorAll('.upsell-group-check').forEach(cb => {
+                cb.checked = productGroups.includes(parseInt(cb.value));
+            });
+
+            editingProductId = product.id;
+            const btn = document.getElementById('add-product-btn');
+            if (btn) { btn.textContent = 'Update Product'; btn.onclick = saveProductEdits; }
+
+            showAdmin();
+            // Scroll the form into view
+            setTimeout(() => {
+                document.getElementById('manual-brand').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 200);
+        }
+
+        function saveProductEdits() {
+            const idx = products.findIndex(p => String(p.id) === String(editingProductId));
+            if (idx === -1) return;
+            const v = getProductFormValues();
+            if (!v.title || !v.price || v.categories.length === 0) {
+                alert("Title, Sales Price, and at least one Category are required");
+                return;
+            }
+
+            // Update upsell groups
+            upsellGroups.forEach(g => {
+                const inGroup = v.upsellGroupIds.includes(g.id);
+                const hasProduct = g.productIds.some(pid => String(pid) === String(editingProductId));
+                if (inGroup && !hasProduct) g.productIds.push(editingProductId);
+                if (!inGroup && hasProduct)  g.productIds = g.productIds.filter(pid => String(pid) !== String(editingProductId));
+            });
+            saveUpsellGroups();
+
+            products[idx] = {
+                ...products[idx],
+                name:            v.title,
+                brand:           v.brand || "Unknown",
+                categories:      v.categories,
+                price:           v.price,
+                quantity:        v.quantity,
+                shipping_weight: v.shippingWeight,
+                compare_to:      v.compareTo,
+                status:          v.status,
+                description:     v.description,
+                upsellGroupIds:  v.upsellGroupIds
+            };
+
+            saveToLocalStorage();
+            alert("Product updated!");
+            editingProductId = null;
+            const btn = document.getElementById('add-product-btn');
+            if (btn) { btn.textContent = 'Add Product'; btn.onclick = addManualProduct; }
+            clearProductForm();
+            closeAdmin();
+            renderAll();
+        }
+
+        // ─── CSV ─────────────────────────────────────────────────────────────
+        async function importCSV() {
+            const fileInput = document.getElementById('csv-file');
+            const resultDiv = document.getElementById('csv-result');
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<span class="text-red-400">Please select a CSV file</span>'; return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines   = e.target.result.trim().split(/\r?\n/);
+                if (lines.length < 2) { resultDiv.innerHTML = '<span class="text-red-400">No data rows found</span>'; return; }
+                const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
+                let success   = 0;
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const vals = parseCSVLine(lines[i]);
+                    const row  = {};
+                    headers.forEach((h, idx) => row[h] = vals[idx] ? vals[idx].trim() : '');
+                    const get  = (...keys) => { for (let k of keys) if (row[k]) return row[k]; return ''; };
+                    const cleanPrice = val => parseFloat((val||'').toString().replace(/[$,\s]/g,'')) || 0;
+                    const catStr  = get('category','categories');
+                    const imgStr  = get('image url','image','images');
+                    products.unshift({
+                        id:              Date.now() + i,
+                        name:            get('title','name') || 'Untitled',
+                        brand:           get('brand') || 'Unknown',
+                        categories:      catStr ? catStr.split(',').map(c=>c.trim()).filter(Boolean) : ['Toys'],
+                        price:           cleanPrice(get('sales price','price','sale price')),
+                        quantity:        parseInt(get('quantity','qty')) || 10,
+                        shipping_weight: parseFloat(get('shipping weight','weight')) || 0,
+                        cost:            cleanPrice(get('cost')),
+                        compare_to:      cleanPrice(get('compare to','compare price')),
+                        status:          get('status','availability') || 'In Stock',
+                        images:          imgStr ? imgStr.split(',').map(u=>u.trim()).filter(Boolean) : ['https://picsum.photos/id/106/600/400'],
+                        description:     get('description','desc') || '',
+                        upsellGroupIds:  [],
+                        created_at:      new Date().toISOString()
+                    });
+                    success++;
+                }
+                saveToLocalStorage();
+                resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products</span>`;
+                renderAll();
+            };
+            reader.readAsText(fileInput.files[0]);
+        }
+
+        function parseCSVLine(line) {
+            const result = []; let current = ''; let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const c = line[i];
+                if (c === '"' && inQuotes && line[i+1] === '"') { current += '"'; i++; }
+                else if (c === '"')           inQuotes = !inQuotes;
+                else if (c === ',' && !inQuotes) { result.push(current); current = ''; }
+                else current += c;
+            }
+            result.push(current);
+            return result;
+        }
+
+        function downloadSampleCSV() {
+            const csv = `Brand,Title,SKU,Categories,Description,Shipping Weight,Quantity,Cost,Sales Price,Compare To,Image URLs,Status\nBLOKEES,Blokees Transformers Version 09,,Model Sets,"Complete set includes 3 mystery figures",0.8,9,4.50,12.00,15.00,https://picsum.photos/id/106/600/400,In Stock`;
+            const a   = document.createElement('a');
+            a.href    = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+            a.download = 'nubz-master-inventory.csv';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // ─── MISC ─────────────────────────────────────────────────────────────
+        function submitContactForm() {
+            alert("Message sent! Thank you.");
+            ['contact-name','contact-email','contact-message'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+
+        // ─── FLASH SALE ───────────────────────────────────────────────────────
+        let flashSaleTimer = null;
+
+        function renderFlashSaleProductCheckboxes() {
+            const container = document.getElementById('fs-product-checkboxes');
+            if (!container) return;
+            if (products.length === 0) {
+                container.innerHTML = '<span class="text-xs text-slate-500">No products yet — add some first.</span>';
+                return;
+            }
+            container.innerHTML = products.map(p => `
+                <label class="flex items-center gap-x-2 text-sm">
+                    <input type="checkbox" class="fs-product-check accent-yellow-400" value="${p.id}">
+                    ${p.name}
+                </label>`).join('');
+        }
+
+        function getFlashSaleConfig() {
+            const title    = document.getElementById('fs-admin-title').value.trim()    || 'FLASH SALE';
+            const subtitle = document.getElementById('fs-admin-subtitle').value.trim() || 'Limited time deals — shop before they're gone!';
+            const hours    = parseInt(document.getElementById('fs-admin-hours').value)  || 0;
+            const mins     = parseInt(document.getElementById('fs-admin-mins').value)   || 0;
+            const secs     = parseInt(document.getElementById('fs-admin-secs').value)   || 0;
+            const selectedIds = Array.from(document.querySelectorAll('.fs-product-check:checked')).map(cb => cb.value);
+            const saleProducts = products.filter(p => selectedIds.includes(String(p.id)));
+            return { title, subtitle, hours, mins, secs, saleProducts };
+        }
+
+        function buildFlashSaleGrid(saleProducts) {
+            const grid = document.getElementById('flash-sale-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            if (saleProducts.length === 0) {
+                grid.innerHTML = '<p class="text-slate-500 col-span-3 text-center">No products selected for this sale.</p>';
+                return;
+            }
+            saleProducts.forEach(p => {
+                const img = (p.images && p.images[0]) || p.image || 'https://picsum.photos/id/106/600/400';
+                const savings = p.compare_to && p.compare_to > p.price
+                    ? Math.round((1 - p.price / p.compare_to) * 100) : null;
+                const card = document.createElement('div');
+                card.className = 'bg-slate-900 border border-slate-700 rounded-3xl overflow-hidden relative';
+                card.innerHTML = `
+                    ${savings ? `<div class="absolute top-3 left-3 bg-red-600 text-white text-xs font-black px-3 py-1 rounded-full z-10">-${savings}%</div>` : ''}
+                    <img src="${img}" class="w-full h-48 object-cover" onerror="this.src='https://picsum.photos/id/106/600/400'">
+                    <div class="p-5">
+                        <div class="font-semibold text-sm mb-3 line-clamp-2">${p.name}</div>
+                        <div class="flex items-baseline gap-2 mb-4">
+                            <span class="text-2xl font-black text-cyan-400">$${(p.price||0).toFixed(2)}</span>
+                            ${p.compare_to && p.compare_to > p.price ? `<span class="text-sm text-slate-500 line-through">$${p.compare_to.toFixed(2)}</span>` : ''}
+                        </div>
+                        <button onclick="addToCart(${p.id})" class="w-full py-2.5 bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-black font-bold rounded-2xl text-sm">+ Add to Cart</button>
+                    </div>`;
+                grid.appendChild(card);
+            });
+        }
+
+        function startFlashSaleCountdown(totalSeconds) {
+            if (flashSaleTimer) clearInterval(flashSaleTimer);
+            let remaining = totalSeconds;
+            function tick() {
+                if (remaining <= 0) { clearInterval(flashSaleTimer); return; }
+                remaining--;
+                const h = Math.floor(remaining / 3600);
+                const m = Math.floor((remaining % 3600) / 60);
+                const s = remaining % 60;
+                const hEl = document.getElementById('fs-hours');
+                const mEl = document.getElementById('fs-mins');
+                const sEl = document.getElementById('fs-secs');
+                if (hEl) hEl.textContent = String(h).padStart(2,'0');
+                if (mEl) mEl.textContent = String(m).padStart(2,'0');
+                if (sEl) sEl.textContent = String(s).padStart(2,'0');
+            }
+            tick();
+            flashSaleTimer = setInterval(tick, 1000);
+        }
+
+        function applyFlashSaleConfig(cfg) {
+            const titleEl    = document.getElementById('flash-sale-title');
+            const subtitleEl = document.getElementById('flash-sale-subtitle');
+            if (titleEl)    titleEl.textContent    = cfg.title;
+            if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
+            buildFlashSaleGrid(cfg.saleProducts);
+            const totalSecs = cfg.hours * 3600 + cfg.mins * 60 + cfg.secs;
+            startFlashSaleCountdown(totalSecs);
+        }
+
+        function launchFlashSalePage() {
+            const cfg = getFlashSaleConfig();
+            closeAdmin();
+            applyFlashSaleConfig(cfg);
+            showPage('flash-sale');
+        }
+
+        function launchFlashSalePopup() {
+            const cfg = getFlashSaleConfig();
+            closeAdmin();
+            applyFlashSaleConfig(cfg);
+
+            const existing = document.getElementById('flash-sale-overlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'flash-sale-overlay';
+            overlay.className = 'fixed inset-0 bg-black/80 z-[130] flex items-center justify-center p-6';
+            overlay.innerHTML = `
+                <div class="bg-slate-900 border border-yellow-600/40 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center p-6 border-b border-slate-800">
+                        <div>
+                            <div class="text-xs text-yellow-400 font-bold tracking-widest uppercase mb-1">⚡ Limited Time</div>
+                            <h3 id="fs-popup-title" class="text-2xl font-black gradient-title">${cfg.title}</h3>
+                            <p class="text-slate-400 text-sm mt-1">${cfg.subtitle}</p>
+                        </div>
+                        <button onclick="document.getElementById('flash-sale-overlay').remove(); if(flashSaleTimer) clearInterval(flashSaleTimer);"
+                                class="text-3xl text-slate-400 hover:text-white ml-4 flex-shrink-0">×</button>
+                    </div>
+                    <div class="flex justify-center gap-4 py-5 border-b border-slate-800">
+                        <div class="text-center"><div id="fs-hours" class="text-3xl font-black text-fuchsia-400 font-mono">00</div><div class="text-xs text-slate-500 uppercase tracking-widest">Hrs</div></div>
+                        <div class="text-center text-2xl font-black text-slate-600 pt-1">:</div>
+                        <div class="text-center"><div id="fs-mins" class="text-3xl font-black text-fuchsia-400 font-mono">00</div><div class="text-xs text-slate-500 uppercase tracking-widest">Min</div></div>
+                        <div class="text-center text-2xl font-black text-slate-600 pt-1">:</div>
+                        <div class="text-center"><div id="fs-secs" class="text-3xl font-black text-fuchsia-400 font-mono">00</div><div class="text-xs text-slate-500 uppercase tracking-widest">Sec</div></div>
+                    </div>
+                    <div id="flash-sale-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6"></div>
+                    <div class="p-6 pt-0 text-center">
+                        <button onclick="document.getElementById('flash-sale-overlay').remove(); if(flashSaleTimer) clearInterval(flashSaleTimer); showPage('flash-sale');"
+                                class="px-8 py-3 border border-white/20 hover:bg-white/5 rounded-3xl text-sm font-semibold">
+                            View Full Sale Page →
+                        </button>
+                    </div>
+                </div>`;
+            document.body.appendChild(overlay);
+            buildFlashSaleGrid(cfg.saleProducts);
+            const totalSecs = cfg.hours * 3600 + cfg.mins * 60 + cfg.secs;
+            startFlashSaleCountdown(totalSecs);
+        }
+
+        // ─── INIT ─────────────────────────────────────────────────────────────
+        async function initializeWebsite() {
+            loadUpsellGroups();
+            await loadProducts();
+            updateCartCount();
+            console.log('%c✅ Nubz Toys loaded successfully', 'color:#22d3ee; font-weight:bold;');
         }
 
         window.onload = initializeWebsite;
