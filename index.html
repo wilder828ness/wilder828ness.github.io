@@ -1181,6 +1181,20 @@
 
             products.unshift(newProduct);
             saveToLocalStorage();
+
+            // Also save to Supabase if connected
+            if (window.supabaseInstance) {
+                try {
+                    const { error } = await window.supabaseInstance
+                        .from('products')
+                        .upsert([newProduct], { onConflict: 'id' });
+                    if (error) console.error('Supabase save error:', error.message);
+                    else console.log('%c✅ Product saved to Supabase', 'color:#22d3ee');
+                } catch(e) {
+                    console.error('Supabase product save failed:', e);
+                }
+            }
+
             clearProductForm();
             alert("Product added successfully!");
             renderUpsellGroups();
@@ -1276,7 +1290,7 @@
                 resultDiv.innerHTML = '<span class="text-red-400">Please select a CSV file</span>'; return;
             }
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const lines   = e.target.result.trim().split(/\r?\n/);
                 if (lines.length < 2) { resultDiv.innerHTML = '<span class="text-red-400">No data rows found</span>'; return; }
                 const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
@@ -1309,7 +1323,27 @@
                     success++;
                 }
                 saveToLocalStorage();
-                resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products</span>`;
+
+                // Also save to Supabase if connected
+                if (window.supabaseInstance && products.length > 0) {
+                    try {
+                        const newProducts = products.slice(0, success);
+                        const { error } = await window.supabaseInstance
+                            .from('products')
+                            .upsert(newProducts, { onConflict: 'id' });
+                        if (error) {
+                            console.error('Supabase save error:', error);
+                            resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products locally</span> <span class="text-yellow-400">⚠ Supabase: ${error.message}</span>`;
+                        } else {
+                            resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products to Supabase!</span>`;
+                        }
+                    } catch(e) {
+                        console.error('Supabase save failed:', e);
+                        resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products locally</span> <span class="text-yellow-400">⚠ Supabase sync failed</span>`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products</span>`;
+                }
                 renderAll();
             };
             reader.readAsText(fileInput.files[0]);
