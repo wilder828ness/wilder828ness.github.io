@@ -391,7 +391,7 @@
                             <div id="product-upsell-group-checkboxes" class="grid grid-cols-2 gap-2 text-sm"></div>
                         </div>
                     </div>
-                    <button id="add-product-btn" onclick="addManualProduct()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
+                    <button id="add-product-btn" onclick="handleProductFormSubmit()" class="mt-4 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-3xl text-sm">Add Product</button>
                 </div>
 
                 <!-- CSV Import -->
@@ -491,12 +491,39 @@
 
         // ─── STORAGE ─────────────────────────────────────────────────────────
         function saveToLocalStorage() {
-            localStorage.setItem('nubz_products', JSON.stringify(products));
+            try {
+                // Strip base64 images before writing to localStorage — they're too large
+                // and will blow the quota. Images are persisted in Supabase instead.
+                const slim = products.map(p => ({
+                    ...p,
+                    images: (p.images || []).filter(img => !img.startsWith('data:'))
+                }));
+                localStorage.setItem('nubz_products', JSON.stringify(slim));
+            } catch(e) {
+                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                    console.warn('⚠️ localStorage quota exceeded — product data saved to Supabase only');
+                } else {
+                    console.error('localStorage save error:', e);
+                }
+            }
         }
 
         function loadFromLocalStorage() {
             const saved = localStorage.getItem('nubz_products');
             if (saved) products = JSON.parse(saved);
+        }
+
+        function normalizeProductFromSupabase(p) {
+            // Supabase stores categories and images as comma-separated strings — convert back to arrays
+            return {
+                ...p,
+                categories: typeof p.categories === 'string'
+                    ? p.categories.split(',').map(c => c.trim()).filter(Boolean)
+                    : (Array.isArray(p.categories) ? p.categories : []),
+                images: typeof p.images === 'string'
+                    ? p.images.split(',').map(u => u.trim()).filter(Boolean)
+                    : (Array.isArray(p.images) ? p.images : [])
+            };
         }
 
         async function loadProducts() {
@@ -506,11 +533,11 @@
                     const { data, error } = await window.supabaseInstance
                         .from('products').select('*').order('created_at', { ascending: false });
                     if (error) {
-                        console.error('❌ Supabase error:', error.message, '| Code:', error.code, '| Details:', error.details, '| Hint:', error.hint);
+                        console.error('❌ Supabase error:', error.message);
                         throw error;
                     }
                     console.log('%c✅ Supabase connected! Products loaded: ' + (data ? data.length : 0), 'color:#22d3ee');
-                    products = data || [];
+                    products = (data || []).map(normalizeProductFromSupabase);
                     renderAll();
                     return;
                 } catch (e) {
@@ -1068,7 +1095,7 @@
             if (editingProductId) {
                 editingProductId = null;
                 const btn = document.getElementById('add-product-btn');
-                if (btn) { btn.textContent = 'Add Product'; btn.onclick = addManualProduct; }
+                if (btn) { btn.textContent = 'Add Product'; }
             }
         }
 
@@ -1086,11 +1113,32 @@
             }
         }
 
-        function changePassword() {
+        // Dispatcher: routes the Add/Update Product button to the right function
+        function handleProductFormSubmit() {
+            if (editingProductId) {
+                saveProductEdits();
+            } else {
+                addManualProduct();
+            }
+        }
+
+        async function changePassword() {
             const newPass = document.getElementById('new-password').value.trim();
             if (!newPass) { alert("Please enter a new password"); return; }
             adminPassword = newPass;
             localStorage.setItem('nubz_admin_password', newPass);
+
+            // Also save to Supabase settings table if available
+            if (window.supabaseInstance) {
+                try {
+                    await window.supabaseInstance
+                        .from('settings')
+                        .upsert([{ key: 'admin_password', value: newPass }], { onConflict: 'key' });
+                } catch(e) {
+                    console.warn('Supabase password save failed (settings table may not exist):', e.message);
+                }
+            }
+
             alert("Password updated successfully!");
             document.getElementById('new-password').value = '';
         }
@@ -1294,7 +1342,7 @@
 
             editingProductId = product.id;
             const btn = document.getElementById('add-product-btn');
-            if (btn) { btn.textContent = 'Update Product'; btn.onclick = saveProductEdits; }
+            if (btn) { btn.textContent = 'Update Product'; }
 
             showAdmin();
             // Scroll the form into view
@@ -1387,7 +1435,7 @@
             alert("Product updated!");
             editingProductId = null;
             const btn = document.getElementById('add-product-btn');
-            if (btn) { btn.textContent = 'Add Product'; btn.onclick = addManualProduct; }
+            if (btn) { btn.textContent = 'Add Product'; }
             clearProductForm();
             closeAdmin();
             renderAll();
