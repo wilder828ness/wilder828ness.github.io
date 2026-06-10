@@ -212,6 +212,7 @@
                     <li><a href="#" onclick="filterAndGoToInventory('Funko Pop')" class="hover:text-cyan-400">Funko Pop</a></li>
                     <li><a href="#" onclick="filterAndGoToInventory('Blind Bag &amp; Mini Figures')" class="hover:text-cyan-400">Blind Bag &amp; Mini Figures</a></li>
                     <li><a href="#" onclick="filterAndGoToInventory('Toys')" class="hover:text-cyan-400">Toys</a></li>
+                    <li><a href="#" onclick="filterAndGoToInventory('Collectibles')" class="hover:text-cyan-400">Collectibles</a></li>
                 </ul>
             </div>
             <div>
@@ -370,6 +371,7 @@
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-funko" class="accent-emerald-500"> Funko Pop</label>
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-blind" class="accent-emerald-500"> Blind Bag &amp; Mini Figures</label>
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-toys" class="accent-emerald-500"> Toys</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-collectibles" class="accent-emerald-500"> Collectibles</label>
                             </div>
                         </div>
                         <div class="md:col-span-2">
@@ -377,15 +379,12 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm text-slate-400 mb-2">Main Product Image</label>
-                            <input type="file" id="manual-image-upload" accept="image/*" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                            <input type="file" id="manual-image-upload" accept="image/*" multiple class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-2xl file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700">
+                            <p class="text-xs text-slate-500 mt-1">Hold Ctrl / Cmd to select multiple images at once</p>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm text-slate-400 mb-2">Additional Image URLs (comma separated)</label>
                             <input id="manual-extra-images" placeholder="https://example.com/img2.jpg, https://example.com/img3.jpg" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
-                        </div>
-                        <div class="md:col-span-2" id="image-manager-section" style="display:none;">
-                            <label class="block text-sm text-slate-400 mb-2">Current Images — click × to remove</label>
-                            <div id="image-manager-container" class="flex flex-wrap gap-3"></div>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm text-slate-400 mb-2">Upsell Groups (select groups this product triggers)</label>
@@ -411,34 +410,32 @@
     </div>
 
     <!-- PRODUCT MODAL -->
-    <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-end sm:items-center justify-center sm:p-6">
-        <div class="bg-slate-900 border border-slate-700 rounded-t-3xl sm:rounded-3xl max-w-2xl w-full overflow-hidden max-h-[92vh] flex flex-col">
-            <div class="relative flex-shrink-0">
-                <img id="modal-image" class="w-full object-contain bg-slate-800" style="max-height: 220px;">
-                <button onclick="prevImage()" class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-xl">←</button>
-                <button onclick="nextImage()" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-xl">→</button>
-                <button onclick="closeProductModal()" class="absolute top-3 right-3 w-9 h-9 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-xl">×</button>
-                <div id="modal-image-counter" class="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-3 py-1 rounded-full"></div>
+    <div id="product-modal" class="hidden fixed inset-0 bg-black/80 z-[110] flex items-center justify-center p-6">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full overflow-hidden">
+            <div class="relative">
+                <img id="modal-image" class="w-full h-80 object-contain bg-slate-800" style="max-height: 320px;">
+                <button onclick="prevImage()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">←</button>
+                <button onclick="nextImage()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">→</button>
+                <button onclick="closeProductModal()" class="absolute top-4 right-4 w-10 h-10 bg-black/70 hover:bg-black rounded-full flex items-center justify-center text-2xl">×</button>
+                <div id="modal-image-counter" class="absolute bottom-4 right-4 bg-black/70 text-white text-xs px-3 py-1 rounded-full"></div>
             </div>
-            <div class="p-5 sm:p-8 overflow-y-auto flex-1">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="flex-1 pr-3">
-                        <h3 id="modal-title" class="text-lg sm:text-2xl font-bold leading-tight"></h3>
-                        <p id="modal-brand-category" class="text-slate-400 text-sm mt-1"></p>
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 id="modal-title" class="text-3xl font-bold leading-tight"></h3>
+                        <p id="modal-brand-category" class="text-slate-400 mt-1"></p>
                     </div>
-                    <div id="modal-status" class="text-xs font-semibold px-3 py-1 rounded-full flex-shrink-0"></div>
+                    <div id="modal-status" class="text-sm font-semibold px-4 py-1 rounded-full"></div>
                 </div>
-                <div class="flex items-baseline gap-x-3 mb-4">
-                    <div class="text-3xl font-bold" id="modal-price"></div>
-                    <div id="modal-compare-price" class="compare-price text-lg"></div>
+                <div class="flex items-baseline gap-x-3 mb-6">
+                    <div class="text-4xl font-bold" id="modal-price"></div>
+                    <div id="modal-compare-price" class="compare-price text-xl"></div>
                 </div>
-                <div id="modal-description" class="text-slate-300 mb-6 text-sm leading-relaxed"></div>
+                <div id="modal-description" class="text-slate-300 mb-8 max-h-48 overflow-y-auto pr-2 text-[15px] leading-relaxed"></div>
                 <div class="flex gap-3">
-                    <button id="modal-add-btn" onclick="addCurrentProductToCart()" class="flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl">ADD TO CART</button>
-                    <button id="edit-product-btn" onclick="editCurrentProduct()" class="hidden px-5 py-3.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl">EDIT</button>
-                </div>
-                <div id="modal-delete-btn-container" class="hidden mt-3">
-                    <button onclick="deleteCurrentProduct()" class="w-full py-2.5 bg-red-900/40 hover:bg-red-900/60 border border-red-700 text-red-400 font-semibold rounded-2xl text-sm">Delete This Product</button>
+                    <button onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
+                    <button id="edit-product-btn" onclick="editCurrentProduct()" class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">EDIT</button>
+                    <button id="delete-product-btn" onclick="deleteProduct(currentProductId)" class="hidden px-6 py-4 bg-red-700 hover:bg-red-800 text-white font-bold rounded-3xl text-lg">DELETE</button>
                 </div>
             </div>
         </div>
@@ -451,7 +448,8 @@
             { name: "Model Sets",              icon: "fa-cube",           color: "emerald-400" },
             { name: "Funko Pop",               icon: "fa-head-side",      color: "purple-400"  },
             { name: "Blind Bag & Mini Figures",icon: "fa-question-circle",color: "fuchsia-400" },
-            { name: "Toys",                    icon: "fa-gamepad",        color: "amber-400"   }
+            { name: "Toys",                    icon: "fa-gamepad",        color: "amber-400"   },
+            { name: "Collectibles",            icon: "fa-star",           color: "rose-400"    }
         ];
 
         let products       = [];
@@ -464,21 +462,6 @@
         let currentModalImages   = [];
         let currentModalImageIndex = 0;
         let editingProductId     = null;   // tracks edit mode
-
-        // ─── HELPERS ─────────────────────────────────────────────────────────
-        function toArray(val) {
-            if (!val) return [];
-            if (Array.isArray(val)) return val;
-            return val.split(',').map(v => v.trim()).filter(Boolean);
-        }
-
-        function normalizeProduct(p) {
-            return {
-                ...p,
-                categories: toArray(p.categories || p.mainCategory),
-                images: toArray(p.images || p.image)
-            };
-        }
 
         // ─── SUPABASE ────────────────────────────────────────────────────────
         window.supabaseInstance = null;
@@ -513,7 +496,7 @@
 
         function loadFromLocalStorage() {
             const saved = localStorage.getItem('nubz_products');
-            if (saved) products = JSON.parse(saved).map(normalizeProduct);
+            if (saved) products = JSON.parse(saved);
         }
 
         async function loadProducts() {
@@ -527,7 +510,7 @@
                         throw error;
                     }
                     console.log('%c✅ Supabase connected! Products loaded: ' + (data ? data.length : 0), 'color:#22d3ee');
-                    products = (data || []).map(normalizeProduct);
+                    products = data || [];
                     renderAll();
                     return;
                 } catch (e) {
@@ -714,23 +697,6 @@
             });
         }
 
-        function getStatusBadge(product) {
-            const qty = parseInt(product.quantity) || 0;
-            const status = (product.status || 'In Stock').trim();
-            if (status === 'On Order') return { badge: 'COMING SOON', cls: 'bg-slate-600 text-slate-200' };
-            if (status === 'In Transit') return { badge: 'IN TRANSIT', cls: 'bg-blue-500 text-white' };
-            if (status === 'In Stock' && qty === 0) return { badge: 'OUT OF STOCK', cls: 'bg-red-600 text-white' };
-            return null; // In Stock with qty > 0 = no badge
-        }
-
-        function canAddToCart(product) {
-            const qty = parseInt(product.quantity) || 0;
-            const status = (product.status || 'In Stock').trim();
-            if (status === 'On Order') return false;
-            if (status === 'In Stock' && qty === 0) return false;
-            return true;
-        }
-
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
@@ -739,42 +705,30 @@
                 ? product.images[0]
                 : (product.image || 'https://picsum.photos/id/106/600/400');
             const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
-            const statusInfo = getStatusBadge(product);
-            const status = (product.status || 'In Stock').trim();
-            const addable = canAddToCart(product);
-            const isOnOrder = status === 'On Order';
-            const qty = parseInt(product.quantity) || 0;
-            const lowQty = (status === 'In Stock' && qty > 0 && qty <= 2);
 
-            const badgeHTML = statusInfo
-                ? `<div class="absolute top-4 right-4"><span class="status-badge ${statusInfo.cls}">${statusInfo.badge}</span>${lowQty ? '<span class="status-badge bg-amber-500 text-black ml-1">LOW QTY</span>' : ''}</div>`
-                : (lowQty ? `<div class="absolute top-4 right-4"><span class="status-badge bg-amber-500 text-black">LOW QTY</span></div>` : '');
-
-            const priceHTML = isOnOrder
-                ? `<div class="text-slate-500 font-semibold text-sm italic">Coming Soon</div>`
-                : `<div class="text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
-                   ${product.compare_to && product.compare_to > product.price
-                       ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}`;
-
-            const btnHTML = addable
-                ? `<button onclick="event.stopImmediatePropagation(); handleAddToCart(${product.id});"
-                          class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>`
-                : isOnOrder
-                    ? `<span class="px-4 py-2 bg-slate-800 text-slate-500 text-xs rounded-2xl font-semibold">Coming Soon</span>`
-                    : `<span class="px-4 py-2 bg-slate-800 text-slate-500 text-xs rounded-2xl font-semibold">Out of Stock</span>`;
+            const statusHTML  = product.status === "In Stock"
+                ? `<span class="status-badge bg-emerald-500 text-black">IN STOCK</span>`
+                : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
+            const lowQtyHTML  = (product.quantity && product.quantity <= 2)
+                ? `<span class="status-badge bg-red-500 text-white ml-1">LOW QTY</span>` : '';
 
             card.innerHTML = `
                 <div class="relative">
                     <img src="${firstImage}" class="w-full h-56 object-cover" loading="lazy"
                          onerror="this.src='https://picsum.photos/id/106/600/400'">
-                    ${badgeHTML}
+                    <div class="absolute top-4 right-4 flex gap-1">${statusHTML}${lowQtyHTML}</div>
                 </div>
                 <div class="p-6">
                     <div class="font-semibold text-lg line-clamp-2">${product.name}</div>
                     <div class="text-xs text-slate-400">${product.brand || 'Unknown'} • ${catDisplay}</div>
                     <div class="flex justify-between items-center mt-4">
-                        <div>${priceHTML}</div>
-                        ${btnHTML}
+                        <div>
+                            <div class="text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
+                            ${product.compare_to && product.compare_to > product.price
+                                ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}
+                        </div>
+                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
                     </div>
                 </div>`;
             card.onclick = () => showProductModal(product);
@@ -855,34 +809,8 @@
 
             document.getElementById('modal-title').textContent          = product.name || 'Untitled';
             document.getElementById('modal-brand-category').textContent = `${product.brand || 'Unknown'} • ${(product.categories || [product.mainCategory || 'Toys']).join(', ')}`;
+            document.getElementById('modal-price').textContent          = `$${(product.price || 0).toFixed(2)}`;
             document.getElementById('modal-description').innerHTML      = product.description || 'No description available.';
-
-            // Price display based on status
-            const modalStatus = (product.status || 'In Stock').trim();
-            const priceEl = document.getElementById('modal-price');
-            if (modalStatus === 'On Order') {
-                priceEl.textContent = 'Coming Soon';
-                priceEl.className = 'text-slate-500 font-semibold italic text-xl';
-            } else {
-                priceEl.textContent = `$${(product.price || 0).toFixed(2)}`;
-                priceEl.className = 'text-4xl font-bold';
-            }
-
-            // Add to cart button based on status
-            const addBtn = document.getElementById('modal-add-btn');
-            if (!canAddToCart(product)) {
-                addBtn.textContent = modalStatus === 'On Order' ? 'Coming Soon' : 'Out of Stock';
-                addBtn.className = 'flex-1 py-3.5 bg-slate-700 text-slate-400 font-bold rounded-3xl cursor-not-allowed';
-                addBtn.onclick = null;
-            } else if (modalStatus === 'In Transit') {
-                addBtn.textContent = 'PRE-ORDER';
-                addBtn.className = 'flex-1 py-3.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-3xl';
-                addBtn.onclick = () => { handleAddToCart(product.id); };
-            } else {
-                addBtn.textContent = 'ADD TO CART';
-                addBtn.className = 'flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl';
-                addBtn.onclick = () => addCurrentProductToCart();
-            }
 
             const compareEl = document.getElementById('modal-compare-price');
             if (product.compare_to && product.compare_to > product.price) {
@@ -896,14 +824,14 @@
             statusEl.textContent = product.status || 'In Stock';
             statusEl.className   = `text-sm font-semibold px-4 py-1 rounded-full ${product.status === 'In Stock' ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
 
-            const editBtn = document.getElementById('edit-product-btn');
-            const deleteContainer = document.getElementById('modal-delete-btn-container');
+            const editBtn   = document.getElementById('edit-product-btn');
+            const deleteBtn = document.getElementById('delete-product-btn');
             if (isAdminLoggedIn) {
-                editBtn.classList.remove('hidden'); editBtn.classList.add('flex');
-                if (deleteContainer) deleteContainer.classList.remove('hidden');
+                editBtn.classList.remove('hidden');   editBtn.classList.add('flex');
+                deleteBtn.classList.remove('hidden'); deleteBtn.classList.add('flex');
             } else {
-                editBtn.classList.add('hidden'); editBtn.classList.remove('flex');
-                if (deleteContainer) deleteContainer.classList.add('hidden');
+                editBtn.classList.add('hidden');    editBtn.classList.remove('flex');
+                deleteBtn.classList.add('hidden');  deleteBtn.classList.remove('flex');
             }
 
             document.getElementById('product-modal').classList.remove('hidden');
@@ -941,36 +869,6 @@
             if (currentProductId) { addToCart(currentProductId); closeProductModal(); }
         }
 
-        async function deleteCurrentProduct() {
-            if (!currentProductId || !isAdminLoggedIn) return;
-            const product = products.find(p => String(p.id) === String(currentProductId));
-            if (!product) return;
-            if (!confirm(`Delete "${product.name}"? This cannot be undone.`)) return;
-
-            // Remove from local array
-            products = products.filter(p => String(p.id) !== String(currentProductId));
-            saveToLocalStorage();
-
-            // Remove from Supabase
-            if (window.supabaseInstance) {
-                try {
-                    const { error } = await window.supabaseInstance
-                        .from('products')
-                        .delete()
-                        .eq('id', currentProductId);
-                    if (error) console.error('Supabase delete error:', error.message);
-                    else console.log('%c✅ Product deleted from Supabase', 'color:#22d3ee');
-                } catch(e) {
-                    console.error('Supabase delete failed:', e);
-                }
-            }
-
-            closeProductModal();
-            renderAll();
-            if (document.getElementById('inventory').classList.contains('active')) filterInventory();
-            alert('Product deleted.');
-        }
-
         // ─── CART ─────────────────────────────────────────────────────────────
         function addToCart(productId) {
             const product = products.find(p => String(p.id) === String(productId));
@@ -979,71 +877,6 @@
             if (existing) existing.quantity++;
             else cart.push({ ...product, quantity: 1 });
             updateCartCount();
-        }
-
-        function handleAddToCart(productId) {
-            const product = products.find(p => String(p.id) === String(productId));
-            if (!product) return;
-            if (!canAddToCart(product)) return;
-            const status = (product.status || 'In Stock').trim();
-            if (status === 'In Transit') {
-                showInTransitModal(productId);
-            } else {
-                addToCart(productId);
-            }
-        }
-
-        function showInTransitModal(productId) {
-            const existing = document.getElementById('in-transit-modal');
-            if (existing) existing.remove();
-
-            const modal = document.createElement('div');
-            modal.id = 'in-transit-modal';
-            modal.className = 'fixed inset-0 bg-black/80 z-[150] flex items-center justify-center p-6';
-            modal.innerHTML = `
-                <div class="bg-slate-900 border border-blue-600/40 rounded-3xl max-w-md w-full p-8">
-                    <div class="text-center mb-6">
-                        <div class="text-4xl mb-3">🚢</div>
-                        <h3 class="text-xl font-bold mb-2">Item In Transit</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">This item is currently on its way to us. You can still purchase it now — please read and acknowledge below before adding to your cart.</p>
-                    </div>
-                    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4 mb-6">
-                        <label class="flex items-start gap-x-3 cursor-pointer">
-                            <input type="checkbox" id="in-transit-checkbox" class="mt-1 accent-cyan-500 w-4 h-4 flex-shrink-0">
-                            <span class="text-sm text-slate-300 leading-relaxed">I understand items in transit may initiate a longer wait time on my order as all items will be shipped together.</span>
-                        </label>
-                    </div>
-                    <button id="in-transit-confirm"
-                            onclick="confirmInTransitAdd(${productId})"
-                            class="w-full py-3.5 bg-slate-700 text-slate-400 font-bold rounded-3xl text-sm cursor-not-allowed mb-3"
-                            disabled>
-                        Add to Cart
-                    </button>
-                    <button onclick="document.getElementById('in-transit-modal').remove()"
-                            class="w-full py-2.5 text-slate-500 text-sm text-center">
-                        Cancel
-                    </button>
-                </div>`;
-            document.body.appendChild(modal);
-
-            // Enable button only when checkbox is checked
-            document.getElementById('in-transit-checkbox').addEventListener('change', function() {
-                const btn = document.getElementById('in-transit-confirm');
-                if (this.checked) {
-                    btn.className = 'w-full py-3.5 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-sm mb-3';
-                    btn.disabled = false;
-                } else {
-                    btn.className = 'w-full py-3.5 bg-slate-700 text-slate-400 font-bold rounded-3xl text-sm cursor-not-allowed mb-3';
-                    btn.disabled = true;
-                }
-            });
-        }
-
-        function confirmInTransitAdd(productId) {
-            const modal = document.getElementById('in-transit-modal');
-            if (modal) modal.remove();
-            addToCart(productId);
-            closeProductModal();
         }
 
         function updateCartCount() {
@@ -1262,8 +1095,38 @@
             document.getElementById('new-password').value = '';
         }
 
-        function deleteAllProducts() {
+        async function deleteProduct(productId) {
+            if (!productId || !isAdminLoggedIn) return;
+            if (!confirm("Delete this product? This cannot be undone.")) return;
+
+            if (window.supabaseInstance) {
+                try {
+                    const { error } = await window.supabaseInstance
+                        .from('products').delete().eq('id', productId);
+                    if (error) console.error('Supabase delete error:', error.message);
+                    else console.log('%c✅ Product deleted from Supabase', 'color:#22d3ee');
+                } catch(e) { console.error('Supabase delete failed:', e); }
+            }
+
+            products = products.filter(p => String(p.id) !== String(productId));
+            saveToLocalStorage();
+            closeProductModal();
+            renderAll();
+            filterInventory();
+        }
+
+        async function deleteAllProducts() {
             if (!confirm("DELETE ALL PRODUCTS? This cannot be undone.")) return;
+
+            if (window.supabaseInstance) {
+                try {
+                    const { error } = await window.supabaseInstance
+                        .from('products').delete().gte('id', 0);
+                    if (error) console.error('Supabase delete-all error:', error.message);
+                    else console.log('%c✅ All products deleted from Supabase', 'color:#22d3ee');
+                } catch(e) { console.error('Supabase delete-all failed:', e); }
+            }
+
             products = [];
             localStorage.removeItem('nubz_products');
             alert("All products deleted.");
@@ -1278,7 +1141,8 @@
             if (document.getElementById('cat-model').checked)  selectedCategories.push("Model Sets");
             if (document.getElementById('cat-funko').checked)  selectedCategories.push("Funko Pop");
             if (document.getElementById('cat-blind').checked)  selectedCategories.push("Blind Bag & Mini Figures");
-            if (document.getElementById('cat-toys').checked)   selectedCategories.push("Toys");
+            if (document.getElementById('cat-toys').checked)         selectedCategories.push("Toys");
+            if (document.getElementById('cat-collectibles').checked)  selectedCategories.push("Collectibles");
             return {
                 brand:          document.getElementById('manual-brand').value.trim(),
                 title:          document.getElementById('manual-title').value.trim(),
@@ -1303,7 +1167,7 @@
             document.getElementById('manual-shipping-weight').value = '';
             document.getElementById('manual-status').value      = 'In Stock';
             document.getElementById('manual-image-upload').value = '';
-            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys'].forEach(id => {
+            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys','cat-collectibles'].forEach(id => {
                 document.getElementById(id).checked = false;
             });
             document.querySelectorAll('.upsell-group-check').forEach(cb => cb.checked = false);
@@ -1319,12 +1183,14 @@
             let images = [];
             const fileInput = document.getElementById('manual-image-upload');
             if (fileInput.files.length > 0) {
-                const base64 = await new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onload = e => resolve(e.target.result);
-                    reader.readAsDataURL(fileInput.files[0]);
-                });
-                images.push(base64);
+                for (const file of fileInput.files) {
+                    const base64 = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                    images.push(base64);
+                }
             }
             if (v.extraImages) {
                 images = images.concat(v.extraImages.split(',').map(u => u.trim()).filter(Boolean));
@@ -1393,36 +1259,6 @@
             renderAll();
         }
 
-        function renderImageManager(product) {
-            const container = document.getElementById('image-manager-container');
-            if (!container) return;
-            const images = product.images || [];
-            if (images.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-500">No images yet.</p>';
-                return;
-            }
-            container.innerHTML = images.map((img, idx) => `
-                <div class="relative group">
-                    <img src="${img}" class="w-20 h-20 object-cover rounded-xl border border-slate-700"
-                         onerror="this.src='https://picsum.photos/id/106/600/400'">
-                    <button onclick="removeImageFromProduct(${idx})"
-                            class="absolute -top-2 -right-2 w-6 h-6 bg-red-600 hover:bg-red-500 text-white rounded-full text-xs font-bold flex items-center justify-center">
-                        ×
-                    </button>
-                    ${idx === 0 ? '<div class="absolute bottom-0 left-0 right-0 bg-black/60 text-xs text-center text-white rounded-b-xl py-0.5">Main</div>' : ''}
-                </div>`).join('');
-        }
-
-        function removeImageFromProduct(imageIndex) {
-            if (!editingProductId) return;
-            const idx = products.findIndex(p => String(p.id) === String(editingProductId));
-            if (idx === -1) return;
-            if (!confirm('Remove this image?')) return;
-            products[idx].images.splice(imageIndex, 1);
-            saveToLocalStorage();
-            renderImageManager(products[idx]);
-        }
-
         function editCurrentProduct() {
             if (!currentProductId || !isAdminLoggedIn) return;
             const product = products.find(p => String(p.id) === String(currentProductId));
@@ -1437,13 +1273,18 @@
             document.getElementById('manual-shipping-weight').value = product.shipping_weight || 0;
             document.getElementById('manual-status').value          = product.status || 'In Stock';
             document.getElementById('manual-description').value     = product.description || '';
+            // Populate existing image URLs so they can be reviewed/replaced
+            const existingImgs = (product.images || (product.image ? [product.image] : []));
+            document.getElementById('manual-extra-images').value    = existingImgs.join(', ');
+            document.getElementById('manual-image-upload').value    = '';
 
             const cats = product.categories || (product.mainCategory ? [product.mainCategory] : []);
             document.getElementById('cat-action').checked = cats.includes("Action Figures");
             document.getElementById('cat-model').checked  = cats.includes("Model Sets");
             document.getElementById('cat-funko').checked  = cats.includes("Funko Pop");
             document.getElementById('cat-blind').checked  = cats.includes("Blind Bag & Mini Figures");
-            document.getElementById('cat-toys').checked   = cats.includes("Toys");
+            document.getElementById('cat-toys').checked         = cats.includes("Toys");
+            document.getElementById('cat-collectibles').checked = cats.includes("Collectibles");
 
             // Check upsell group checkboxes
             const productGroups = product.upsellGroupIds || [];
@@ -1455,18 +1296,14 @@
             const btn = document.getElementById('add-product-btn');
             if (btn) { btn.textContent = 'Update Product'; btn.onclick = saveProductEdits; }
 
-            // Render image management
-            renderImageManager(product);
-            const imgSection = document.getElementById('image-manager-section');
-            if (imgSection) imgSection.style.display = 'block';
-
             showAdmin();
+            // Scroll the form into view
             setTimeout(() => {
                 document.getElementById('manual-brand').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 200);
         }
 
-        function saveProductEdits() {
+        async function saveProductEdits() {
             const idx = products.findIndex(p => String(p.id) === String(editingProductId));
             if (idx === -1) return;
             const v = getProductFormValues();
@@ -1477,12 +1314,33 @@
 
             // Update upsell groups
             upsellGroups.forEach(g => {
-                const inGroup = v.upsellGroupIds.includes(g.id);
+                const inGroup    = v.upsellGroupIds.includes(g.id);
                 const hasProduct = g.productIds.some(pid => String(pid) === String(editingProductId));
                 if (inGroup && !hasProduct) g.productIds.push(editingProductId);
-                if (!inGroup && hasProduct)  g.productIds = g.productIds.filter(pid => String(pid) !== String(editingProductId));
+                if (!inGroup && hasProduct) g.productIds = g.productIds.filter(pid => String(pid) !== String(editingProductId));
             });
             saveUpsellGroups();
+
+            // Handle image: new file upload takes priority, then extra images field, then keep existing
+            let images = [];
+            const fileInput = document.getElementById('manual-image-upload');
+            if (fileInput.files.length > 0) {
+                for (const file of fileInput.files) {
+                    const base64 = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = e => resolve(e.target.result);
+                        reader.readAsDataURL(file);
+                    });
+                    images.push(base64);
+                }
+            }
+            if (v.extraImages) {
+                images = images.concat(v.extraImages.split(',').map(u => u.trim()).filter(Boolean));
+            }
+            if (images.length === 0) {
+                // Keep whatever was already on the product
+                images = products[idx].images || (products[idx].image ? [products[idx].image] : ['https://picsum.photos/id/106/600/400']);
+            }
 
             products[idx] = {
                 ...products[idx],
@@ -1495,17 +1353,42 @@
                 compare_to:      v.compareTo,
                 status:          v.status,
                 description:     v.description,
-                upsellGroupIds:  v.upsellGroupIds
+                upsellGroupIds:  v.upsellGroupIds,
+                images:          images
             };
 
             saveToLocalStorage();
+
+            // Sync to Supabase so changes survive a refresh
+            if (window.supabaseInstance) {
+                try {
+                    const p = products[idx];
+                    const { error } = await window.supabaseInstance
+                        .from('products')
+                        .upsert([{
+                            id:              p.id,
+                            name:            p.name,
+                            brand:           p.brand,
+                            categories:      Array.isArray(p.categories) ? p.categories.join(', ') : '',
+                            price:           p.price,
+                            compare_to:      p.compare_to || 0,
+                            quantity:        p.quantity,
+                            shipping_weight: p.shipping_weight || 0,
+                            status:          p.status,
+                            images:          Array.isArray(p.images) ? p.images.join(', ') : '',
+                            description:     p.description,
+                            created_at:      p.created_at
+                        }], { onConflict: 'id' });
+                    if (error) console.error('Supabase update error:', error.message);
+                    else console.log('%c✅ Product updated in Supabase', 'color:#22d3ee');
+                } catch(e) { console.error('Supabase product update failed:', e); }
+            }
+
             alert("Product updated!");
             editingProductId = null;
             const btn = document.getElementById('add-product-btn');
             if (btn) { btn.textContent = 'Add Product'; btn.onclick = addManualProduct; }
             clearProductForm();
-            const imgSection = document.getElementById('image-manager-section');
-            if (imgSection) imgSection.style.display = 'none';
             closeAdmin();
             renderAll();
         }
