@@ -2,7 +2,7 @@
 "buildCommand": "node generate.js",
 "outputDirectory": ".",
 "cleanUrls": true,
-"trailingSlash": false
+"trailingSlash": false,
   "functions": {
     "api/*.js": {
       "memory": 128,
