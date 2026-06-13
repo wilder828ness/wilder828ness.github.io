@@ -1,7 +1,12 @@
 {
   "name": "nubztoys",
   "version": "1.0.0",
-  "dependencies": {
-    "stripe": "^14.0.0"
+  "private": true,
+  "description": "Nubz Toys & Collectibles storefront + static SEO page generator",
+  "scripts": {
+    "build": "node generate.js"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
