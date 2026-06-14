@@ -45,6 +45,22 @@ module.exports = async (req, res) => {
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA', 'GB', 'AU']
             },
+            // Flat-rate shipping. Change `amount` (in cents) to adjust the price.
+            // To add a faster tier later, add a second { shipping_rate_data: {...} }
+            // object below with display_name 'Express' and its own amount.
+            shipping_options: [
+                {
+                    shipping_rate_data: {
+                        type: 'fixed_amount',
+                        fixed_amount: { amount: 899, currency: 'usd' }, // $8.99
+                        display_name: 'Standard Shipping',
+                        delivery_estimate: {
+                            minimum: { unit: 'business_day', value: 2 },
+                            maximum: { unit: 'business_day', value: 6 }
+                        }
+                    }
+                }
+            ],
             metadata: {
                 source: 'nubztoys-web'
             }
