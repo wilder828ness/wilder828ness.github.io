@@ -28,6 +28,11 @@ const SITE_NAME    = 'Nubz Toys & Collectibles';
 const SUPABASE_URL = process.env.SUPABASE_URL      || 'https://vdkjjyjfwfndrksruisn.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr';
 const SKIP_SUPABASE = process.env.SKIP_SUPABASE === '1';
+// Set GA_MEASUREMENT_ID in Vercel env vars to turn on Google Analytics on the
+// generated product/category pages. Left empty = no tracking script emitted.
+const GA_ID = process.env.GA_MEASUREMENT_ID || '';
+const GA_SNIPPET = GA_ID ? `  <script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');</script>` : '';
 
 const ROOT           = __dirname;
 const PRODUCTS_DIR   = path.join(ROOT, 'products');
@@ -72,6 +77,17 @@ const catKey = (c) => String(c || '')
 const ALIAS_BY_KEY = Object.fromEntries(
   Object.entries(CATEGORY_ALIASES).map(([k, v]) => [catKey(k), v]));
 const canonicalCat = (c) => ALIAS_BY_KEY[catKey(c)] || String(c || '').trim();
+
+// Hand-written, keyword-rich category descriptions (better than a generic template).
+// Falls back to a template for any category not listed here.
+const CATEGORY_DESC = {
+  'Funko Pop': 'Funko Pop! vinyl figures spanning Marvel, Star Wars, horror, anime and WWE — plus store and convention exclusives.',
+  'Action Figures': 'Collectible action figures from Transformers, DC, Marvel, McFarlane and more — new in box and ready to display.',
+  'Model Sets': 'Snap-together model kits and building sets, including Blokees Transformers — no glue required, great for all ages.',
+  'Blind Bag & Mini Figures': 'Blind bags, mystery minis and 3D foam bag clips — surprise collectibles to open, trade and hunt down.',
+  'Toys': 'Die-cast cars, card games and playtime favorites for kids and collectors alike.',
+  'Collectibles': 'Hard-to-find collectibles, exclusives and display pieces for the serious collector.',
+};
 
 // ── HELPERS ────────────────────────────────────────────────────────────
 const slugify = (s) => String(s || '')
@@ -174,10 +190,13 @@ const head = ({ title, desc, canonical, image, type = 'website', jsonld = [] }) 
   <meta name="twitter:title" content="${esc(title)}">
   <meta name="twitter:description" content="${esc(desc)}">
   <meta name="twitter:image" content="${esc(image)}">
+${GA_SNIPPET}
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    html { -webkit-text-size-adjust: 100%; }
+    html, body { overflow-x: hidden; }
+    body { font-family: 'Inter', system-ui, sans-serif; min-height: 100%; }
     .gradient-title { background: linear-gradient(to right,#22d3ee,#e879f9,#fbbf24);
       -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
     .compare-price { text-decoration: line-through; color:#64748b; }
@@ -185,14 +204,20 @@ const head = ({ title, desc, canonical, image, type = 'website', jsonld = [] }) 
 ${jsonld.map(j => `  <script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n')}
 </head>
 <body class="bg-slate-950 text-slate-200">
-  <nav class="border-b border-slate-800 bg-slate-950/95 sticky top-0 z-50">
+  <nav class="border-b border-slate-800 bg-slate-950/95">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <a href="/" class="flex items-center gap-x-3"><img src="${LOGO}" alt="${esc(SITE_NAME)}" class="h-14 w-auto"></a>
-      <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
-        <a href="/" class="hover:text-cyan-400">Home</a>
-        <a href="/#categories" class="hover:text-cyan-400">Categories</a>
-        <a href="/#inventory" class="hover:text-cyan-400">All Inventory</a>
-        <a href="/#about" class="hover:text-cyan-400">About</a>
+      <div class="flex items-center gap-x-6">
+        <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
+          <a href="/" class="hover:text-cyan-400">Home</a>
+          <a href="/#categories" class="hover:text-cyan-400">Categories</a>
+          <a href="/#inventory" class="hover:text-cyan-400">All Inventory</a>
+          <a href="/#about" class="hover:text-cyan-400">About</a>
+        </div>
+        <a href="/?checkout=1" aria-label="View cart" class="inline-flex items-center gap-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl text-sm">
+          <i class="fa-solid fa-shopping-bag"></i>
+          <span id="navCartCount" class="font-mono text-xs bg-slate-800 px-2 py-0.5 rounded-full">0</span>
+        </a>
       </div>
     </div>
   </nav>`;
@@ -203,7 +228,7 @@ const footer = () => `
       <div class="flex flex-wrap items-center justify-between gap-6">
         <div>
           <img src="${LOGO}" alt="${esc(SITE_NAME)}" class="h-10 w-auto mb-3">
-          <p>Rare finds. Real fun. Toys &amp; collectibles shipped from the USA.</p>
+          <p>Action figures, Funko, blind bags &amp; more — shipped fast from the USA.</p>
         </div>
         <div class="flex items-center gap-x-5 text-xl">
           <a href="${SOCIAL.facebook}"  aria-label="Facebook"  class="hover:text-cyan-400"><i class="fa-brands fa-facebook"></i></a>
@@ -215,6 +240,17 @@ const footer = () => `
       <p class="mt-8 text-xs text-slate-600">© ${new Date().getFullYear()} ${esc(SITE_NAME)} — a Wilderness Dealz LLC company. All rights reserved.</p>
     </div>
   </footer>
+  <script>
+    // Shared cart (same localStorage key as the storefront) — keep nav count in sync.
+    (function(){
+      try {
+        var c = JSON.parse(localStorage.getItem('nubz_cart')) || [];
+        var n = c.reduce(function(s,i){ return s + (i.quantity||1); }, 0);
+        var el = document.getElementById('navCartCount');
+        if (el) el.textContent = n;
+      } catch(e) {}
+    })();
+  </script>
 </body>
 </html>`;
 
@@ -294,30 +330,59 @@ function productPage(p, related) {
         <span class="text-xs font-semibold px-3 py-1 rounded-full ${available ? 'bg-emerald-600/20 text-emerald-400' : 'bg-slate-700 text-slate-300'}">${available ? 'In Stock' : 'Sold Out'}</span>
       </div>
       <div class="prose prose-invert text-slate-300 leading-relaxed mb-8 whitespace-pre-line">${esc(String(p.description || '').split(/keywords:/i)[0].trim())}</div>
-      ${available ? `<button id="buyNow" class="w-full md:w-auto px-10 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition inline-flex items-center gap-x-2">
-        <i class="fa-solid fa-bolt"></i> Buy Now</button>
-      <p class="text-xs text-slate-500 mt-3">🔒 Secure checkout powered by Stripe</p>` :
+      ${available ? `<div class="flex flex-col sm:flex-row gap-3">
+        <button id="addCart" class="flex-1 px-8 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+        <button id="buyNow" class="flex-1 px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-bolt"></i> Buy Now</button>
+      </div>
+      <div id="addedMsg" class="hidden mt-4 bg-slate-900 border border-slate-700 rounded-2xl p-4">
+        <p class="text-cyan-400 font-semibold mb-3"><i class="fa-solid fa-check"></i> Added to your cart.</p>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <a href="/categories/${catSlug}" class="flex-1 text-center px-5 py-3 border border-slate-600 rounded-2xl font-semibold hover:bg-white/5">← Continue shopping</a>
+          <a href="/?checkout=1" class="flex-1 text-center px-5 py-3 bg-white text-slate-950 hover:bg-slate-100 rounded-2xl font-semibold">View cart &amp; checkout →</a>
+        </div>
+      </div>
+      <p class="text-sm text-slate-300 mt-4"><i class="fa-solid fa-bolt text-cyan-400"></i> Fast shipping · Packed with care · <span class="text-amber-400">★</span> 5-star seller on Whatnot</p>
+      <p class="text-xs text-slate-500 mt-2">🔒 Secure checkout powered by Stripe</p>` :
       `<a href="/#inventory" class="inline-block px-10 py-4 border border-slate-700 rounded-3xl font-semibold hover:bg-white/5">Browse other items</a>`}
       <p class="mt-6 text-sm"><a href="/categories/${catSlug}" class="text-cyan-400 hover:text-cyan-300">← More in ${esc(cat)}</a></p>
     </div>
   </article>
   ${relatedHtml}
   <script>
-    document.getElementById('buyNow')?.addEventListener('click', async (e) => {
-      const btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Redirecting…';
-      try {
-        const res = await fetch('/api/create-checkout', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ cartItems: [${buyItem}] })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Checkout failed');
-        window.location.href = data.url;
-      } catch (err) {
-        btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Buy Now';
-        alert('Unable to start checkout. Please try again.');
-      }
-    });
+    (function(){
+      var ITEM = ${buyItem};
+      function readCart(){ try { return JSON.parse(localStorage.getItem('nubz_cart')) || []; } catch(e){ return []; } }
+      function writeCart(c){ try { localStorage.setItem('nubz_cart', JSON.stringify(c)); } catch(e){} }
+      function count(c){ return c.reduce(function(s,i){ return s + (i.quantity||1); }, 0); }
+      function syncBadge(){ var el = document.getElementById('navCartCount'); if (el) el.textContent = count(readCart()); }
+
+      var add = document.getElementById('addCart');
+      if (add) add.addEventListener('click', function(){
+        var c = readCart();
+        var ex = c.find(function(x){ return String(x.id) === String(ITEM.id); });
+        if (ex) ex.quantity = (ex.quantity||1) + 1; else c.push(Object.assign({}, ITEM));
+        writeCart(c); syncBadge();
+        document.getElementById('addedMsg').classList.remove('hidden');
+        add.innerHTML = '<i class="fa-solid fa-check"></i> Added';
+      });
+
+      var buy = document.getElementById('buyNow');
+      if (buy) buy.addEventListener('click', async function(e){
+        var btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Redirecting…';
+        try {
+          var res = await fetch('/api/create-checkout', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ cartItems: [ITEM] })
+          });
+          var data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Checkout failed');
+          window.location.href = data.url;
+        } catch (err) {
+          btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Buy Now';
+          alert('Unable to start checkout. Please try again.');
+        }
+      });
+    })();
   </script>`;
 
   return head({ title: `${p.name} | ${SITE_NAME}`, desc, canonical, image: img,
@@ -329,7 +394,9 @@ function categoryPage(cat, items) {
   const slug      = slugify(cat);
   const canonical = `${SITE}/categories/${slug}`;
   const img       = items.length ? firstImage(items[0]) : `${SITE}${LOGO}`;
-  const desc      = `Shop ${cat} at ${SITE_NAME}. ${items.length} item${items.length===1?'':'s'} in stock — rare finds, fair prices, shipped from the USA.`;
+  const n         = items.length;
+  const base      = CATEGORY_DESC[cat] || `Shop ${cat} at ${SITE_NAME}.`;
+  const desc      = `${base} ${n} in stock — fair prices, fast shipping from the USA.`;
 
   const listLd = {
     '@context': 'https://schema.org', '@type': 'ItemList',
