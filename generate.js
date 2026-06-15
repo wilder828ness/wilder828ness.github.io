@@ -30,7 +30,7 @@ const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY || 'sb_publishable_MUbT8VJ6HK
 const SKIP_SUPABASE = process.env.SKIP_SUPABASE === '1';
 // Set GA_MEASUREMENT_ID in Vercel env vars to turn on Google Analytics on the
 // generated product/category pages. Left empty = no tracking script emitted.
-const GA_ID = process.env.GA_MEASUREMENT_ID || '';
+const GA_ID = process.env.GA_MEASUREMENT_ID || 'G-3C0EDZG38D';
 const GA_SNIPPET = GA_ID ? `  <script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');</script>` : '';
 
@@ -40,10 +40,10 @@ const CATEGORIES_DIR = path.join(ROOT, 'categories');
 const LOGO           = '/nubz-header-logo.png';
 
 const SOCIAL = {
-  facebook:  'https://facebook.nubztoys.com',
-  instagram: 'https://instagram.nubztoys.com',
-  youtube:   'https://youtube.nubztoys.com',
-  whatnot:   'https://whatnot.nubztoys.com',
+  facebook:  'https://facebook.com/nubztoys',
+  instagram: 'https://instagram.com/nubz_toys',
+  youtube:   'https://youtube.com/@nubztoys',
+  whatnot:   'https://whatnot.com/users/wildernessdealz',
 };
 
 // Canonical categories (match the storefront) + aliases for messy source data.
@@ -180,6 +180,9 @@ const head = ({ title, desc, canonical, image, type = 'website', jsonld = [] }) 
   <title>${esc(title)}</title>
   <meta name="description" content="${esc(desc)}">
   <link rel="canonical" href="${esc(canonical)}">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta property="og:type" content="${type}">
   <meta property="og:site_name" content="${esc(SITE_NAME)}">
   <meta property="og:title" content="${esc(title)}">
@@ -231,10 +234,10 @@ const footer = () => `
           <p>Action figures, Funko, blind bags &amp; more — shipped fast from the USA.</p>
         </div>
         <div class="flex items-center gap-x-5 text-xl">
-          <a href="${SOCIAL.facebook}"  aria-label="Facebook"  class="hover:text-cyan-400"><i class="fa-brands fa-facebook"></i></a>
-          <a href="${SOCIAL.instagram}" aria-label="Instagram" class="hover:text-cyan-400"><i class="fa-brands fa-instagram"></i></a>
-          <a href="${SOCIAL.youtube}"   aria-label="YouTube"   class="hover:text-cyan-400"><i class="fa-brands fa-youtube"></i></a>
-          <a href="${SOCIAL.whatnot}"   aria-label="Whatnot"   class="hover:text-cyan-400"><i class="fa-solid fa-tower-broadcast"></i></a>
+          <a href="${SOCIAL.facebook}"  target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Facebook"  class="hover:text-cyan-400"><i class="fa-brands fa-facebook"></i></a>
+          <a href="${SOCIAL.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Instagram" class="hover:text-cyan-400"><i class="fa-brands fa-instagram"></i></a>
+          <a href="${SOCIAL.youtube}"   target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on YouTube"   class="hover:text-cyan-400"><i class="fa-brands fa-youtube"></i></a>
+          <a href="${SOCIAL.whatnot}"   target="_blank" rel="noopener noreferrer" aria-label="Wilderness Dealz on Whatnot"   class="hover:text-cyan-400"><i class="fa-solid fa-tower-broadcast"></i></a>
         </div>
       </div>
       <p class="mt-8 text-xs text-slate-600">© ${new Date().getFullYear()} ${esc(SITE_NAME)} — a Wilderness Dealz LLC company. All rights reserved.</p>

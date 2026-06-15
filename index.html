@@ -6,6 +6,9 @@
     <title>Nubz Toys &amp; Collectibles — Action Figures, Funko, Blind Bags &amp; More</title>
     <meta name="description" content="Shop action figures, Funko Pop, blind bags, model kits, Hot Wheels die-cast and collectibles at Nubz Toys. Fair prices, fast shipping from the USA.">
     <link rel="canonical" href="https://nubztoys.com/">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Nubz Toys &amp; Collectibles">
     <meta property="og:title" content="Nubz Toys &amp; Collectibles — Action Figures, Funko, Blind Bags &amp; More">
@@ -16,9 +19,9 @@
     <meta name="twitter:title" content="Nubz Toys &amp; Collectibles">
     <meta name="twitter:description" content="Action figures, Funko Pop, blind bags, model kits, die-cast and collectibles. Fast shipping from the USA.">
     <meta name="twitter:image" content="https://nubztoys.com/nubz-header-logo.png">
-    <!-- Google Analytics (GA4). Replace G-XXXXXXXXXX with your Measurement ID to turn it on. -->
+    <!-- Google Analytics (GA4). Live Measurement ID for nubztoys.com. -->
     <script>
-      window.GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+      window.GA_MEASUREMENT_ID = 'G-3C0EDZG38D';
       if (window.GA_MEASUREMENT_ID && window.GA_MEASUREMENT_ID.indexOf('XXXX') === -1) {
         var gaScript = document.createElement('script');
         gaScript.async = true;
@@ -31,7 +34,7 @@
         gtag('config', window.GA_MEASUREMENT_ID);
       }
     </script>
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Nubz Toys & Collectibles","url":"https://nubztoys.com/","logo":"https://nubztoys.com/nubz-header-logo.png","parentOrganization":{"@type":"Organization","name":"Wilderness Dealz LLC"},"sameAs":["https://facebook.nubztoys.com","https://instagram.nubztoys.com","https://youtube.nubztoys.com","https://whatnot.nubztoys.com"]}</script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Nubz Toys & Collectibles","url":"https://nubztoys.com/","logo":"https://nubztoys.com/nubz-header-logo.png","parentOrganization":{"@type":"Organization","name":"Wilderness Dealz LLC"},"sameAs":["https://facebook.com/nubztoys","https://instagram.com/nubz_toys","https://youtube.com/@nubztoys","https://whatnot.com/users/wildernessdealz"]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Nubz Toys & Collectibles","url":"https://nubztoys.com/"}</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
@@ -326,6 +329,20 @@
     <footer class="bg-black border-t border-slate-800 py-10 mt-12">
         <div class="max-w-7xl mx-auto px-6 text-sm text-slate-400 flex flex-col md:flex-row justify-between items-center gap-y-6">
             <div>© 2026 Nubz Toys &amp; Collectibles. All rights reserved.</div>
+            <div class="flex items-center gap-x-3">
+                <a href="https://facebook.com/nubztoys" target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Facebook" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-800 hover:bg-blue-600 text-slate-300 hover:text-white transition-colors">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                <a href="https://instagram.com/nubz_toys" target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Instagram" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-800 hover:bg-pink-600 text-slate-300 hover:text-white transition-colors">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="https://youtube.com/@nubztoys" target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on YouTube" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white transition-colors">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+                <a href="https://whatnot.com/users/wildernessdealz" target="_blank" rel="noopener noreferrer" aria-label="Wilderness Dealz on Whatnot" class="h-9 px-3 flex items-center gap-x-2 rounded-full bg-slate-800 hover:bg-amber-500 text-slate-300 hover:text-black text-xs font-semibold transition-colors">
+                    <i class="fa-solid fa-tower-broadcast"></i>Whatnot
+                </a>
+            </div>
             <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
                 <a href="#" onclick="event.preventDefault(); showPage('about')" class="hover:text-white">About Us</a>
                 <a href="#" onclick="event.preventDefault(); showPage('contact')" class="hover:text-white">Contact Us</a>
@@ -507,7 +524,7 @@
                 </div>
                 <div id="modal-description" class="text-slate-300 mb-8 pr-2 text-[15px] leading-relaxed"></div>
                 <div class="flex gap-3">
-                    <button onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
+                    <button id="modal-add-btn" onclick="addCurrentProductToCart()" class="flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg">ADD TO CART</button>
                     <button id="edit-product-btn" onclick="editCurrentProduct()" class="hidden px-6 py-4 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-lg">EDIT</button>
                     <button id="delete-product-btn" onclick="deleteProduct(currentProductId)" class="hidden px-6 py-4 bg-red-700 hover:bg-red-800 text-white font-bold rounded-3xl text-lg">DELETE</button>
                 </div>
@@ -817,7 +834,7 @@
             if (!container) return;
             container.innerHTML = '';
             const inStock = products
-                .filter(p => p.status === "In Stock")
+                .filter(p => p.status === "In Stock" && !stockState(p).soldOut)
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
                 .slice(0, 6);
             inStock.forEach(p => container.appendChild(createProductCard(p)));
@@ -863,6 +880,18 @@
             return '/products/' + (slugMap[product.id] || productSlugify(product.name));
         }
 
+        // Availability is driven by on-hand quantity first, then status.
+        // qty <= 0  -> Sold Out (even if status still says In Stock)
+        // status In Transit (with stock) -> incoming badge
+        // quantity null/blank -> not tracked, fall back to status only.
+        function stockState(p) {
+            const qty    = (p.quantity === null || p.quantity === undefined || p.quantity === '') ? null : Number(p.quantity);
+            const status = (p.status || '').toLowerCase().replace(/\s+/g,'');
+            const soldOut   = (qty !== null && qty <= 0) || status === 'soldout';
+            const inTransit = !soldOut && status === 'intransit';
+            return { qty, soldOut, inTransit };
+        }
+
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
@@ -872,12 +901,14 @@
                 : (product.image || 'https://picsum.photos/id/106/600/400');
             const catDisplay = (product.categories || [product.mainCategory || 'Toys']).join(', ');
 
-            const isInStock   = (product.status || '').toLowerCase().replace(/\s+/g,'') === 'instock';
-            const statusHTML  = isInStock
-                ? ''
-                : `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`;
-            const lowQtyHTML  = (product.quantity && product.quantity <= 2)
-                ? `<span class="status-badge bg-red-500 text-white ml-1">LOW QTY</span>` : '';
+            const ss          = stockState(product);
+            const statusHTML  = ss.soldOut
+                ? `<span class="status-badge bg-red-600 text-white">SOLD OUT</span>`
+                : ss.inTransit
+                    ? `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`
+                    : '';
+            const lowQtyHTML  = (!ss.soldOut && product.quantity && product.quantity <= 2)
+                ? `<span class="status-badge bg-amber-500 text-black ml-1">LOW QTY</span>` : '';
 
             card.innerHTML = `
                 <div class="relative">
@@ -894,8 +925,10 @@
                             ${product.compare_to && product.compare_to > product.price
                                 ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}
                         </div>
-                        <button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
-                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>
+                        ${ss.soldOut
+                            ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">SOLD OUT</button>`
+                            : `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>`}
                     </div>
                 </div>`;
             // Customers go to the clean standalone product page; admins still get
@@ -1002,9 +1035,21 @@
             }
 
             const statusEl     = document.getElementById('modal-status');
-            const modalInStock = (product.status || '').toLowerCase().replace(/\s+/g,'') === 'instock';
-            statusEl.textContent = product.status || 'In Stock';
-            statusEl.className   = `text-sm font-semibold px-4 py-1 rounded-full ${modalInStock ? 'bg-emerald-500 text-black' : 'bg-blue-500 text-white'}`;
+            const mss          = stockState(product);
+            statusEl.textContent = mss.soldOut ? 'Sold Out' : (mss.inTransit ? 'In Transit' : (product.status || 'In Stock'));
+            statusEl.className   = `text-sm font-semibold px-4 py-1 rounded-full ${mss.soldOut ? 'bg-red-600 text-white' : (mss.inTransit ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-black')}`;
+            const modalAddBtn  = document.getElementById('modal-add-btn');
+            if (modalAddBtn) {
+                if (mss.soldOut) {
+                    modalAddBtn.disabled = true;
+                    modalAddBtn.textContent = 'SOLD OUT';
+                    modalAddBtn.className = 'flex-1 py-4 bg-slate-700 text-slate-400 font-bold rounded-3xl text-lg cursor-not-allowed';
+                } else {
+                    modalAddBtn.disabled = false;
+                    modalAddBtn.textContent = 'ADD TO CART';
+                    modalAddBtn.className = 'flex-1 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg';
+                }
+            }
 
             const editBtn   = document.getElementById('edit-product-btn');
             const deleteBtn = document.getElementById('delete-product-btn');
@@ -1064,6 +1109,7 @@
         function addToCart(productId) {
             const product = products.find(p => String(p.id) === String(productId));
             if (!product) return;
+            if (stockState(product).soldOut) { alert('Sorry, this item is sold out.'); return; }
             const existing = cart.find(item => String(item.id) === String(productId));
             if (existing) existing.quantity++;
             else cart.push({ ...product, quantity: 1 });
