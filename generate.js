@@ -43,7 +43,7 @@ const SOCIAL = {
   facebook:  'https://facebook.com/nubztoys',
   instagram: 'https://instagram.com/nubz_toys',
   youtube:   'https://youtube.com/@nubztoys',
-  whatnot:   'https://whatnot.com/users/wildernessdealz',
+  whatnot:   'https://www.whatnot.com/user/wildernessdealz',
 };
 
 // Canonical categories (match the storefront) + aliases for messy source data.
@@ -497,7 +497,7 @@ function categoriesIndexPage(byCat) {
   const ICONS = {
     'Action Figures': 'fa-dragon',
     'Model Sets': 'fa-cube',
-    'Funko Pop': 'fa-head-side',
+    'Funko Pop': 'fa-box-open',
     'Blind Bag & Mini Figures': 'fa-question-circle',
     'Toys': 'fa-gamepad',
     'Collectibles': 'fa-star',
