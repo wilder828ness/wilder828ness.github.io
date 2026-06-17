@@ -213,9 +213,10 @@ ${jsonld.map(j => `  <script type="application/ld+json">${JSON.stringify(j)}</sc
       <div class="flex items-center gap-x-6">
         <div class="hidden md:flex items-center gap-x-8 text-sm font-medium">
           <a href="/" class="hover:text-cyan-400">Home</a>
-          <a href="/#categories" class="hover:text-cyan-400">Categories</a>
-          <a href="/#inventory" class="hover:text-cyan-400">All Inventory</a>
-          <a href="/#about" class="hover:text-cyan-400">About</a>
+          <a href="/categories" class="hover:text-cyan-400">Categories</a>
+          <a href="/inventory" class="hover:text-cyan-400">All Inventory</a>
+          <a href="/about" class="hover:text-cyan-400">About</a>
+          <a href="/contact" class="hover:text-cyan-400">Contact</a>
         </div>
         <a href="/?checkout=1" aria-label="View cart" class="inline-flex items-center gap-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl text-sm">
           <i class="fa-solid fa-shopping-bag"></i>
@@ -228,19 +229,41 @@ ${jsonld.map(j => `  <script type="application/ld+json">${JSON.stringify(j)}</sc
 const footer = () => `
   <footer class="border-t border-slate-800 mt-20">
     <div class="max-w-7xl mx-auto px-6 py-12 text-sm text-slate-400">
-      <div class="flex flex-wrap items-center justify-between gap-6">
+      <div class="flex flex-wrap items-start justify-between gap-8 mb-8">
         <div>
           <img src="${LOGO}" alt="${esc(SITE_NAME)}" class="h-10 w-auto mb-3">
           <p>Action figures, Funko, blind bags &amp; more — shipped fast from the USA.</p>
+          <div class="flex items-center gap-x-5 text-xl mt-4">
+            <a href="${SOCIAL.facebook}"  target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Facebook"  class="hover:text-cyan-400"><i class="fa-brands fa-facebook"></i></a>
+            <a href="${SOCIAL.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Instagram" class="hover:text-cyan-400"><i class="fa-brands fa-instagram"></i></a>
+            <a href="${SOCIAL.youtube}"   target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on YouTube"   class="hover:text-cyan-400"><i class="fa-brands fa-youtube"></i></a>
+            <a href="${SOCIAL.whatnot}"   target="_blank" rel="noopener noreferrer" aria-label="Wilderness Dealz on Whatnot" class="hover:text-cyan-400"><i class="fa-solid fa-tower-broadcast"></i></a>
+          </div>
         </div>
-        <div class="flex items-center gap-x-5 text-xl">
-          <a href="${SOCIAL.facebook}"  target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Facebook"  class="hover:text-cyan-400"><i class="fa-brands fa-facebook"></i></a>
-          <a href="${SOCIAL.instagram}" target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on Instagram" class="hover:text-cyan-400"><i class="fa-brands fa-instagram"></i></a>
-          <a href="${SOCIAL.youtube}"   target="_blank" rel="noopener noreferrer" aria-label="Nubz Toys on YouTube"   class="hover:text-cyan-400"><i class="fa-brands fa-youtube"></i></a>
-          <a href="${SOCIAL.whatnot}"   target="_blank" rel="noopener noreferrer" aria-label="Wilderness Dealz on Whatnot"   class="hover:text-cyan-400"><i class="fa-solid fa-tower-broadcast"></i></a>
+        <div class="flex flex-wrap gap-x-12 gap-y-6 text-sm">
+          <div>
+            <p class="font-semibold text-slate-300 mb-3 uppercase tracking-widest text-xs">Shop</p>
+            <ul class="space-y-2">
+              <li><a href="/categories" class="hover:text-white">Categories</a></li>
+              <li><a href="/inventory" class="hover:text-white">All Inventory</a></li>
+              <li><a href="/categories/funko-pop" class="hover:text-white">Funko Pop</a></li>
+              <li><a href="/categories/action-figures" class="hover:text-white">Action Figures</a></li>
+              <li><a href="/categories/blind-bag-and-mini-figures" class="hover:text-white">Blind Bags</a></li>
+              <li><a href="/categories/model-sets" class="hover:text-white">Model Sets</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="font-semibold text-slate-300 mb-3 uppercase tracking-widest text-xs">Company</p>
+            <ul class="space-y-2">
+              <li><a href="/about" class="hover:text-white">About Us</a></li>
+              <li><a href="/contact" class="hover:text-white">Contact</a></li>
+              <li><a href="/privacy-policy" class="hover:text-white">Privacy Policy</a></li>
+              <li><a href="/returns" class="hover:text-white">Returns &amp; Exchanges</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-      <p class="mt-8 text-xs text-slate-600">© ${new Date().getFullYear()} ${esc(SITE_NAME)} — a Wilderness Dealz LLC company. All rights reserved.</p>
+      <p class="border-t border-slate-800 pt-6 text-xs text-slate-600">© ${new Date().getFullYear()} ${esc(SITE_NAME)} — a Wilderness Dealz LLC company. All rights reserved.</p>
     </div>
   </footer>
   <script>
@@ -346,7 +369,7 @@ function productPage(p, related) {
       </div>
       <p class="text-sm text-slate-300 mt-4"><i class="fa-solid fa-bolt text-cyan-400"></i> Fast shipping · Packed with care · <span class="text-amber-400">★</span> 5-star seller on Whatnot</p>
       <p class="text-xs text-slate-500 mt-2">🔒 Secure checkout powered by Stripe</p>` :
-      `<a href="/#inventory" class="inline-block px-10 py-4 border border-slate-700 rounded-3xl font-semibold hover:bg-white/5">Browse other items</a>`}
+      `<a href="/inventory" class="inline-block px-10 py-4 border border-slate-700 rounded-3xl font-semibold hover:bg-white/5">Browse other items</a>`}
       <p class="mt-6 text-sm"><a href="/categories/${catSlug}" class="text-cyan-400 hover:text-cyan-300">← More in ${esc(cat)}</a></p>
     </div>
   </article>
@@ -399,7 +422,7 @@ function categoryPage(cat, items) {
   const img       = items.length ? firstImage(items[0]) : `${SITE}${LOGO}`;
   const n         = items.length;
   const base      = CATEGORY_DESC[cat] || `Shop ${cat} at ${SITE_NAME}.`;
-  const desc      = `${base} ${n} in stock — fair prices, fast shipping from the USA.`;
+  const desc      = metaFrom(`${base} ${n} in stock — fair prices, fast shipping from the USA.`, base);
 
   const listLd = {
     '@context': 'https://schema.org', '@type': 'ItemList',
@@ -447,6 +470,12 @@ function sitemap(products, categories) {
     `  <url><loc>${loc}</loc><lastmod>${today}</lastmod><priority>${pr}</priority></url>`;
   const urls = [
     url(`${SITE}/`, '1.0'),
+    url(`${SITE}/categories`, '0.8'),
+    url(`${SITE}/inventory`, '0.8'),
+    url(`${SITE}/about`, '0.5'),
+    url(`${SITE}/contact`, '0.5'),
+    url(`${SITE}/privacy-policy`, '0.3'),
+    url(`${SITE}/returns`, '0.3'),
     ...categories.map(c => url(`${SITE}/categories/${slugify(c)}`, '0.7')),
     ...products.map(p => url(`${SITE}/products/${p.slug}`, '0.8')),
   ];
@@ -460,6 +489,361 @@ const robots = () => `User-agent: *
 Allow: /
 
 Sitemap: ${SITE}/sitemap.xml`;
+
+// ── CATEGORIES INDEX PAGE ─────────────────────────────────────────────
+function categoriesIndexPage(byCat) {
+  const canonical = `${SITE}/categories`;
+  const desc = 'Browse all toy and collectible categories at Nubz Toys — Action Figures, Funko Pop, Blind Bags, Model Sets, die-cast and more. Fair prices, fast USA shipping.';
+  const ICONS = {
+    'Action Figures': 'fa-dragon',
+    'Model Sets': 'fa-cube',
+    'Funko Pop': 'fa-head-side',
+    'Blind Bag & Mini Figures': 'fa-question-circle',
+    'Toys': 'fa-gamepad',
+    'Collectibles': 'fa-star',
+  };
+  const COLORS = {
+    'Action Figures': '#22d3ee',
+    'Model Sets': '#34d399',
+    'Funko Pop': '#c084fc',
+    'Blind Bag & Mini Figures': '#e879f9',
+    'Toys': '#fbbf24',
+    'Collectibles': '#fb7185',
+  };
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Categories', item: canonical },
+    ],
+  };
+  const cards = Object.entries(byCat).map(([cat, items]) => {
+    const slug  = slugify(cat);
+    const icon  = ICONS[cat] || 'fa-tag';
+    const color = COLORS[cat] || '#22d3ee';
+    const img   = items.length ? firstImage(items[0]) : '';
+    return `
+    <a href="/categories/${slug}" class="group relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-cyan-500/50 transition-all hover:-translate-y-1 flex flex-col">
+      ${img ? `<div class="aspect-video overflow-hidden"><img src="${esc(img)}" alt="${esc(cat)} collectibles at Nubz Toys" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"></div>` : ''}
+      <div class="p-6 flex-1 flex flex-col justify-between">
+        <div class="flex items-center gap-x-3 mb-2">
+          <i class="fa-solid ${icon} text-xl" style="color:${color}"></i>
+          <h2 class="font-bold text-lg">${esc(cat)}</h2>
+        </div>
+        <p class="text-slate-400 text-sm mb-4">${esc(CATEGORY_DESC[cat] || `Shop ${cat} at Nubz Toys.`)}</p>
+        <div class="flex items-center justify-between">
+          <span class="text-xs text-slate-500">${items.length} item${items.length === 1 ? '' : 's'}</span>
+          <span class="text-cyan-400 text-sm font-semibold group-hover:text-cyan-300">Shop Now →</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+
+  const body = `
+  <nav class="max-w-6xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">Categories</span>
+  </nav>
+  <header class="max-w-6xl mx-auto px-6 py-10 text-center">
+    <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-3">SHOP BY CATEGORY</div>
+    <h1 class="text-4xl md:text-5xl font-bold gradient-title inline-block mb-4">All Categories</h1>
+    <p class="text-slate-400 text-lg max-w-2xl mx-auto">Action figures, Funko Pop, blind bags, model kits, die-cast and more — find exactly what you're looking for.</p>
+  </header>
+  <section class="max-w-6xl mx-auto px-6 pb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">${cards}</section>`;
+
+  return head({ title: `All Categories | ${SITE_NAME}`, desc, canonical, image: `${SITE}${LOGO}`,
+    type: 'website', jsonld: [crumbLd] }) + body + footer();
+}
+
+// ── ALL INVENTORY PAGE ─────────────────────────────────────────────────
+function inventoryPage(products) {
+  const canonical = `${SITE}/inventory`;
+  const desc = `Shop all ${products.length}+ toys and collectibles at Nubz Toys — action figures, Funko Pop, blind bags, model kits, die-cast and more. Fair prices, fast USA shipping.`;
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'All Inventory', item: canonical },
+    ],
+  };
+  const listLd = {
+    '@context': 'https://schema.org', '@type': 'ItemList',
+    name: `All Products — ${SITE_NAME}`,
+    itemListElement: products.map((p, i) => ({
+      '@type': 'ListItem', position: i + 1, url: `${SITE}/products/${p.slug}`, name: p.name,
+    })),
+  };
+  const grid = products.map(p => {
+    const pr = price(p);
+    const available = inStock(p);
+    return `
+    <a href="/products/${p.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
+      <div class="relative">
+        <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover" loading="lazy">
+        ${!available ? '<div class="absolute inset-0 bg-black/60 flex items-center justify-center"><span class="bg-slate-900 text-slate-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700">SOLD OUT</span></div>' : ''}
+      </div>
+      <div class="p-4">
+        ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
+        <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
+        ${pr != null ? `<p class="font-bold">${available ? `$${pr.toFixed(2)}` : `<span class="text-slate-500 line-through">$${pr.toFixed(2)}</span>`}</p>` : ''}
+      </div>
+    </a>`;
+  }).join('');
+
+  const body = `
+  <nav class="max-w-6xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">All Inventory</span>
+  </nav>
+  <header class="max-w-6xl mx-auto px-6 py-10">
+    <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-3">COMPLETE CATALOG</div>
+    <h1 class="text-4xl md:text-5xl font-bold gradient-title inline-block mb-4">All Inventory</h1>
+    <p class="text-slate-400 text-lg">${products.length} items · Browse our full catalog of toys and collectibles</p>
+  </header>
+  <section class="max-w-6xl mx-auto px-6 pb-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${grid}</section>`;
+
+  return head({ title: `All Inventory | ${SITE_NAME}`, desc, canonical, image: `${SITE}${LOGO}`,
+    type: 'website', jsonld: [crumbLd, listLd] }) + body + footer();
+}
+
+// ── ABOUT PAGE ─────────────────────────────────────────────────────────
+function aboutPage() {
+  const canonical = `${SITE}/about`;
+  const desc = 'Nubz Toys & Collectibles — Est. 2026. Action figures, Funko Pop and everything in between. For collectors, the nostalgic, and anyone who never stopped playing.';
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'About Us', item: canonical },
+    ],
+  };
+  const orgLd = {
+    '@context': 'https://schema.org', '@type': 'Organization',
+    name: SITE_NAME, url: SITE + '/', logo: SITE + LOGO,
+    foundingDate: '2026',
+    description: desc,
+    parentOrganization: { '@type': 'Organization', name: 'Wilderness Dealz LLC' },
+    sameAs: [SOCIAL.facebook, SOCIAL.instagram, SOCIAL.youtube, SOCIAL.whatnot],
+    contactPoint: { '@type': 'ContactPoint', email: 'nubz@wildernessdealz.com', contactType: 'customer service' },
+  };
+
+  const body = `
+  <nav class="max-w-4xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">About Us</span>
+  </nav>
+  <article class="max-w-4xl mx-auto px-6 py-16">
+    <div class="text-center mb-16">
+      <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-3">OUR STORY</div>
+      <h1 class="text-4xl md:text-5xl font-bold gradient-title inline-block mb-6">About Nubz Toys &amp; Collectibles</h1>
+    </div>
+    <div class="prose prose-invert max-w-none text-lg text-slate-300 leading-relaxed space-y-6">
+      <p>Nubz Toys &amp; Collectibles was founded in 2026 with one simple mission: to just keep it simple. Remember when we used to just play? We owned the dialogue. We wrote the scenes. We defined the storyline — it didn't define us. Well, maybe it did, and we just got away from it for a while.</p>
+      <p>From yesterday's nostalgia to discovering the vintage of tomorrow, we're here for it. Don't mind the fake airplane noises — we're just going on a little journey. Thanks for joining us. Remember, you might not be old enough for some toys &amp; collectibles, but you're never too old for them.</p>
+      <div class="grid md:grid-cols-3 gap-6 my-12 not-prose">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center">
+          <div class="text-3xl font-black text-cyan-400 mb-2">45+</div>
+          <div class="text-slate-300 font-semibold">Products in Stock</div>
+          <div class="text-slate-500 text-sm mt-1">Action figures, Funko, die-cast &amp; more</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center">
+          <div class="text-3xl font-black text-fuchsia-400 mb-2">★★★★★</div>
+          <div class="text-slate-300 font-semibold">5-Star Seller</div>
+          <div class="text-slate-500 text-sm mt-1">Verified reviews on Whatnot</div>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center">
+          <div class="text-3xl font-black text-amber-400 mb-2">🚀</div>
+          <div class="text-slate-300 font-semibold">Fast Shipping</div>
+          <div class="text-slate-500 text-sm mt-1">Packed with care, ships from the USA</div>
+        </div>
+      </div>
+      <h2 class="text-2xl font-bold text-white not-prose">Part of the Wilderness Dealz Family</h2>
+      <p>Nubz Toys &amp; Collectibles is a DBA of Wilderness Dealz LLC, based in North Carolina. We also operate <strong>Wilderness Dealz</strong> — an auction and resale business on Whatnot and our own Shopify store. Whether you find us through Nubz or Dealz, you're shopping with the same team that packs your order, answers your emails, and takes pride in getting it right.</p>
+    </div>
+    <div class="mt-12 flex flex-wrap gap-4 justify-center">
+      <a href="/categories" class="px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition">Shop Now</a>
+      <a href="/contact" class="px-8 py-4 border border-slate-700 hover:bg-white/5 font-semibold rounded-3xl text-lg">Contact Us</a>
+    </div>
+  </article>`;
+
+  return head({ title: `About Us | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
+    type: 'website', jsonld: [crumbLd, orgLd] }) + body + footer();
+}
+
+// ── CONTACT PAGE ────────────────────────────────────────────────────────
+function contactPage() {
+  const canonical = `${SITE}/contact`;
+  const desc = 'Contact Nubz Toys & Collectibles — order questions, returns, or just want to say hi? Email nubz@wildernessdealz.com. Real people, real responses.';
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Contact Us', item: canonical },
+    ],
+  };
+  const contactLd = {
+    '@context': 'https://schema.org', '@type': 'ContactPage',
+    name: `Contact ${SITE_NAME}`, url: canonical,
+    mainEntity: { '@type': 'Organization', name: SITE_NAME, email: 'nubz@wildernessdealz.com' },
+  };
+
+  const body = `
+  <nav class="max-w-2xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">Contact Us</span>
+  </nav>
+  <section class="max-w-2xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-3">LET'S CONNECT</div>
+      <h1 class="text-4xl md:text-5xl font-bold gradient-title inline-block mb-4">Contact Us</h1>
+      <p class="text-slate-400 text-lg">We're real people. We actually respond.</p>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8">
+      <h2 class="font-bold text-lg mb-2 text-white">Email us directly</h2>
+      <p class="text-slate-400 text-sm mb-4">The fastest way to reach us for order questions, returns, or anything else.</p>
+      <a href="mailto:nubz@wildernessdealz.com" class="inline-flex items-center gap-x-2 text-cyan-400 hover:text-cyan-300 font-semibold text-lg">
+        <i class="fa-solid fa-envelope"></i> nubz@wildernessdealz.com
+      </a>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8">
+      <h2 class="font-bold text-lg mb-4 text-white">Send a message</h2>
+      <form id="contact-form" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input type="text" id="contact-name" name="name" placeholder="Your Name" required
+            class="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 text-sm w-full focus:outline-none focus:border-cyan-500">
+          <input type="email" id="contact-email" name="email" placeholder="Your Email" required
+            class="bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 text-sm w-full focus:outline-none focus:border-cyan-500">
+        </div>
+        <textarea id="contact-message" name="message" placeholder="Your message…" rows="6" required
+          class="w-full bg-slate-800 border border-slate-700 rounded-3xl px-5 py-4 text-sm focus:outline-none focus:border-cyan-500"></textarea>
+        <button type="button" onclick="submitContactForm()" class="w-full py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition">SEND MESSAGE</button>
+      </form>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <a href="/returns" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-solid fa-rotate-left text-2xl text-cyan-400 mb-2"></i>
+        <p class="font-semibold text-sm">Returns</p>
+        <p class="text-slate-500 text-xs mt-1">Our return policy</p>
+      </a>
+      <a href="/about" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-solid fa-store text-2xl text-fuchsia-400 mb-2"></i>
+        <p class="font-semibold text-sm">About Us</p>
+        <p class="text-slate-500 text-xs mt-1">Who we are</p>
+      </a>
+    </div>
+  </section>
+  <script>
+    function submitContactForm() {
+      var name    = document.getElementById('contact-name').value.trim();
+      var email   = document.getElementById('contact-email').value.trim();
+      var message = document.getElementById('contact-message').value.trim();
+      if (!name || !email || !message) { alert('Please fill in all fields.'); return; }
+      var subject = encodeURIComponent('Message from ' + name + ' via NubzToys.com');
+      var body    = encodeURIComponent('Name: ' + name + '\\nEmail: ' + email + '\\n\\n' + message);
+      window.location.href = 'mailto:nubz@wildernessdealz.com?subject=' + subject + '&body=' + body;
+    }
+  </script>`;
+
+  return head({ title: `Contact Us | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
+    type: 'website', jsonld: [crumbLd, contactLd] }) + body + footer();
+}
+
+// ── PRIVACY POLICY PAGE ────────────────────────────────────────────────
+function privacyPage() {
+  const canonical = `${SITE}/privacy-policy`;
+  const desc = 'Privacy Policy for Nubz Toys & Collectibles — how we collect, use, and protect your personal information. Updated June 2026.';
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Privacy Policy', item: canonical },
+    ],
+  };
+
+  const body = `
+  <nav class="max-w-4xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">Privacy Policy</span>
+  </nav>
+  <article class="max-w-4xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-bold gradient-title inline-block mb-3">Privacy Policy</h1>
+    <p class="text-slate-500 text-sm mb-10">Last updated: June 5, 2026</p>
+    <div class="prose prose-invert text-slate-300 leading-relaxed space-y-6 text-base">
+      <p>Wilderness Dealz LLC dba Nubz Toys &amp; Collectibles ("we," "us," or "our") operates this website at nubztoys.com. This Privacy Policy describes how we collect, use, and disclose your personal information when you visit, use, or make a purchase from us.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Information We Collect</h2>
+      <p>We may collect the following categories of personal information: contact details (name, email, phone, shipping address), financial information (payment method — processed securely by Stripe; we do not store full card numbers), transaction information (order history, items purchased, prices paid), device and usage information (browser type, IP address, pages visited, referring URLs), and account information if you create an account with us.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">How We Use Your Information</h2>
+      <p>We use your information to: process and fulfill orders; communicate with you about your purchases; provide customer support; send marketing communications (with your consent); detect and prevent fraud; comply with legal obligations; and improve our website and services.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Sharing Your Information</h2>
+      <p>We may share your information with: service providers who help us operate our business (payment processors, shipping carriers, email platforms); business partners and affiliates under confidentiality obligations; and as required by law, court order, or government authority.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Your Rights</h2>
+      <p>Depending on your location, you may have the right to access, correct, delete, or port your personal data. To exercise any of these rights, contact us at <a href="mailto:nubz@wildernessdealz.com" class="text-cyan-400 hover:text-cyan-300">nubz@wildernessdealz.com</a>.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Children's Privacy</h2>
+      <p>Our services are not directed to children under the age of majority. We do not knowingly collect personal information from minors. If you believe a minor has provided us personal information, contact us immediately.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Contact</h2>
+      <p>Questions about this policy? Email us at <a href="mailto:nubz@wildernessdealz.com" class="text-cyan-400 hover:text-cyan-300">nubz@wildernessdealz.com</a>.</p>
+    </div>
+  </article>`;
+
+  return head({ title: `Privacy Policy | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
+    type: 'website', jsonld: [crumbLd] }) + body + footer();
+}
+
+// ── RETURNS PAGE ────────────────────────────────────────────────────────
+function returnsPage() {
+  const canonical = `${SITE}/returns`;
+  const desc = 'Returns & Exchanges at Nubz Toys — 30-day returns on new, unopened items. Manufacturer defects and fulfillment errors always made right. Easy process.';
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Returns & Exchanges', item: canonical },
+    ],
+  };
+
+  const body = `
+  <nav class="max-w-4xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">Returns &amp; Exchanges</span>
+  </nav>
+  <article class="max-w-4xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-bold gradient-title inline-block mb-3">Returns &amp; Exchanges</h1>
+    <p class="text-slate-500 text-sm mb-10">We want you to love what you ordered. Here's how returns work.</p>
+    <div class="grid md:grid-cols-3 gap-4 mb-10">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">📦</div>
+        <div class="font-bold text-white">30 Days</div>
+        <div class="text-slate-400 text-sm mt-1">Return window from delivery</div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">✅</div>
+        <div class="font-bold text-white">New &amp; Unopened</div>
+        <div class="text-slate-400 text-sm mt-1">Item must be in original condition</div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">💳</div>
+        <div class="font-bold text-white">Full Refund</div>
+        <div class="text-slate-400 text-sm mt-1">Sales price refunded, no restocking fee</div>
+      </div>
+    </div>
+    <div class="prose prose-invert text-slate-300 leading-relaxed space-y-5 text-base">
+      <p>We accept returns on new, unopened merchandise purchased from us within 30 days of delivery. Items must be in original, unaltered condition with original packaging intact. We do not accept returns on opened, damaged, or altered merchandise.</p>
+      <p>Since we do not upcharge for shipping, return shipping is the buyer's responsibility. Refunds are equal to the sales price of the item at the time of purchase. We currently do not charge a restocking fee, though we reserve the right to introduce them on a case-by-case basis if the policy is abused.</p>
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Exceptions — We Always Make It Right</h2>
+      <p>Manufacturer defects (no, that hand was <em>not</em> supposed to fall off Superman!) and fulfillment errors on our end (you received Donatello instead of Squirtle) are fully covered. In these cases, we will either send the correct item or issue a full refund including return shipping — your choice.</p>
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">How to Start a Return</h2>
+      <p>Email us at <a href="mailto:nubz@wildernessdealz.com" class="text-cyan-400 hover:text-cyan-300">nubz@wildernessdealz.com</a> with your order details and the reason for the return. Please respond to any follow-up communication so we can process it quickly. Have a Nub-riffic day!</p>
+    </div>
+    <div class="mt-10">
+      <a href="/contact" class="inline-flex items-center gap-x-2 px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl hover:bg-slate-100 transition">
+        <i class="fa-solid fa-envelope"></i> Start a Return
+      </a>
+    </div>
+  </article>`;
+
+  return head({ title: `Returns & Exchanges | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
+    type: 'website', jsonld: [crumbLd] }) + body + footer();
+}
 
 // ── MAIN ───────────────────────────────────────────────────────────────
 (async () => {
@@ -500,6 +884,16 @@ Sitemap: ${SITE}/sitemap.xml`;
     fs.writeFileSync(path.join(CATEGORIES_DIR, `${slugify(cat)}.html`), categoryPage(cat, items));
   }
 
+  // categories index page (/categories/)
+  fs.writeFileSync(path.join(CATEGORIES_DIR, 'index.html'), categoriesIndexPage(byCat));
+
+  // standalone pages
+  fs.writeFileSync(path.join(ROOT, 'inventory.html'), inventoryPage(products));
+  fs.writeFileSync(path.join(ROOT, 'about.html'), aboutPage());
+  fs.writeFileSync(path.join(ROOT, 'contact.html'), contactPage());
+  fs.writeFileSync(path.join(ROOT, 'privacy-policy.html'), privacyPage());
+  fs.writeFileSync(path.join(ROOT, 'returns.html'), returnsPage());
+
   // sitemap / robots / snapshot
   fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), sitemap(products, Object.keys(byCat)));
   fs.writeFileSync(path.join(ROOT, 'robots.txt'), robots());
@@ -508,5 +902,7 @@ Sitemap: ${SITE}/sitemap.xml`;
   console.log(`\n✨ Generated:`);
   console.log(`   ${products.length} product pages  -> /products/`);
   console.log(`   ${Object.keys(byCat).length} category pages -> /categories/`);
+  console.log(`   /categories/index.html (categories landing page)`);
+  console.log(`   /inventory.html, /about.html, /contact.html, /privacy-policy.html, /returns.html`);
   console.log(`   sitemap.xml, robots.txt, products.json`);
 })().catch(e => { console.error('❌ Build failed:', e); process.exit(1); });
