@@ -363,9 +363,11 @@
             </div>
 
             <div id="admin-login">
-                <p class="text-sm text-slate-400 mb-4">Enter admin password:</p>
-                <input type="password" id="admin-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="Password">
-                <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Login</button>
+                <p class="text-sm text-slate-400 mb-4">Admin sign in:</p>
+                <input type="email" id="admin-email" autocomplete="username" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-3" placeholder="Email">
+                <input type="password" id="admin-password" autocomplete="current-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="Password">
+                <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Sign In</button>
+                <p id="admin-login-error" class="text-sm text-red-400 mt-3 hidden"></p>
             </div>
 
             <div id="admin-panel" class="hidden">
@@ -377,11 +379,12 @@
                     <button onclick="deleteAllProducts()" class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-3xl text-sm">DELETE ALL PRODUCTS</button>
                 </div>
 
-                <!-- Change Password -->
+                <!-- Account -->
                 <div class="mb-6 border border-slate-700 rounded-2xl p-6">
-                    <h4 class="font-semibold text-lg mb-4">Change Admin Password</h4>
-                    <input type="password" id="new-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="New Password">
-                    <button onclick="changePassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
+                    <h4 class="font-semibold text-lg mb-2">Account</h4>
+                    <p id="admin-account-email" class="text-xs text-slate-500 mb-4"></p>
+                    <button onclick="signOutAdmin()" class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-3xl text-sm">Sign Out</button>
+                    <p class="text-xs text-slate-500 mt-3">Password changes are managed in your Supabase account.</p>
                 </div>
 
 
@@ -547,7 +550,7 @@
         let cart           = [];
         let upsellGroups   = [];
         let isAdminLoggedIn      = false;
-        let adminPassword        = localStorage.getItem('nubz_admin_password') || "nubz2026";
+        let adminPassword        = '';   // legacy field, no longer used for the gate (auth is via Supabase)
         let currentProductId     = null;
         let currentCategoryFilter = null;
         let currentModalImages   = [];
@@ -1334,18 +1337,62 @@
             }
         }
 
-        function loginAdmin() {
-            const passInput = document.getElementById('admin-password');
+        // Reveal the admin panel UI once authenticated.
+        function showAdminPanel(email) {
+            isAdminLoggedIn = true;
+            document.getElementById('admin-login').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+            const emailEl = document.getElementById('admin-account-email');
+            if (emailEl && email) emailEl.textContent = 'Signed in as ' + email;
+            renderUpsellGroups();
+            renderUpsellGroupCheckboxes();
+            renderFlashSaleProductCheckboxes();
+        }
+
+        // Real authentication via Supabase Auth. A valid session is what unlocks
+        // database writes once Row-Level Security is enabled, so this gate is now
+        // backed by the database itself rather than a client-side string compare.
+        async function loginAdmin() {
+            const emailInput = document.getElementById('admin-email');
+            const passInput  = document.getElementById('admin-password');
+            const errEl      = document.getElementById('admin-login-error');
             if (!passInput) return;
-            if (passInput.value.trim() === adminPassword) {
-                isAdminLoggedIn = true;
-                document.getElementById('admin-login').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-                renderUpsellGroups();
-                renderUpsellGroupCheckboxes();
-            } else {
-                alert("Wrong password");
+            const email = (emailInput ? emailInput.value : '').trim();
+            const password = passInput.value;
+            if (!window.supabaseInstance) { alert('Sign in is unavailable — please refresh the page.'); return; }
+            try {
+                const { error } = await window.supabaseInstance.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                if (errEl) errEl.classList.add('hidden');
+                passInput.value = '';
+                showAdminPanel(email);
+            } catch (e) {
+                if (errEl) { errEl.textContent = 'Sign in failed: ' + (e.message || 'check your email and password'); errEl.classList.remove('hidden'); }
+                else alert('Sign in failed');
             }
+        }
+
+        // Keep the owner signed in across page refreshes (Supabase persists the
+        // session in localStorage), so they don't re-enter credentials constantly.
+        async function restoreAdminSession() {
+            if (!window.supabaseInstance) return;
+            try {
+                const { data } = await window.supabaseInstance.auth.getSession();
+                if (data && data.session) {
+                    const email = data.session.user ? data.session.user.email : '';
+                    isAdminLoggedIn = true;
+                    const emailEl = document.getElementById('admin-account-email');
+                    if (emailEl && email) emailEl.textContent = 'Signed in as ' + email;
+                }
+            } catch (e) { /* not signed in — fine */ }
+        }
+
+        async function signOutAdmin() {
+            try { if (window.supabaseInstance) await window.supabaseInstance.auth.signOut(); } catch (e) {}
+            isAdminLoggedIn = false;
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('admin-login').classList.remove('hidden');
+            closeAdmin();
         }
 
         // Dispatcher: routes the Add/Update Product button to the right function
@@ -2009,6 +2056,7 @@
         async function initializeWebsite() {
             loadUpsellGroups();
             loadCart();
+            await restoreAdminSession();
             await loadProducts();
             updateCartCount();
             handleOrderReturn();
