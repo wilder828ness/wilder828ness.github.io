@@ -661,9 +661,23 @@
         // After adding/editing a product, re-fetch from Supabase (confirms the
         // save actually persisted) and repaint the inventory grid + home so the
         // new image/changes appear immediately instead of "nothing happening".
+        // Ask Vercel to rebuild the static product pages + sitemap after a catalog
+        // change, so new products get a crawlable page (and removed ones drop off the
+        // sitemap) automatically — no manual redeploy. Debounced because the build
+        // pulls live Supabase data, so a single build after a burst of edits captures
+        // them all. Fails silently if the rebuild hook isn't configured yet.
+        let _lastRebuildPing = 0;
+        function triggerRebuild() {
+            const now = Date.now();
+            if (now - _lastRebuildPing < 45000) return;
+            _lastRebuildPing = now;
+            try { fetch('/api/rebuild', { method: 'POST', keepalive: true }); } catch (e) {}
+        }
+
         async function refreshAfterSave() {
             await loadProducts();   // re-fetches from Supabase, then calls renderAll()
             if (typeof filterInventory === 'function') filterInventory();
+            triggerRebuild();
         }
 
         // ─── UPSELL GROUPS ───────────────────────────────────────────────────
@@ -1109,13 +1123,29 @@
         function loadCart()  { try { const s = localStorage.getItem(CART_KEY); cart = s ? (JSON.parse(s) || []) : []; } catch(e) { cart = []; } }
         function clearCart() { cart = []; try { localStorage.removeItem(CART_KEY); } catch(e) {} updateCartCount(); }
 
+        // On-hand quantity for a product, read live from the catalog (the source of
+        // truth). Returns Infinity when quantity isn't tracked, so untracked items
+        // aren't artificially capped. This is what stops a 1-in-stock item from being
+        // added to the cart hundreds of times.
+        function onHandQty(productId) {
+            const p = products.find(x => String(x.id) === String(productId));
+            if (!p) return Infinity;
+            const q = (p.quantity === null || p.quantity === undefined || p.quantity === '') ? null : Number(p.quantity);
+            return (q === null || isNaN(q)) ? Infinity : q;
+        }
+
         function addToCart(productId) {
             const product = products.find(p => String(p.id) === String(productId));
             if (!product) return;
             if (stockState(product).soldOut) { alert('Sorry, this item is sold out.'); return; }
+            const max = onHandQty(productId);
             const existing = cart.find(item => String(item.id) === String(productId));
-            if (existing) existing.quantity++;
-            else cart.push({ ...product, quantity: 1 });
+            if (existing) {
+                if (existing.quantity >= max) { showToast("That's the most we can add for this item right now", 'warning'); return; }
+                existing.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
             saveCart();
             updateCartCount();
         }
@@ -1237,6 +1267,8 @@
         function cartInc(id) {
             const it = cart.find(i => String(i.id) === String(id));
             if (!it) return;
+            const max = onHandQty(id);
+            if (it.quantity >= max) { showToast("That's the most we can add for this item right now", 'warning'); reopenCheckout(); return; }
             it.quantity = (it.quantity || 1) + 1;
             saveCart(); updateCartCount(); reopenCheckout();
         }
@@ -1453,6 +1485,7 @@
                 closeProductModal();
                 renderAll();
                 filterInventory();
+                triggerRebuild();
             }
         }
 
@@ -1473,6 +1506,7 @@
             alert("All products deleted.");
             closeAdmin();
             renderAll();
+            triggerRebuild();
         }
 
         // ─── ADD / EDIT PRODUCT ──────────────────────────────────────────────
@@ -1565,17 +1599,38 @@
             }
         }
 
+        // Upload photos to Supabase Storage and keep only the resulting URL.
+        // Previously each photo was stored as a multi-MB base64 blob inside the
+        // product row, which made saves time out and silently fail — that was the
+        // real cause of "upload says success but nothing shows." URLs are tiny and
+        // reliable, and the storefront/build already handle image URLs everywhere.
+        const IMAGE_BUCKET = 'product-images';
         async function addUploadedImages(input) {
-            for (const file of input.files) {
-                const base64 = await new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onload = e => resolve(e.target.result);
-                    reader.readAsDataURL(file);
-                });
-                manualImages.push(base64);
-            }
+            const files = Array.from(input.files);
             input.value = '';
-            renderImageManager();
+            if (!window.supabaseInstance) { showToast('Image upload unavailable — please refresh and sign in', 'error'); return; }
+            for (const file of files) {
+                try {
+                    showToast('Uploading ' + file.name + '…', 'warning');
+                    const ext  = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+                    const path = 'products/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+                    const { error: upErr } = await window.supabaseInstance
+                        .storage.from(IMAGE_BUCKET)
+                        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/jpeg' });
+                    if (upErr) throw upErr;
+                    const { data: pub } = window.supabaseInstance.storage.from(IMAGE_BUCKET).getPublicUrl(path);
+                    if (pub && pub.publicUrl) {
+                        manualImages.push(pub.publicUrl);
+                        renderImageManager();
+                        showToast('✅ Image added', 'success');
+                    } else {
+                        throw new Error('Could not get public URL');
+                    }
+                } catch (e) {
+                    showToast('Image upload failed: ' + (e.message || 'unknown error'), 'error');
+                    console.error('Storage upload failed:', e);
+                }
+            }
         }
 
         async function addManualProduct() {
@@ -1747,6 +1802,7 @@
             saveToLocalStorage();
 
             // Sync to Supabase so changes survive a refresh
+            let saved = true;
             if (window.supabaseInstance) {
                 try {
                     const p = products[idx];
@@ -1767,18 +1823,22 @@
                             created_at:      p.created_at
                         }], { onConflict: 'id' });
                     if (error) {
-                        showToast('⚠️ Supabase save failed: ' + error.message, 'error');
+                        saved = false;
+                        showToast('⚠️ Save failed: ' + error.message, 'error');
                         console.error('Supabase update error:', error);
                     } else {
                         showToast('✅ Product updated', 'success');
                     }
                 } catch(e) {
-                    showToast('⚠️ Supabase save failed: ' + e.message, 'error');
+                    saved = false;
+                    showToast('⚠️ Save failed: ' + e.message, 'error');
                     console.error('Supabase product update failed:', e);
                 }
             }
 
-            alert("Product updated!");
+            // Only clear and close on a real save. On failure we keep the form open
+            // so the edit (and any just-added photos) isn't silently lost.
+            if (!saved) return;
             editingProductId = null;
             const btn = document.getElementById('add-product-btn');
             if (btn) { btn.textContent = 'Add Product'; }
@@ -1854,6 +1914,7 @@
                             resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products locally</span> <span class="text-yellow-400">⚠ Supabase: ${error.message}</span>`;
                         } else {
                             resultDiv.innerHTML = `<span class="text-emerald-400">✅ Imported ${success} products to Supabase!</span>`;
+                            triggerRebuild();
                         }
                     } catch(e) {
                         console.error('Supabase save failed:', e);
