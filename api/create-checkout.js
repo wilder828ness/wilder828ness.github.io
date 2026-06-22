@@ -21,6 +21,19 @@ module.exports = async (req, res) => {
             return res.status(400).json({ error: 'Cart is empty' });
         }
 
+        // ── Weight-tiered shipping ──────────────────────────────────────────
+        // Light tier (no item over 1.5 lb): $6.00 first item + $1.50 each additional.
+        // Heavy tier (any item over 1.5 lb): $8.00 first item + $2.00 each additional.
+        // Tier is set by the HEAVIEST single item — so a light + heavy mix charges the
+        // heavy tier. Items with no weight set count as 0 (light), so make sure each
+        // product has a shipping_weight in the admin (especially the heavy ones).
+        const totalQty = cartItems.reduce((s, i) => s + (i.quantity || 1), 0);
+        const maxItemWeight = cartItems.reduce((m, i) => Math.max(m, Number(i.shipping_weight) || 0), 0);
+        const isHeavy = maxItemWeight > 1.5;
+        const baseCents = isHeavy ? 800 : 600;
+        const extraCents = isHeavy ? 200 : 150;
+        const shippingCents = baseCents + extraCents * Math.max(0, totalQty - 1);
+
         const lineItems = cartItems.map(item => ({
             price_data: {
                 currency: 'usd',
@@ -39,21 +52,22 @@ module.exports = async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
+            // Shows a "Add promotion code" field on the Stripe checkout page.
+            // Create the actual codes in the Stripe dashboard (Coupons + Promotion codes).
+            allow_promotion_codes: true,
             success_url: 'https://nubztoys.com?order=success',
             cancel_url: 'https://nubztoys.com?order=cancelled',
             billing_address_collection: 'required',
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA', 'GB', 'AU']
             },
-            // Flat-rate shipping. Change `amount` (in cents) to adjust the price.
-            // To add a faster tier later, add a second { shipping_rate_data: {...} }
-            // object below with display_name 'Express' and its own amount.
+            // Weight-tiered shipping computed above (shippingCents).
             shipping_options: [
                 {
                     shipping_rate_data: {
                         type: 'fixed_amount',
-                        fixed_amount: { amount: 899, currency: 'usd' }, // $8.99
-                        display_name: 'Standard Shipping',
+                        fixed_amount: { amount: shippingCents, currency: 'usd' },
+                        display_name: 'Shipping',
                         delivery_estimate: {
                             minimum: { unit: 'business_day', value: 2 },
                             maximum: { unit: 'business_day', value: 6 }
