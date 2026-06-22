@@ -49,6 +49,10 @@ const SOCIAL = {
 // Canonical categories (match the storefront) + aliases for messy source data.
 // Edit this map if your admin uses different category names.
 const CATEGORY_ALIASES = {
+  'bulk': 'Bulk',
+  'case': 'Bulk',
+  'cases': 'Bulk',
+  'by the case': 'Bulk',
   'funko': 'Funko Pop',
   'funko pops': 'Funko Pop',
   'funko pop': 'Funko Pop',
@@ -87,6 +91,7 @@ const CATEGORY_DESC = {
   'Blind Bag & Mini Figures': 'Blind bags, mystery minis and 3D foam bag clips — surprise collectibles to open, trade and hunt down.',
   'Toys': 'Die-cast cars, card games and playtime favorites for kids and collectors alike.',
   'Collectibles': 'Hard-to-find collectibles, exclusives and display pieces for the serious collector.',
+  'Bulk': 'Buy by the case and save — sealed cases and multi-packs at bulk pricing, perfect for resellers and serious collectors.',
 };
 
 // ── HELPERS ────────────────────────────────────────────────────────────
@@ -331,7 +336,7 @@ function productPage(p, related) {
     </section>` : '';
 
   const buyItem = JSON.stringify({
-    id: p.id, name: p.name, price: pr || 0, images: p.images, quantity: 1,
+    id: p.id, name: p.name, price: pr || 0, images: p.images, quantity: 1, shipping_weight: p.shipping_weight || 0,
   });
 
   const body = `
@@ -344,8 +349,8 @@ function productPage(p, related) {
 
   <article class="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-2 gap-12">
     <div>
-      <img src="${esc(img)}" alt="${esc(p.name)}" class="w-full rounded-3xl border border-slate-800 bg-slate-900 object-contain">
-      ${p.images.length > 1 ? `<div class="grid grid-cols-4 gap-3 mt-3">${p.images.slice(0,4).map(u=>`<img src="${esc(u)}" alt="${esc(p.name)}" class="w-full aspect-square object-cover rounded-xl border border-slate-800" loading="lazy">`).join('')}</div>` : ''}
+      <img id="mainImg" src="${esc(img)}" alt="${esc(p.name)}" class="w-full rounded-3xl border border-slate-800 bg-slate-900 object-contain cursor-zoom-in">
+      ${p.images.length > 1 ? `<div class="grid grid-cols-4 gap-3 mt-3">${p.images.map((u,i)=>`<img data-full="${esc(u)}" src="${esc(u)}" alt="${esc(p.name)} view ${i+1}" class="thumb w-full aspect-square object-cover rounded-xl border ${i===0?'border-cyan-500':'border-slate-800'} cursor-pointer hover:border-cyan-500 transition" loading="lazy">`).join('')}</div>` : ''}
     </div>
     <div>
       ${p.brand ? `<p class="text-cyan-400 text-sm font-semibold tracking-wide uppercase mb-2">${esc(p.brand)}</p>` : ''}
@@ -374,6 +379,10 @@ function productPage(p, related) {
     </div>
   </article>
   ${relatedHtml}
+  <div id="lightbox" class="hidden fixed inset-0 z-[200] bg-black/90 items-center justify-center p-4" role="dialog" aria-modal="true">
+    <button id="lightboxClose" aria-label="Close" class="absolute top-4 right-5 text-white text-4xl leading-none">&times;</button>
+    <img id="lightboxImg" src="" alt="${esc(p.name)}" class="max-w-full max-h-full object-contain rounded-xl">
+  </div>
   <script>
     (function(){
       var ITEM = ${buyItem};
@@ -381,6 +390,27 @@ function productPage(p, related) {
       function writeCart(c){ try { localStorage.setItem('nubz_cart', JSON.stringify(c)); } catch(e){} }
       function count(c){ return c.reduce(function(s,i){ return s + (i.quantity||1); }, 0); }
       function syncBadge(){ var el = document.getElementById('navCartCount'); if (el) el.textContent = count(readCart()); }
+
+      // --- Image gallery: thumbnails swap the main image; click/tap to enlarge ---
+      var mainImg = document.getElementById('mainImg');
+      var thumbs  = Array.prototype.slice.call(document.querySelectorAll('.thumb'));
+      thumbs.forEach(function(t){
+        t.addEventListener('click', function(){
+          var full = t.getAttribute('data-full');
+          if (full && mainImg) mainImg.src = full;
+          thumbs.forEach(function(x){ x.classList.remove('border-cyan-500'); x.classList.add('border-slate-800'); });
+          t.classList.add('border-cyan-500'); t.classList.remove('border-slate-800');
+        });
+      });
+      var lb = document.getElementById('lightbox');
+      var lbImg = document.getElementById('lightboxImg');
+      var lbClose = document.getElementById('lightboxClose');
+      function openLb(){ if (!lb || !mainImg) return; lbImg.src = mainImg.src; lb.classList.remove('hidden'); lb.classList.add('flex'); document.body.style.overflow = 'hidden'; }
+      function closeLb(){ if (!lb) return; lb.classList.add('hidden'); lb.classList.remove('flex'); document.body.style.overflow = ''; }
+      if (mainImg) mainImg.addEventListener('click', openLb);
+      if (lbClose) lbClose.addEventListener('click', closeLb);
+      if (lb) lb.addEventListener('click', function(e){ if (e.target === lb) closeLb(); });
+      document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeLb(); });
 
       var add = document.getElementById('addCart');
       if (add) add.addEventListener('click', function(){
@@ -501,6 +531,7 @@ function categoriesIndexPage(byCat) {
     'Blind Bag & Mini Figures': 'fa-question-circle',
     'Toys': 'fa-gamepad',
     'Collectibles': 'fa-star',
+    'Bulk': 'fa-boxes-stacked',
   };
   const COLORS = {
     'Action Figures': '#22d3ee',
@@ -509,6 +540,7 @@ function categoriesIndexPage(byCat) {
     'Blind Bag & Mini Figures': '#e879f9',
     'Toys': '#fbbf24',
     'Collectibles': '#fb7185',
+    'Bulk': '#fb923c',
   };
   const crumbLd = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',

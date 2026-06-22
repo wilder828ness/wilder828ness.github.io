@@ -368,6 +368,14 @@
                 <input type="password" id="admin-password" autocomplete="current-password" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-4" placeholder="Password">
                 <button onclick="loginAdmin()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Sign In</button>
                 <p id="admin-login-error" class="text-sm text-red-400 mt-3 hidden"></p>
+                <button onclick="sendPasswordReset()" class="w-full mt-3 text-sm text-slate-400 hover:text-cyan-400 underline">Forgot password?</button>
+            </div>
+
+            <div id="admin-recovery" class="hidden">
+                <p class="text-sm text-slate-300 mb-4">Set a new password for your admin account:</p>
+                <input type="password" id="recovery-password" autocomplete="new-password" placeholder="New password (min 6 characters)" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-3">
+                <button onclick="completePasswordRecovery()" class="w-full py-3 bg-white text-slate-950 font-bold rounded-3xl">Set Password</button>
+                <p id="recovery-msg" class="text-sm mt-3 hidden"></p>
             </div>
 
             <div id="admin-panel" class="hidden">
@@ -383,8 +391,13 @@
                 <div class="mb-6 border border-slate-700 rounded-2xl p-6">
                     <h4 class="font-semibold text-lg mb-2">Account</h4>
                     <p id="admin-account-email" class="text-xs text-slate-500 mb-4"></p>
+                    <div class="mb-4">
+                        <label class="block text-sm text-slate-400 mb-2">Change password</label>
+                        <input type="password" id="new-admin-password" autocomplete="new-password" placeholder="New password (min 6 characters)" class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-3 mb-2">
+                        <button onclick="changeAdminPassword()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-3xl text-sm">Update Password</button>
+                        <p id="change-pw-msg" class="text-sm mt-2 hidden"></p>
+                    </div>
                     <button onclick="signOutAdmin()" class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-3xl text-sm">Sign Out</button>
-                    <p class="text-xs text-slate-500 mt-3">Password changes are managed in your Supabase account.</p>
                 </div>
 
 
@@ -451,6 +464,9 @@
                         <input id="manual-compare-to" type="number" step="0.01" placeholder="Compare To (optional)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-quantity" type="number" placeholder="Quantity" value="10" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <input id="manual-shipping-weight" type="number" step="0.01" placeholder="Shipping Weight (lbs)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-sku" placeholder="SKU" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-upc" placeholder="UPC / Barcode" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
+                        <input id="manual-cost" type="number" step="0.01" placeholder="Cost (your cost)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <select id="manual-status" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                             <option value="In Stock">In Stock</option>
                             <option value="In Transit">In Transit</option>
@@ -465,6 +481,7 @@
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-blind" class="accent-emerald-500"> Blind Bag &amp; Mini Figures</label>
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-toys" class="accent-emerald-500"> Toys</label>
                                 <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-collectibles" class="accent-emerald-500"> Collectibles</label>
+                                <label class="flex items-center gap-x-2"><input type="checkbox" id="cat-bulk" class="accent-emerald-500"> Bulk</label>
                             </div>
                         </div>
                         <div class="md:col-span-2">
@@ -543,7 +560,8 @@
             { name: "Funko Pop",               icon: "fa-box-open",       color: "purple-400"  },
             { name: "Blind Bag & Mini Figures",icon: "fa-question-circle",color: "fuchsia-400" },
             { name: "Toys",                    icon: "fa-gamepad",        color: "amber-400"   },
-            { name: "Collectibles",            icon: "fa-star",           color: "rose-400"    }
+            { name: "Collectibles",            icon: "fa-star",           color: "rose-400"    },
+            { name: "Bulk",                    icon: "fa-boxes-stacked",  color: "orange-400"  }
         ];
 
         let products       = [];
@@ -1427,6 +1445,66 @@
             closeAdmin();
         }
 
+        // Change password while signed in (the simple, common case).
+        async function changeAdminPassword() {
+            const el  = document.getElementById('new-admin-password');
+            const msg = document.getElementById('change-pw-msg');
+            const pw  = el ? el.value : '';
+            const show = (t, ok) => { if (msg) { msg.textContent = t; msg.className = 'text-sm mt-2 ' + (ok ? 'text-emerald-400' : 'text-red-400'); msg.classList.remove('hidden'); } };
+            if (!pw || pw.length < 6) return show('Password must be at least 6 characters.', false);
+            if (!window.supabaseInstance) return show('Unavailable — please refresh.', false);
+            try {
+                const { error } = await window.supabaseInstance.auth.updateUser({ password: pw });
+                if (error) throw error;
+                show('✅ Password updated.', true);
+                el.value = '';
+            } catch (e) { show('Could not update: ' + (e.message || 'try again'), false); }
+        }
+
+        // Forgot password: email a reset link that returns to this site.
+        async function sendPasswordReset() {
+            const emailInput = document.getElementById('admin-email');
+            const errEl = document.getElementById('admin-login-error');
+            const email = (emailInput ? emailInput.value : '').trim();
+            const show = (t, ok) => { if (errEl) { errEl.textContent = t; errEl.className = 'text-sm mt-3 ' + (ok ? 'text-emerald-400' : 'text-red-400'); errEl.classList.remove('hidden'); } };
+            if (!email) return show('Enter your email above first, then tap Forgot password.', false);
+            if (!window.supabaseInstance) return show('Unavailable — please refresh.', false);
+            try {
+                const { error } = await window.supabaseInstance.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/' });
+                if (error) throw error;
+                show('✅ If that email is registered, a reset link is on its way. Open it on this site to set a new password.', true);
+            } catch (e) { show('Could not send reset: ' + (e.message || 'try again'), false); }
+        }
+
+        // When the reset link is opened, Supabase fires a PASSWORD_RECOVERY event;
+        // we show this panel so the owner can set a new password.
+        function showRecoveryPanel() {
+            const modal = document.getElementById('admin-modal');
+            if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+            const l = document.getElementById('admin-login');   if (l) l.classList.add('hidden');
+            const p = document.getElementById('admin-panel');   if (p) p.classList.add('hidden');
+            const r = document.getElementById('admin-recovery'); if (r) r.classList.remove('hidden');
+        }
+
+        async function completePasswordRecovery() {
+            const el  = document.getElementById('recovery-password');
+            const msg = document.getElementById('recovery-msg');
+            const pw  = el ? el.value : '';
+            const show = (t, ok) => { if (msg) { msg.textContent = t; msg.className = 'text-sm mt-3 ' + (ok ? 'text-emerald-400' : 'text-red-400'); msg.classList.remove('hidden'); } };
+            if (!pw || pw.length < 6) return show('Password must be at least 6 characters.', false);
+            if (!window.supabaseInstance) return show('Unavailable — please refresh.', false);
+            try {
+                const { error } = await window.supabaseInstance.auth.updateUser({ password: pw });
+                if (error) throw error;
+                show('✅ Password updated — you are signed in.', true);
+                el.value = '';
+                setTimeout(function(){
+                    const r = document.getElementById('admin-recovery'); if (r) r.classList.add('hidden');
+                    showAdminPanel('');
+                }, 1200);
+            } catch (e) { show('Could not update password: ' + (e.message || 'try again'), false); }
+        }
+
         // Dispatcher: routes the Add/Update Product button to the right function
         function handleProductFormSubmit() {
             if (editingProductId) {
@@ -1518,6 +1596,7 @@
             if (document.getElementById('cat-blind').checked)  selectedCategories.push("Blind Bag & Mini Figures");
             if (document.getElementById('cat-toys').checked)         selectedCategories.push("Toys");
             if (document.getElementById('cat-collectibles').checked)  selectedCategories.push("Collectibles");
+            if (document.getElementById('cat-bulk').checked)          selectedCategories.push("Bulk");
             return {
                 brand:          document.getElementById('manual-brand').value.trim(),
                 title:          document.getElementById('manual-title').value.trim(),
@@ -1525,6 +1604,9 @@
                 compareTo:      parseFloat(document.getElementById('manual-compare-to').value) || 0,
                 quantity:       parseInt(document.getElementById('manual-quantity').value)    || 10,
                 shippingWeight: parseFloat(document.getElementById('manual-shipping-weight').value) || 0,
+                sku:            document.getElementById('manual-sku').value.trim(),
+                upc:            document.getElementById('manual-upc').value.trim(),
+                cost:           parseFloat(document.getElementById('manual-cost').value) || 0,
                 status:         document.getElementById('manual-status').value.trim() || "In Stock",
                 description:    document.getElementById('manual-description').value.trim(),
                 extraImages:    document.getElementById('manual-extra-images').value.trim(),
@@ -1535,6 +1617,7 @@
 
         function clearProductForm() {
             ['manual-brand','manual-title','manual-price','manual-compare-to',
+             'manual-sku','manual-upc','manual-cost',
              'manual-description','manual-extra-images'].forEach(id => {
                 document.getElementById(id).value = '';
             });
@@ -1542,7 +1625,7 @@
             document.getElementById('manual-shipping-weight').value = '';
             document.getElementById('manual-status').value      = 'In Stock';
             document.getElementById('manual-image-upload').value = '';
-            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys','cat-collectibles'].forEach(id => {
+            ['cat-action','cat-model','cat-funko','cat-blind','cat-toys','cat-collectibles','cat-bulk'].forEach(id => {
                 document.getElementById(id).checked = false;
             });
             document.querySelectorAll('.upsell-group-check').forEach(cb => cb.checked = false);
@@ -1605,18 +1688,56 @@
         // real cause of "upload says success but nothing shows." URLs are tiny and
         // reliable, and the storefront/build already handle image URLs everywhere.
         const IMAGE_BUCKET = 'product-images';
+        const IMAGE_MAX_EDGE = 1200;   // px on the longest side — plenty for product cards/detail
+        const IMAGE_QUALITY  = 0.82;   // JPEG quality
+
+        // Downscale + compress a photo in the browser before upload. The owner's
+        // cache is always warm; it's the first-time customer who pays for oversized
+        // files, so we shrink to a sane web size and re-encode as JPEG. Anything that
+        // can't be processed (or would get bigger) falls back to the original file.
+        function resizeImageFile(file) {
+            return new Promise((resolve) => {
+                const fallback = { blob: file, ext: ((file.name.split('.').pop() || 'jpg')) };
+                if (!file.type || !file.type.indexOf || file.type.indexOf('image/') !== 0 || file.type === 'image/gif') {
+                    return resolve(fallback);
+                }
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const longest = Math.max(img.width, img.height) || 1;
+                        const scale = longest > IMAGE_MAX_EDGE ? IMAGE_MAX_EDGE / longest : 1;
+                        const w = Math.max(1, Math.round(img.width * scale));
+                        const h = Math.max(1, Math.round(img.height * scale));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        canvas.toBlob((blob) => {
+                            URL.revokeObjectURL(url);
+                            if (blob && blob.size < file.size) resolve({ blob, ext: 'jpg' });
+                            else resolve(fallback);   // never upsize a file that was already small
+                        }, 'image/jpeg', IMAGE_QUALITY);
+                    } catch (e) { URL.revokeObjectURL(url); resolve(fallback); }
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); resolve(fallback); };
+                img.src = url;
+            });
+        }
+
         async function addUploadedImages(input) {
             const files = Array.from(input.files);
             input.value = '';
             if (!window.supabaseInstance) { showToast('Image upload unavailable — please refresh and sign in', 'error'); return; }
             for (const file of files) {
                 try {
-                    showToast('Uploading ' + file.name + '…', 'warning');
-                    const ext  = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
-                    const path = 'products/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+                    showToast('Optimizing & uploading ' + file.name + '…', 'warning');
+                    const { blob, ext } = await resizeImageFile(file);
+                    const cleanExt = (ext || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+                    const path = 'products/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + cleanExt;
                     const { error: upErr } = await window.supabaseInstance
                         .storage.from(IMAGE_BUCKET)
-                        .upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type || 'image/jpeg' });
+                        // 1-year cache: filenames are unique, so the file at a URL never changes
+                        .upload(path, blob, { cacheControl: '31536000', upsert: false, contentType: blob.type || 'image/jpeg' });
                     if (upErr) throw upErr;
                     const { data: pub } = window.supabaseInstance.storage.from(IMAGE_BUCKET).getPublicUrl(path);
                     if (pub && pub.publicUrl) {
@@ -1653,7 +1774,9 @@
                 price:           v.price,
                 quantity:        v.quantity,
                 shipping_weight: v.shippingWeight,
-                cost:            0,
+                sku:             v.sku,
+                upc:             v.upc,
+                cost:            v.cost,
                 compare_to:      v.compareTo,
                 status:          v.status,
                 images:          images,
@@ -1686,6 +1809,9 @@
                         compare_to:      newProduct.compare_to || 0,
                         quantity:        newProduct.quantity,
                         shipping_weight: newProduct.shipping_weight || 0,
+                        sku:             newProduct.sku || '',
+                        upc:             newProduct.upc || '',
+                        cost:            newProduct.cost || 0,
                         status:          newProduct.status,
                         images:          Array.isArray(newProduct.images) ? newProduct.images.join(', ') : '',
                         description:     newProduct.description,
@@ -1719,6 +1845,9 @@
             document.getElementById('manual-compare-to').value      = product.compare_to || '';
             document.getElementById('manual-quantity').value        = product.quantity || 10;
             document.getElementById('manual-shipping-weight').value = product.shipping_weight || 0;
+            document.getElementById('manual-sku').value             = product.sku || '';
+            document.getElementById('manual-upc').value             = product.upc || '';
+            document.getElementById('manual-cost').value            = product.cost || '';
             (function(){
                 const sel = document.getElementById('manual-status');
                 const raw = (product.status || 'In Stock').trim().toLowerCase();
@@ -1739,6 +1868,7 @@
             document.getElementById('cat-blind').checked  = cats.includes("Blind Bag & Mini Figures");
             document.getElementById('cat-toys').checked         = cats.includes("Toys");
             document.getElementById('cat-collectibles').checked = cats.includes("Collectibles");
+            document.getElementById('cat-bulk').checked         = cats.includes("Bulk");
 
             // Check upsell group checkboxes
             const productGroups = product.upsellGroupIds || [];
@@ -1792,6 +1922,9 @@
                 price:           v.price,
                 quantity:        v.quantity,
                 shipping_weight: v.shippingWeight,
+                sku:             v.sku,
+                upc:             v.upc,
+                cost:            v.cost,
                 compare_to:      v.compareTo,
                 status:          v.status,
                 description:     v.description,
@@ -1817,6 +1950,9 @@
                             compare_to:      p.compare_to || 0,
                             quantity:        p.quantity,
                             shipping_weight: p.shipping_weight || 0,
+                            sku:             p.sku || '',
+                            upc:             p.upc || '',
+                            cost:            p.cost || 0,
                             status:          p.status,
                             images:          Array.isArray(p.images) ? p.images.join(', ') : '',
                             description:     p.description,
@@ -1877,6 +2013,8 @@
                         price:           cleanPrice(get('sales price','price','sale price')),
                         quantity:        parseInt(get('quantity','qty')) || 10,
                         shipping_weight: parseFloat(get('shipping weight','weight')) || 0,
+                        sku:             get('sku'),
+                        upc:             get('upc','barcode'),
                         cost:            cleanPrice(get('cost')),
                         compare_to:      cleanPrice(get('compare to','compare price')),
                         status:          get('status','availability') || 'In Stock',
@@ -1901,6 +2039,9 @@
                             compare_to:      p.compare_to || 0,
                             quantity:        p.quantity,
                             shipping_weight: p.shipping_weight || 0,
+                            sku:             p.sku || '',
+                            upc:             p.upc || '',
+                            cost:            p.cost || 0,
                             status:          p.status,
                             images:          Array.isArray(p.images) ? p.images.join(', ') : (p.images || ''),
                             description:     p.description,
@@ -1942,7 +2083,7 @@
         }
 
         function downloadSampleCSV() {
-            const csv = `Brand,Title,SKU,Categories,Description,Shipping Weight,Quantity,Cost,Sales Price,Compare To,Image URLs,Status\nBLOKEES,Blokees Transformers Version 09,,Model Sets,"Complete set includes 3 mystery figures",0.8,9,4.50,12.00,15.00,https://picsum.photos/id/106/600/400,In Stock`;
+            const csv = `Brand,Title,SKU,UPC,Categories,Description,Shipping Weight,Quantity,Cost,Sales Price,Compare To,Image URLs,Status\nBLOKEES,Blokees Transformers Version 09,BLK71109,889698123456,Model Sets,"Complete set includes 3 mystery figures",0.8,9,4.50,12.00,15.00,https://picsum.photos/id/106/600/400,In Stock`;
             const a   = document.createElement('a');
             a.href    = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
             a.download = 'nubz-master-inventory.csv';
@@ -2118,6 +2259,13 @@
             loadUpsellGroups();
             loadCart();
             await restoreAdminSession();
+            // Catch password-reset links — Supabase fires PASSWORD_RECOVERY when the
+            // emailed reset link is opened, so we show the set-new-password panel.
+            if (window.supabaseInstance && window.supabaseInstance.auth && window.supabaseInstance.auth.onAuthStateChange) {
+                window.supabaseInstance.auth.onAuthStateChange(function(event){
+                    if (event === 'PASSWORD_RECOVERY') showRecoveryPanel();
+                });
+            }
             await loadProducts();
             updateCartCount();
             handleOrderReturn();
