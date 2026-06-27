@@ -60,7 +60,9 @@ module.exports = async (req, res) => {
       // so a re-publish syncs availability only (status + quantity). Price/compare are
       // filled ONLY if the store has none yet, and are NEVER overwritten once set.
       const ex  = found[0];
-      const upd = { status: row.status, quantity: row.quantity };
+      // Sync availability + cost (both master-owned). cost flows on every re-publish
+      // so a later landed-cost update (freight added) reaches the store when you publish.
+      const upd = { status: row.status, quantity: row.quantity, cost: row.cost };
       if (ex.price == null || Number(ex.price) === 0)           upd.price = row.price;
       if (ex.compare_to == null || Number(ex.compare_to) === 0) upd.compare_to = row.compare_to;
       method = 'PATCH'; url = `${base}?sku=eq.${encodeURIComponent(p.sku)}`; body = upd;
