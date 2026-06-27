@@ -469,6 +469,7 @@
                         <input id="manual-cost" type="number" step="0.01" placeholder="Cost (your cost)" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                         <select id="manual-status" class="bg-slate-800 border border-slate-700 rounded-2xl px-4 py-2 text-sm">
                             <option value="In Stock">In Stock</option>
+                            <option value="On Order">On Order</option>
                             <option value="In Transit">In Transit</option>
                             <option value="Sold Out">Sold Out</option>
                         </select>
@@ -922,9 +923,11 @@
         function stockState(p) {
             const qty    = (p.quantity === null || p.quantity === undefined || p.quantity === '') ? null : Number(p.quantity);
             const status = (p.status || '').toLowerCase().replace(/\s+/g,'');
-            const soldOut   = (qty !== null && qty <= 0) || status === 'soldout';
-            const inTransit = !soldOut && status === 'intransit';
-            return { qty, soldOut, inTransit };
+            // On Order = show & tell (not buyable). In Transit = pre-order (buyable w/ caution).
+            const onOrder   = status === 'onorder';
+            const soldOut   = !onOrder && ((qty !== null && qty <= 0) || status === 'soldout' || status === 'outofstock');
+            const inTransit = !soldOut && !onOrder && status === 'intransit';
+            return { qty, soldOut, onOrder, inTransit };
         }
 
         function createProductCard(product) {
@@ -939,10 +942,12 @@
             const ss          = stockState(product);
             const statusHTML  = ss.soldOut
                 ? `<span class="status-badge bg-red-600 text-white">SOLD OUT</span>`
-                : ss.inTransit
-                    ? `<span class="status-badge bg-blue-500 text-white">IN TRANSIT</span>`
-                    : '';
-            const lowQtyHTML  = (!ss.soldOut && product.quantity && product.quantity <= 2)
+                : ss.onOrder
+                    ? `<span class="status-badge bg-purple-500 text-white">COMING SOON</span>`
+                    : ss.inTransit
+                        ? `<span class="status-badge bg-blue-500 text-white">PRE-ORDER</span>`
+                        : '';
+            const lowQtyHTML  = (!ss.soldOut && !ss.onOrder && !ss.inTransit && product.quantity && product.quantity <= 2)
                 ? `<span class="status-badge bg-amber-500 text-black ml-1">LOW QTY</span>` : '';
 
             card.innerHTML = `
@@ -956,14 +961,21 @@
                     <div class="text-xs text-slate-400">${product.brand || 'Unknown'} • ${catDisplay}</div>
                     <div class="flex justify-between items-center mt-4">
                         <div>
-                            <div class="text-xl sm:text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
-                            ${product.compare_to && product.compare_to > product.price
-                                ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}
+                            ${ss.onOrder
+                                ? `<div class="text-base font-semibold text-purple-300">Coming soon</div>`
+                                : `<div class="text-xl sm:text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
+                                   ${product.compare_to && product.compare_to > product.price
+                                       ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}`}
                         </div>
                         ${ss.soldOut
                             ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">SOLD OUT</button>`
-                            : `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
-                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>`}
+                            : ss.onOrder
+                                ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">COMING SOON</button>`
+                                : ss.inTransit
+                                    ? `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                        class="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-2xl">PRE-ORDER</button>`
+                                    : `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                        class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>`}
                     </div>
                 </div>`;
             // Customers go to the clean standalone product page; admins still get
@@ -1071,14 +1083,25 @@
 
             const statusEl     = document.getElementById('modal-status');
             const mss          = stockState(product);
-            statusEl.textContent = mss.soldOut ? 'Sold Out' : (mss.inTransit ? 'In Transit' : (product.status || 'In Stock'));
-            statusEl.className   = `text-sm font-semibold px-4 py-1 rounded-full ${mss.soldOut ? 'bg-red-600 text-white' : (mss.inTransit ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-black')}`;
+            statusEl.textContent = mss.soldOut ? 'Sold Out' : mss.onOrder ? 'Coming Soon' : mss.inTransit ? 'Pre-order' : (product.status || 'In Stock');
+            statusEl.className   = `text-sm font-semibold px-4 py-1 rounded-full ${mss.soldOut ? 'bg-red-600 text-white' : mss.onOrder ? 'bg-purple-500 text-white' : mss.inTransit ? 'bg-blue-500 text-white' : 'bg-emerald-500 text-black'}`;
+            // On Order = show & tell: hide the price.
+            const modalPriceEl = document.getElementById('modal-price');
+            if (modalPriceEl) modalPriceEl.style.display = mss.onOrder ? 'none' : '';
             const modalAddBtn  = document.getElementById('modal-add-btn');
             if (modalAddBtn) {
                 if (mss.soldOut) {
                     modalAddBtn.disabled = true;
                     modalAddBtn.textContent = 'SOLD OUT';
                     modalAddBtn.className = 'flex-1 py-4 bg-slate-700 text-slate-400 font-bold rounded-3xl text-lg cursor-not-allowed';
+                } else if (mss.onOrder) {
+                    modalAddBtn.disabled = true;
+                    modalAddBtn.textContent = 'COMING SOON';
+                    modalAddBtn.className = 'flex-1 py-4 bg-slate-700 text-slate-400 font-bold rounded-3xl text-lg cursor-not-allowed';
+                } else if (mss.inTransit) {
+                    modalAddBtn.disabled = false;
+                    modalAddBtn.textContent = 'PRE-ORDER';
+                    modalAddBtn.className = 'flex-1 py-4 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-3xl text-lg';
                 } else {
                     modalAddBtn.disabled = false;
                     modalAddBtn.textContent = 'ADD TO CART';
@@ -1155,11 +1178,17 @@
         function addToCart(productId) {
             const product = products.find(p => String(p.id) === String(productId));
             if (!product) return;
-            if (stockState(product).soldOut) { alert('Sorry, this item is sold out.'); return; }
+            const ss = stockState(product);
+            if (ss.soldOut) { alert('Sorry, this item is sold out.'); return; }
+            if (ss.onOrder) { alert("This item is on order and not available to buy yet — check back soon!"); return; }
+            if (ss.inTransit) {
+                if (!confirm('Heads up — this item is available for PRE-ORDER only. It ships when it arrives in stock. Add to cart?')) return;
+            }
             const max = onHandQty(productId);
             const existing = cart.find(item => String(item.id) === String(productId));
             if (existing) {
-                if (existing.quantity >= max) { showToast("That's the most we can add for this item right now", 'warning'); return; }
+                // Pre-order (in transit) isn't capped by on-hand quantity.
+                if (!ss.inTransit && existing.quantity >= max) { showToast("That's the most we can add for this item right now", 'warning'); return; }
                 existing.quantity++;
             } else {
                 cart.push({ ...product, quantity: 1 });

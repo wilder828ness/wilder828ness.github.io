@@ -126,6 +126,17 @@ const inStock = (p) => {
   return true;
 };
 
+// Four marketable states: in_stock | in_transit (pre-order) | on_order (coming soon) | sold_out
+const availState = (p) => {
+  const s = String(p.status || '').toLowerCase().replace(/\s+/g, '');
+  const qty = Number(p.quantity);
+  if (s === 'onorder') return 'on_order';
+  if (s.includes('sold') || s.includes('out')) return 'sold_out';
+  if (!isNaN(qty) && qty <= 0) return 'sold_out';
+  if (s === 'intransit') return 'in_transit';
+  return 'in_stock';
+};
+
 const price = (p) => {
   const n = Number(p.price);
   return isNaN(n) ? null : n;
@@ -295,7 +306,8 @@ function productPage(p, related) {
   const cat       = (p.categories[0] || 'Toys');
   const catSlug   = slugify(cat);
   const desc      = metaFrom(p.description, `${p.name} — available now at ${SITE_NAME}.`);
-  const available = inStock(p);
+  const st        = availState(p);
+  const available = (st === 'in_stock' || st === 'in_transit'); // purchasable (in stock or pre-order)
 
   const productLd = {
     '@context': 'https://schema.org', '@type': 'Product',
@@ -308,7 +320,9 @@ function productPage(p, related) {
     offers: {
       '@type': 'Offer', url: canonical, priceCurrency: 'USD',
       ...(pr != null ? { price: pr.toFixed(2) } : {}),
-      availability: available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability: st === 'in_stock' ? 'https://schema.org/InStock'
+                  : (st === 'in_transit' || st === 'on_order') ? 'https://schema.org/PreOrder'
+                  : 'https://schema.org/OutOfStock',
       itemCondition: 'https://schema.org/NewCondition',
       seller: { '@type': 'Organization', name: SITE_NAME },
     },
@@ -356,13 +370,13 @@ function productPage(p, related) {
       ${p.brand ? `<p class="text-cyan-400 text-sm font-semibold tracking-wide uppercase mb-2">${esc(p.brand)}</p>` : ''}
       <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-4">${esc(p.name)}</h1>
       <div class="flex items-center gap-x-3 mb-6">
-        ${pr != null ? `<span class="text-3xl font-bold">$${pr.toFixed(2)}</span>` : ''}
-        ${(!isNaN(cmp) && cmp > (pr||0)) ? `<span class="compare-price text-lg">$${cmp.toFixed(2)}</span>` : ''}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full ${available ? 'bg-emerald-600/20 text-emerald-400' : 'bg-slate-700 text-slate-300'}">${available ? 'In Stock' : 'Sold Out'}</span>
+        ${(pr != null && st !== 'on_order') ? `<span class="text-3xl font-bold">$${pr.toFixed(2)}</span>` : ''}
+        ${(!isNaN(cmp) && cmp > (pr||0) && st !== 'on_order') ? `<span class="compare-price text-lg">$${cmp.toFixed(2)}</span>` : ''}
+        <span class="text-xs font-semibold px-3 py-1 rounded-full ${st==='in_stock' ? 'bg-emerald-600/20 text-emerald-400' : st==='in_transit' ? 'bg-blue-500/20 text-blue-300' : st==='on_order' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-300'}">${st==='in_stock' ? 'In Stock' : st==='in_transit' ? 'Pre-order' : st==='on_order' ? 'Coming Soon' : 'Sold Out'}</span>
       </div>
       <div class="prose prose-invert text-slate-300 leading-relaxed mb-8 whitespace-pre-line">${esc(String(p.description || '').split(/keywords:/i)[0].trim())}</div>
-      ${available ? `<div class="flex flex-col sm:flex-row gap-3">
-        <button id="addCart" class="flex-1 px-8 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-cart-plus"></i> Add to Cart</button>
+      ${available ? `${st === 'in_transit' ? `<div class="mb-3 text-sm bg-blue-500/15 border border-blue-500/40 text-blue-200 rounded-2xl px-4 py-3">⏳ Available for <b>pre-order</b> — ships when it arrives in stock.</div>` : ''}<div class="flex flex-col sm:flex-row gap-3">
+        <button id="addCart" class="flex-1 px-8 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-cart-plus"></i> ${st === 'in_transit' ? 'Pre-order' : 'Add to Cart'}</button>
         <button id="buyNow" class="flex-1 px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-bolt"></i> Buy Now</button>
       </div>
       <div id="addedMsg" class="hidden mt-4 bg-slate-900 border border-slate-700 rounded-2xl p-4">
@@ -374,7 +388,9 @@ function productPage(p, related) {
       </div>
       <p class="text-sm text-slate-300 mt-4"><i class="fa-solid fa-bolt text-cyan-400"></i> Fast shipping · Packed with care · <span class="text-amber-400">★</span> 5-star seller on Whatnot</p>
       <p class="text-xs text-slate-500 mt-2">🔒 Secure checkout powered by Stripe</p>` :
-      `<a href="/inventory" class="inline-block px-10 py-4 border border-slate-700 rounded-3xl font-semibold hover:bg-white/5">Browse other items</a>`}
+      st === 'on_order'
+        ? `<div class="inline-block px-6 py-4 bg-purple-500/15 border border-purple-500/40 text-purple-200 rounded-3xl font-semibold">🔜 Coming soon — not yet available to order. Check back!</div>`
+        : `<a href="/inventory" class="inline-block px-10 py-4 border border-slate-700 rounded-3xl font-semibold hover:bg-white/5">Browse other items</a>`}
       <p class="mt-6 text-sm"><a href="/categories/${catSlug}" class="text-cyan-400 hover:text-cyan-300">← More in ${esc(cat)}</a></p>
     </div>
   </article>
@@ -414,6 +430,7 @@ function productPage(p, related) {
 
       var add = document.getElementById('addCart');
       if (add) add.addEventListener('click', function(){
+        ${st === 'in_transit' ? `if(!confirm('Heads up — this item is available for PRE-ORDER only. It ships when it arrives in stock. Add to cart?')) return;` : ''}
         var c = readCart();
         var ex = c.find(function(x){ return String(x.id) === String(ITEM.id); });
         if (ex) ex.quantity = (ex.quantity||1) + 1; else c.push(Object.assign({}, ITEM));
@@ -606,17 +623,18 @@ function inventoryPage(products) {
   };
   const grid = products.map(p => {
     const pr = price(p);
-    const available = inStock(p);
+    const st = availState(p);
+    const available = (st === 'in_stock' || st === 'in_transit');
     return `
     <a href="/products/${p.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
       <div class="relative">
         <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover" loading="lazy">
-        ${!available ? '<div class="absolute inset-0 bg-black/60 flex items-center justify-center"><span class="bg-slate-900 text-slate-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700">SOLD OUT</span></div>' : ''}
+        ${st==='sold_out' ? '<div class="absolute inset-0 bg-black/60 flex items-center justify-center"><span class="bg-slate-900 text-slate-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700">SOLD OUT</span></div>' : st==='on_order' ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">COMING SOON</span></div>' : st==='in_transit' ? '<span class="absolute top-2 left-2 bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">PRE-ORDER</span>' : ''}
       </div>
       <div class="p-4">
         ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
         <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
-        ${pr != null ? `<p class="font-bold">${available ? `$${pr.toFixed(2)}` : `<span class="text-slate-500 line-through">$${pr.toFixed(2)}</span>`}</p>` : ''}
+        ${(pr != null && st !== 'on_order') ? `<p class="font-bold">${available ? `$${pr.toFixed(2)}` : `<span class="text-slate-500 line-through">$${pr.toFixed(2)}</span>`}</p>` : (st === 'on_order' ? `<p class="font-bold text-purple-300 text-sm">Coming soon</p>` : '')}
       </div>
     </a>`;
   }).join('');
