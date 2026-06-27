@@ -131,9 +131,9 @@ const availState = (p) => {
   const s = String(p.status || '').toLowerCase().replace(/\s+/g, '');
   const qty = Number(p.quantity);
   if (s === 'onorder') return 'on_order';
+  if (s === 'intransit') return 'in_transit';   // pre-order: available even with 0 on hand
   if (s.includes('sold') || s.includes('out')) return 'sold_out';
   if (!isNaN(qty) && qty <= 0) return 'sold_out';
-  if (s === 'intransit') return 'in_transit';
   return 'in_stock';
 };
 

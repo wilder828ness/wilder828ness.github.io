@@ -924,9 +924,11 @@
             const qty    = (p.quantity === null || p.quantity === undefined || p.quantity === '') ? null : Number(p.quantity);
             const status = (p.status || '').toLowerCase().replace(/\s+/g,'');
             // On Order = show & tell (not buyable). In Transit = pre-order (buyable w/ caution).
-            const onOrder   = status === 'onorder';
-            const soldOut   = !onOrder && ((qty !== null && qty <= 0) || status === 'soldout' || status === 'outofstock');
-            const inTransit = !soldOut && !onOrder && status === 'intransit';
+            // Both take precedence over a 0 on-hand count — a pre-order item legitimately has 0 in hand.
+            const onOrder       = status === 'onorder';
+            const inTransitFlag = status === 'intransit';
+            const soldOut   = !onOrder && !inTransitFlag && ((qty !== null && qty <= 0) || status === 'soldout' || status === 'outofstock');
+            const inTransit = !soldOut && !onOrder && inTransitFlag;
             return { qty, soldOut, onOrder, inTransit };
         }
 
