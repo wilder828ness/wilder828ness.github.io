@@ -36,7 +36,9 @@ module.exports = async (req, res) => {
   const row = {
     name:            p.name,
     brand:           p.brand || null,
-    categories:      Array.isArray(p.categories) ? p.categories : (p.category ? [p.category] : []),
+    // Storefront stores categories as a comma-separated STRING (it splits on load),
+    // so flatten whatever we get into that format — never a JSON array.
+    categories:      Array.isArray(p.categories) ? p.categories.join(', ') : (p.categories || p.category || ''),
     price:           p.price != null ? p.price : 0,
     compare_to:      p.compare_to != null ? p.compare_to : null,
     quantity:        p.quantity != null ? p.quantity : 0,
