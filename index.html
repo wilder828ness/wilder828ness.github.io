@@ -1261,6 +1261,14 @@
                     </div>`;
             });
 
+            // Estimate shipping with the SAME weight-tiered formula as create-checkout.js,
+            // so the customer sees the real total here instead of a surprise at Stripe.
+            const shipQty    = cart.reduce((s, i) => s + (i.quantity || 1), 0);
+            const maxWeight  = cart.reduce((m, i) => Math.max(m, Number(i.shipping_weight) || 0), 0);
+            const heavy      = maxWeight > 1.5;
+            const shipping   = (heavy ? 8 : 6) + (heavy ? 2 : 1.5) * Math.max(0, shipQty - 1);
+            const grandTotal = total + shipping;
+
             const upsells    = getUpsellsForCart();
             const upsellHTML = upsells.length
                 ? upsells.map(p => `
@@ -1284,10 +1292,12 @@
                     <h3 class="text-2xl font-bold mb-2">Checkout</h3>
                     <h4 class="font-semibold mb-3">Your Items</h4>
                     ${itemsHTML}
-                    <div class="flex justify-between text-xl mb-6 border-t border-slate-700 pt-4">
-                        <span>Total</span>
-                        <span class="font-bold" id="checkout-total">$${total.toFixed(2)}</span>
+                    <div class="border-t border-slate-700 pt-4 mb-2 space-y-1.5">
+                        <div class="flex justify-between text-sm text-slate-300"><span>Subtotal</span><span>$${total.toFixed(2)}</span></div>
+                        <div class="flex justify-between text-sm text-slate-300"><span>Shipping (est.)</span><span>$${shipping.toFixed(2)}</span></div>
+                        <div class="flex justify-between text-xl font-bold pt-2 border-t border-slate-800"><span>Total</span><span id="checkout-total">$${grandTotal.toFixed(2)}</span></div>
                     </div>
+                    <p class="text-[11px] text-slate-500 mb-6">Shipping is weight-based; the exact amount is confirmed on the secure checkout page.</p>
                     ${upsells.length ? `
                     <h4 class="font-semibold mb-3 text-cyan-400">🎁 Recommended Add-ons</h4>
                     <div class="space-y-3 mb-6">${upsellHTML}</div>` : ''}
