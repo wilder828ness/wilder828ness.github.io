@@ -342,7 +342,7 @@ function productPage(p, related) {
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         ${related.map(r => `
         <a href="/products/${r.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
-          <img src="${esc(firstImage(r))}" alt="${esc(r.name)}" class="w-full aspect-square object-cover" loading="lazy">
+          <img src="${esc(firstImage(r))}" alt="${esc(r.name)}" class="w-full aspect-square object-cover object-top" loading="lazy">
           <div class="p-3"><p class="text-sm font-medium line-clamp-2">${esc(r.name)}</p>
           ${price(r) != null ? `<p class="text-cyan-400 font-bold mt-1">$${price(r).toFixed(2)}</p>` : ''}</div>
         </a>`).join('')}
@@ -488,7 +488,7 @@ function categoryPage(cat, items) {
 
   const grid = items.map(p => `
     <a href="/products/${p.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
-      <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover" loading="lazy">
+      <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover object-top" loading="lazy">
       <div class="p-4">
         ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
         <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
@@ -628,7 +628,7 @@ function inventoryPage(products) {
     return `
     <a href="/products/${p.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
       <div class="relative">
-        <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover" loading="lazy">
+        <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover object-top" loading="lazy">
         ${st==='sold_out' ? '<div class="absolute inset-0 bg-black/60 flex items-center justify-center"><span class="bg-slate-900 text-slate-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700">SOLD OUT</span></div>' : st==='on_order' ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">COMING SOON</span></div>' : st==='in_transit' ? '<span class="absolute top-2 left-2 bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">PRE-ORDER</span>' : ''}
       </div>
       <div class="p-4">
