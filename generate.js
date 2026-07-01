@@ -915,30 +915,43 @@ function returnsPage() {
   fs.mkdirSync(PRODUCTS_DIR, { recursive: true });
   fs.mkdirSync(CATEGORIES_DIR, { recursive: true });
 
-  // category map
+  // category map — FULL (every product; keeps product pages + sitemap alive)
   const byCat = {};
   for (const p of products) {
     const cats = p.categories.length ? p.categories : ['Toys'];
     for (const c of cats) (byCat[c] = byCat[c] || []).push(p);
   }
 
-  // product pages (+ related from same category)
+  // RETREAT: sold-out items disappear from BROWSE (category grids, related,
+  // categories index, homepage) so customers never hit a dead listing — but
+  // each keeps its own product page + sitemap entry so the earned Google
+  // authority survives and it's a one-flip return when restocked.
+  const isLive = (p) => availState(p) !== 'sold_out';
+  const liveByCat = {};
+  for (const [cat, items] of Object.entries(byCat)) {
+    const live = items.filter(isLive);
+    if (live.length) liveByCat[cat] = live;
+  }
+
+  // product pages for ALL products (sold-out included → URL stays crawlable),
+  // related pulled from LIVE items only (never link out to a retreated item).
   for (const p of products) {
     const cat = p.categories[0] || 'Toys';
-    const related = (byCat[cat] || []).filter(r => r.slug !== p.slug).slice(0, 4);
+    const related = (liveByCat[cat] || []).filter(r => r.slug !== p.slug).slice(0, 4);
     fs.writeFileSync(path.join(PRODUCTS_DIR, `${p.slug}.html`), productPage(p, related));
   }
 
-  // category pages
-  for (const [cat, items] of Object.entries(byCat)) {
-    fs.writeFileSync(path.join(CATEGORIES_DIR, `${slugify(cat)}.html`), categoryPage(cat, items));
+  // category pages — page still generated for every category (SEO), grid shows
+  // LIVE items only. An all-sold-out category renders empty until restocked.
+  for (const cat of Object.keys(byCat)) {
+    fs.writeFileSync(path.join(CATEGORIES_DIR, `${slugify(cat)}.html`), categoryPage(cat, liveByCat[cat] || []));
   }
 
-  // categories index page (/categories/)
-  fs.writeFileSync(path.join(CATEGORIES_DIR, 'index.html'), categoriesIndexPage(byCat));
+  // categories index page (/categories/) — only categories with live items show.
+  fs.writeFileSync(path.join(CATEGORIES_DIR, 'index.html'), categoriesIndexPage(liveByCat));
 
-  // standalone pages
-  fs.writeFileSync(path.join(ROOT, 'inventory.html'), inventoryPage(products));
+  // standalone pages — homepage / all-inventory grid shows LIVE items only.
+  fs.writeFileSync(path.join(ROOT, 'inventory.html'), inventoryPage(products.filter(isLive)));
   fs.writeFileSync(path.join(ROOT, 'about.html'), aboutPage());
   fs.writeFileSync(path.join(ROOT, 'contact.html'), contactPage());
   fs.writeFileSync(path.join(ROOT, 'privacy-policy.html'), privacyPage());

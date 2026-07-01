@@ -1048,6 +1048,13 @@
                 );
             }
 
+            // RETREAT: sold-out items disappear from browse (homepage + category
+            // grids) so customers don't hit dead listings. They stay reachable by
+            // direct search and keep their own product page/URL for SEO.
+            if (!search) {
+                filtered = filtered.filter(p => !stockState(p).soldOut);
+            }
+
             const sortEl   = document.getElementById('sort-select');
             const sortMode = sortEl ? sortEl.value : 'newest';
             if (sortMode === 'price-low')  filtered.sort((a,b) => (a.price||0)-(b.price||0));
