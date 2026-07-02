@@ -12,7 +12,10 @@
 
 const SUPA_URL = process.env.SUPABASE_URL || 'https://vdkjjyjfwfndrksruisn.supabase.co';
 const SERVICE  = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const TOKEN    = process.env.PUBLISH_TOKEN;
+// The dashboard authorizes with the caller's Master (wd-master) Supabase login
+// (a JWT), not a static token — so nothing sensitive lives in the hosted page.
+const MASTER_URL  = process.env.MASTER_SUPABASE_URL  || 'https://zprwqahydkwsmvgcpots.supabase.co';
+const MASTER_ANON = process.env.MASTER_SUPABASE_ANON || 'sb_publishable_V2qZ8k1tn8rbDWQDH-tohw_HoFLl49v';
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,9 +25,17 @@ module.exports = async (req, res) => {
   if (req.method !== 'POST')    return res.status(405).json({ error: 'POST only' });
   if (!SERVICE) return res.status(500).json({ error: 'Server not configured: SUPABASE_SERVICE_ROLE_KEY missing' });
 
-  // Authorize the caller.
+  // Authorize the caller: must present a valid, unexpired wd-master login (JWT).
   const bearer = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  if (!TOKEN || bearer !== TOKEN) return res.status(401).json({ error: 'Unauthorized' });
+  if (!bearer) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const who = await fetch(`${MASTER_URL}/auth/v1/user`, {
+      headers: { apikey: MASTER_ANON, Authorization: `Bearer ${bearer}` },
+    });
+    if (!who.ok) return res.status(401).json({ error: 'Unauthorized — please sign in again' });
+  } catch (e) {
+    return res.status(401).json({ error: 'Auth verification failed' });
+  }
 
   const p = (req.body && req.body.product) || {};
   if (!p.sku || !p.name) return res.status(400).json({ error: 'product requires at least sku + name' });
