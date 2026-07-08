@@ -9,6 +9,7 @@
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" type="image/png" href="/favicon.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <script defer src="/_vercel/insights/script.js"></script>
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Nubz Toys &amp; Collectibles">
     <meta property="og:title" content="Nubz Toys &amp; Collectibles — Action Figures, Funko, Blind Bags &amp; More">
@@ -2318,6 +2319,19 @@
             updateCartCount();
             handleOrderReturn();
             renderImageManager();
+            // Google Shopping "checkout" link: /?buy=<sku|id> → drop it in the cart
+            // and open checkout, so a shopper lands mid-purchase from a Google listing.
+            const buyId = new URLSearchParams(window.location.search).get('buy');
+            if (buyId) {
+                const bp = products.find(p => String(p.sku) === String(buyId))
+                       || products.find(p => String(p.id) === String(buyId));
+                window.history.replaceState({}, '', '/');
+                if (bp) {
+                    const ss = stockState(bp);
+                    if (!ss.soldOut && !ss.onOrder) { addToCart(bp.id); showCart(); }
+                    else { showProductModal(bp); }
+                }
+            }
             // If a product page sent the shopper here to check out, open it.
             if (new URLSearchParams(window.location.search).get('checkout') === '1') {
                 window.history.replaceState({}, '', '/');
