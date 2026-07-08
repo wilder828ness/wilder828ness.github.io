@@ -537,6 +537,51 @@ Allow: /
 
 Sitemap: ${SITE}/sitemap.xml`;
 
+// ── GOOGLE MERCHANT CENTER FEED ────────────────────────────────────────
+// RSS 2.0 product feed at /feed.xml. Uses the SAME canonical apex URLs as the
+// sitemap so there's no redirect mismatch. Licensing-restricted lines are
+// excluded (Blokees, Mickey Mouse blind bags, Godzilla, Pokémon keychains).
+const FEED_EXCLUDE = (p) => {
+  const t = `${p.name || ''} ${p.brand || ''}`.toLowerCase();
+  return /blokees/.test(t)
+      || /godzilla/.test(t)
+      || (/mickey/.test(t) && /(blind|bag|mini)/.test(t))
+      || (/pok[eé]?mon/.test(t) && /key ?chain/.test(t));
+};
+function productFeed(products) {
+  const items = products.filter(p => {
+    const st = availState(p);
+    return price(p) > 0 && (st === 'in_stock' || st === 'sold_out') && !FEED_EXCLUDE(p);
+  }).map(p => {
+    const avail = availState(p) === 'sold_out' ? 'out_of_stock' : 'in_stock';
+    const desc = String(p.description || p.name || '')
+      .split(/keywords:/i)[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 4900);
+    const gtin = p.upc ? `\n      <g:gtin>${esc(String(p.upc))}</g:gtin>` : '';
+    const mpn  = p.sku ? `\n      <g:mpn>${esc(String(p.sku))}</g:mpn>` : '';
+    return `    <item>
+      <g:id>${esc(String(p.sku || p.id))}</g:id>
+      <title>${esc(p.name || '')}</title>
+      <g:description>${esc(desc)}</g:description>
+      <link>${SITE}/products/${p.slug}</link>
+      <g:image_link>${esc(firstImage(p))}</g:image_link>
+      <g:availability>${avail}</g:availability>
+      <g:price>${price(p).toFixed(2)} USD</g:price>
+      <g:condition>new</g:condition>
+      <g:brand>${esc(p.brand || SITE_NAME)}</g:brand>${gtin}${mpn}
+      <g:product_type>${esc(p.categories[0] || 'Toys')}</g:product_type>
+    </item>`;
+  }).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>${esc(SITE_NAME)}</title>
+    <link>${SITE}</link>
+    <description>Product feed for ${esc(SITE_NAME)}</description>
+${items}
+  </channel>
+</rss>`;
+}
+
 // ── CATEGORIES INDEX PAGE ─────────────────────────────────────────────
 function categoriesIndexPage(byCat) {
   const canonical = `${SITE}/categories`;
@@ -960,6 +1005,7 @@ function returnsPage() {
   // sitemap / robots / snapshot
   fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), sitemap(products, Object.keys(byCat)));
   fs.writeFileSync(path.join(ROOT, 'robots.txt'), robots());
+  fs.writeFileSync(path.join(ROOT, 'feed.xml'), productFeed(products));
   fs.writeFileSync(path.join(ROOT, 'products.json'), JSON.stringify(raw, null, 2));
 
   console.log(`\n✨ Generated:`);
