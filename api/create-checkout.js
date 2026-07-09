@@ -76,7 +76,12 @@ module.exports = async (req, res) => {
                 }
             ],
             metadata: {
-                source: 'nubztoys-web'
+                source: 'nubztoys-web',
+                // Compact cart so the webhook knows what sold (sku, qty, price).
+                // Stripe caps a metadata value at 500 chars — typical carts fit.
+                items: JSON.stringify(
+                    cartItems.map(i => ({ s: String(i.sku || i.id || '').slice(0, 24), q: i.quantity || 1, p: Number(i.price) || 0 }))
+                ).slice(0, 490)
             }
         });
 
