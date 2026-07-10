@@ -210,6 +210,7 @@ const head = ({ title, desc, canonical, image, type = 'website', jsonld = [] }) 
   <meta name="twitter:description" content="${esc(desc)}">
   <meta name="twitter:image" content="${esc(image)}">
 ${GA_SNIPPET}
+  <script defer src="/_vercel/insights/script.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
@@ -233,6 +234,7 @@ ${jsonld.map(j => `  <script type="application/ld+json">${JSON.stringify(j)}</sc
           <a href="/inventory" class="hover:text-cyan-400">All Inventory</a>
           <a href="/about" class="hover:text-cyan-400">About</a>
           <a href="/contact" class="hover:text-cyan-400">Contact</a>
+          <a href="/blog" class="hover:text-cyan-400">Blog</a>
         </div>
         <a href="/?checkout=1" aria-label="View cart" class="inline-flex items-center gap-x-2 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-3xl text-sm">
           <i class="fa-solid fa-shopping-bag"></i>
@@ -521,6 +523,7 @@ function sitemap(products, categories) {
     url(`${SITE}/inventory`, '0.8'),
     url(`${SITE}/about`, '0.5'),
     url(`${SITE}/contact`, '0.5'),
+    url(`${SITE}/blog`, '0.6'),
     url(`${SITE}/privacy-policy`, '0.3'),
     url(`${SITE}/returns`, '0.3'),
     ...categories.map(c => url(`${SITE}/categories/${slugify(c)}`, '0.7')),
@@ -548,6 +551,14 @@ const FEED_EXCLUDE = (p) => {
       || (/mickey/.test(t) && /(blind|bag|mini)/.test(t))
       || (/pok[eé]?mon/.test(t) && /key ?chain/.test(t));
 };
+// Always give Google a valid absolute https image URL: first real http(s) image,
+// forced to https, else a valid placeholder. Never emits http://, data:, or relative.
+function feedImage(p) {
+  const list = Array.isArray(p.images) ? p.images : [];
+  const httpImg = list.map(String).find(u => /^https?:\/\//i.test(u));
+  const chosen = httpImg || 'https://placehold.co/800x800/0f172a/22d3ee?text=Nubz+Toys';
+  return chosen.replace(/^http:\/\//i, 'https://');
+}
 function productFeed(products) {
   const items = products.filter(p => {
     const st = availState(p);
@@ -558,16 +569,17 @@ function productFeed(products) {
       .split(/keywords:/i)[0].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 4900);
     const gtin = p.upc ? `\n      <g:gtin>${esc(String(p.upc))}</g:gtin>` : '';
     const mpn  = p.sku ? `\n      <g:mpn>${esc(String(p.sku))}</g:mpn>` : '';
+    const wt   = Number(p.shipping_weight) > 0 ? `\n      <g:shipping_weight>${Number(p.shipping_weight)} lb</g:shipping_weight>` : '';
     return `    <item>
       <g:id>${esc(String(p.sku || p.id))}</g:id>
       <title>${esc(p.name || '')}</title>
       <g:description>${esc(desc)}</g:description>
       <link>${SITE}/products/${p.slug}</link>
-      <g:image_link>${esc(firstImage(p))}</g:image_link>
+      <g:image_link>${esc(feedImage(p))}</g:image_link>
       <g:availability>${avail}</g:availability>
       <g:price>${price(p).toFixed(2)} USD</g:price>
       <g:condition>new</g:condition>
-      <g:brand>${esc(p.brand || SITE_NAME)}</g:brand>${gtin}${mpn}
+      <g:brand>${esc(p.brand || SITE_NAME)}</g:brand>${gtin}${mpn}${wt}
       <g:product_type>${esc(p.categories[0] || 'Toys')}</g:product_type>
     </item>`;
   }).join('\n');
