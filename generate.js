@@ -556,8 +556,10 @@ const FEED_EXCLUDE = (p) => {
 function feedImage(p) {
   const list = Array.isArray(p.images) ? p.images : [];
   const httpImg = list.map(String).find(u => /^https?:\/\//i.test(u));
-  const chosen = httpImg || 'https://placehold.co/800x800/0f172a/22d3ee?text=Nubz+Toys';
-  return chosen.replace(/^http:\/\//i, 'https://');
+  const chosen = (httpImg || 'https://placehold.co/800x800/0f172a/22d3ee?text=Nubz+Toys').replace(/^http:\/\//i, 'https://');
+  // Route through the weserv image CDN → always https + resized under Google's
+  // size cap, so oversized EE "XL/XXL" images can't be rejected as "too big".
+  return `https://wsrv.nl/?url=${encodeURIComponent(chosen)}&w=1200&output=jpg&q=82`;
 }
 function productFeed(products) {
   const items = products.filter(p => {
