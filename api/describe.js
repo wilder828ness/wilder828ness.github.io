@@ -42,7 +42,7 @@ async function viaAnthropic(prompt, key) {
     method: 'POST',
     headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: process.env.DESCRIBE_MODEL || 'claude-3-5-sonnet-latest',
+      model: process.env.DESCRIBE_MODEL || 'claude-haiku-4-5-20251001',
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }],
     }),
