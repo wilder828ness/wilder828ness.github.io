@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog | Nubz Toys &amp; Collectibles</title>
+<meta name="description" content="News, drops, and finds from Nubz Toys & Collectibles.">
+<link rel="canonical" href="https://nubztoys.com/blog">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:title" content="Nubz Toys Blog">
+<meta property="og:description" content="News, drops, and finds from Nubz Toys & Collectibles.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nubztoys.com/blog">
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+  :root{ --bg:#020617; --panel:#0f172a; --panel2:#111a2e; --line:#1e293b; --ink:#e2e8f0; --muted:#94a3b8; --cyan:#22d3ee; --green:#34d399; --red:#f87171; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 Inter,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}
+  a{color:var(--cyan);text-decoration:none}
+  header{border-bottom:1px solid var(--line);background:rgba(2,6,23,.9);position:sticky;top:0;z-index:20;backdrop-filter:blur(6px)}
+  .bar{max-width:900px;margin:0 auto;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{font-weight:800;font-size:18px}
+  .brand span{background:linear-gradient(to right,#22d3ee,#e879f9,#fbbf24);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .nav a{margin-left:16px;font-size:14px;color:var(--muted)} .nav a:hover{color:var(--ink)}
+  main{max-width:900px;margin:0 auto;padding:30px 20px 60px}
+  h1{font-size:30px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 26px}
+  .grid{display:grid;gap:18px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .1s}
+  .card:hover{border-color:var(--cyan);transform:translateY(-2px)}
+  .card img{width:100%;max-height:260px;object-fit:cover;object-position:top;display:block;background:#0b1120}
+  .card .body{padding:16px 18px}
+  .card h2{margin:0 0 4px;font-size:20px}
+  .card .date{color:var(--muted);font-size:12px;margin-bottom:8px}
+  .card .excerpt{color:var(--muted);font-size:14px}
+  .draft{display:inline-block;font-size:11px;color:#fbbf24;border:1px solid #fbbf24;border-radius:999px;padding:1px 8px;margin-left:8px}
+  input,textarea,select{width:100%;padding:11px 13px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;font-size:15px;outline:none}
+  input:focus,textarea:focus{border-color:var(--cyan)}
+  label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px;text-transform:uppercase;letter-spacing:.04em}
+  button{cursor:pointer;border:0;border-radius:10px;font-weight:700;padding:11px 16px;font-size:14px}
+  .btn-c{background:var(--cyan);color:#06212a} .btn-ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+  .btn-red{background:#3a0d0d;color:#fca5a5;border:1px solid #7f1d1d}
+  .muted{color:var(--muted)} .hidden{display:none}
+  .post-body{font-size:16px;line-height:1.75} .post-body img{max-width:100%;border-radius:12px}
+  .overlay{position:fixed;inset:0;background:rgba(2,6,23,.75);z-index:50;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow:auto}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:760px;width:100%;padding:24px;margin:24px 0}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  footer{border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center;padding:24px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">Nubz <span>Blog</span></div>
+    <div class="nav">
+      <a href="/">Shop</a>
+      <a href="/categories">Categories</a>
+      <a href="#" id="adminLink" onclick="toggleAdmin(event)">Admin</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <h1>The Nubz Blog</h1>
+  <p class="sub">News, drops, and finds from the shop.</p>
+
+  <!-- Admin bar (hidden until logged in) -->
+  <div id="adminBar" class="hidden" style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:22px">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b>✍️ Author mode</b>
+      <div class="row">
+        <button class="btn-c" onclick="newPost()">+ New post</button>
+        <button class="btn-ghost" onclick="signOut()">Log out</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="posts" class="grid"></div>
+  <div id="empty" class="muted hidden">No posts yet.</div>
+</main>
+
+<!-- Read-a-post overlay -->
+<div id="readOverlay" class="overlay">
+  <div class="modal">
+    <div class="row" style="justify-content:space-between;align-items:start">
+      <div><h1 id="rTitle" style="font-size:26px"></h1><div id="rDate" class="muted" style="font-size:13px"></div></div>
+      <button class="btn-ghost" onclick="closeRead()">✕</button>
+    </div>
+    <img id="rImg" style="width:100%;max-height:340px;object-fit:cover;object-position:top;border-radius:12px;margin:14px 0;display:none">
+    <div id="rBody" class="post-body"></div>
+    <div id="rEmbed" style="margin-top:16px"></div>
+    <div id="rAdmin" class="row hidden" style="margin-top:20px">
+      <button class="btn-ghost" onclick="editCurrent()">Edit</button>
+      <button class="btn-red" onclick="deleteCurrent()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Editor overlay -->
+<div id="editOverlay" class="overlay">
+  <div class="modal">
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <b id="edHdr" style="font-size:18px">New post</b>
+      <button class="btn-ghost" onclick="closeEdit()">✕</button>
+    </div>
+    <label>Title</label>
+    <input id="edTitle" placeholder="Post title">
+    <label>Cover image URL (optional)</label>
+    <input id="edImage" placeholder="https://…">
+    <label>Body (plain text or basic HTML)</label>
+    <textarea id="edBody" rows="8" placeholder="Write your post…"></textarea>
+    <label>Social embed code (optional — paste from Instagram/Facebook/X)</label>
+    <textarea id="edEmbed" rows="3" placeholder="<blockquote>…embed code…</blockquote>"></textarea>
+    <label class="row" style="align-items:center;gap:8px;text-transform:none;margin-top:14px">
+      <input type="checkbox" id="edPublished" checked style="width:auto"> <span>Published (uncheck to save as a draft)</span>
+    </label>
+    <div id="edMsg" style="font-size:13px;margin:10px 0"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn-ghost" style="flex:1" onclick="closeEdit()">Cancel</button>
+      <button class="btn-c" style="flex:1" onclick="savePost()">Save post ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- Login overlay -->
+<div id="loginOverlay" class="overlay">
+  <div class="modal" style="max-width:380px">
+    <div class="row" style="justify-content:space-between;align-items:center"><b>Author login</b><button class="btn-ghost" onclick="closeLogin()">✕</button></div>
+    <label>Email</label><input id="liEmail" type="email">
+    <label>Password</label><input id="liPass" type="password">
+    <div id="liMsg" style="color:var(--red);font-size:13px;margin:8px 0"></div>
+    <button class="btn-c" style="width:100%;margin-top:8px" onclick="doLogin()">Log in</button>
+  </div>
+</div>
+
+<footer>© <span id="yr"></span> Wilderness Dealz LLC · Nubz Toys &amp; Collectibles · <a href="/">Back to shop</a></footer>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const supa = createClient('https://vdkjjyjfwfndrksruisn.supabase.co', 'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr', { auth:{persistSession:true} });
+const $ = id => document.getElementById(id);
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+let isAdmin = false, posts = [], current = null;
+const slugify = s => String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,60);
+const fmt = d => d ? new Date(d).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}) : '';
+// Inject HTML and re-run any <script> so social embeds execute.
+function injectHTML(el, html){
+  el.innerHTML = html || '';
+  el.querySelectorAll('script').forEach(old=>{ const s=document.createElement('script'); [...old.attributes].forEach(a=>s.setAttribute(a.name,a.value)); s.textContent=old.textContent; old.replaceWith(s); });
+}
+
+async function init(){
+  const { data:{ session } } = await supa.auth.getSession();
+  isAdmin = !!session;
+  $('adminBar').classList.toggle('hidden', !isAdmin);
+  await loadPosts();
+  const slug = new URLSearchParams(location.search).get('post');
+  if(slug){ const p = posts.find(x=>x.slug===slug); if(p) openPost(p.id); }
+}
+async function loadPosts(){
+  let q = supa.from('blog_posts').select('*').order('published_at',{ascending:false});
+  if(!isAdmin) q = q.eq('published', true);
+  const { data, error } = await q;
+  if(error){ $('posts').innerHTML = '<div class="muted">Could not load posts: '+error.message+'</div>'; return; }
+  posts = data||[];
+  renderPosts();
+}
+function renderPosts(){
+  $('empty').classList.toggle('hidden', posts.length>0);
+  $('posts').innerHTML = posts.map(p=>`
+    <div class="card" onclick="openPost('${p.id}')">
+      ${p.image_url?`<img src="${String(p.image_url).replace(/"/g,'&quot;')}" alt="${String(p.title||'').replace(/"/g,'&quot;')}">`:''}
+      <div class="body">
+        <h2>${esc(p.title)}${!p.published?'<span class="draft">draft</span>':''}</h2>
+        <div class="date">${fmt(p.published_at)}</div>
+        <div class="excerpt">${esc(String(p.body||'').replace(/<[^>]+>/g,' ').slice(0,140))}${(p.body||'').length>140?'…':''}</div>
+      </div>
+    </div>`).join('');
+}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+window.openPost = (id) => {
+  const p = posts.find(x=>String(x.id)===String(id)); if(!p) return;
+  current = p;
+  $('rTitle').textContent = p.title||'';
+  $('rDate').textContent = fmt(p.published_at) + (!p.published?' · draft':'');
+  if(p.image_url){ $('rImg').src = p.image_url; $('rImg').style.display='block'; } else $('rImg').style.display='none';
+  injectHTML($('rBody'), (p.body||'').replace(/\n/g,'<br>'));
+  injectHTML($('rEmbed'), p.embed_html||'');
+  $('rAdmin').classList.toggle('hidden', !isAdmin);
+  $('readOverlay').style.display='flex';
+};
+window.closeRead = () => { $('readOverlay').style.display='none'; };
+
+// ── Admin ──
+window.toggleAdmin = (e) => { e.preventDefault(); if(isAdmin){ signOut(); } else { $('loginOverlay').style.display='flex'; } };
+window.closeLogin = () => { $('loginOverlay').style.display='none'; };
+window.doLogin = async () => {
+  $('liMsg').textContent='';
+  const { error } = await supa.auth.signInWithPassword({ email:$('liEmail').value.trim(), password:$('liPass').value });
+  if(error){ $('liMsg').textContent = error.message; return; }
+  closeLogin(); location.reload();
+};
+window.signOut = async () => { await supa.auth.signOut(); location.reload(); };
+
+window.newPost = () => { current=null; $('edHdr').textContent='New post'; ['edTitle','edImage','edBody','edEmbed'].forEach(i=>$(i).value=''); $('edPublished').checked=true; $('edMsg').textContent=''; $('editOverlay').style.display='flex'; };
+window.editCurrent = () => { if(!current) return; closeRead(); openEditor(current); };
+function openEditor(p){
+  $('edHdr').textContent='Edit post';
+  $('edTitle').value=p.title||''; $('edImage').value=p.image_url||''; $('edBody').value=p.body||''; $('edEmbed').value=p.embed_html||'';
+  $('edPublished').checked=!!p.published; $('edMsg').textContent='';
+  $('editOverlay').style.display='flex';
+}
+window.closeEdit = () => { $('editOverlay').style.display='none'; };
+window.savePost = async () => {
+  const title=$('edTitle').value.trim(); if(!title){ $('edMsg').innerHTML='<span style="color:var(--red)">Title required.</span>'; return; }
+  const rec = { title, image_url:$('edImage').value.trim()||null, body:$('edBody').value, embed_html:$('edEmbed').value.trim()||null, published:$('edPublished').checked, updated_at:new Date().toISOString() };
+  let error;
+  if(current){ ({ error } = await supa.from('blog_posts').update(rec).eq('id', current.id)); }
+  else { rec.slug = slugify(title)+'-'+Math.random().toString(36).slice(2,6); rec.published_at=new Date().toISOString(); ({ error } = await supa.from('blog_posts').insert(rec)); }
+  if(error){ $('edMsg').innerHTML='<span style="color:var(--red)">'+error.message+'</span>'; return; }
+  closeEdit(); await loadPosts();
+};
+window.deleteCurrent = async () => {
+  if(!current || !confirm('Delete this post permanently?')) return;
+  const { error } = await supa.from('blog_posts').delete().eq('id', current.id);
+  if(error){ alert(error.message); return; }
+  closeRead(); await loadPosts();
+};
+
+init();
+</script>
+</body>
+</html>
