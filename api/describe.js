@@ -3,14 +3,18 @@
 // returns a short, keyword-rich store description in the Nubz voice.
 //
 // Vercel env vars (Project → Settings → Environment Variables):
-//   PUBLISH_TOKEN      = (same token the dashboard already sends to /api/publish)
 //   ANTHROPIC_API_KEY  = (preferred) an Anthropic key  — OR —
 //   OPENAI_API_KEY     = an OpenAI key
 // Set ONE of the two AI keys. The function auto-detects which is present.
+//   DESCRIBE_MODEL     = (optional) override the Anthropic model string.
+//
+// Auth: the dashboard authorizes with the caller's Master (wd-master) Supabase
+// login (a JWT) — same as /api/publish — so no static token lives anywhere.
 //
 // No npm dependencies — uses raw fetch, so nothing to install/build.
 
-const TOKEN = process.env.PUBLISH_TOKEN;
+const MASTER_URL  = process.env.MASTER_SUPABASE_URL  || 'https://zprwqahydkwsmvgcpots.supabase.co';
+const MASTER_ANON = process.env.MASTER_SUPABASE_ANON || 'sb_publishable_V2qZ8k1tn8rbDWQDH-tohw_HoFLl49v';
 
 function buildPrompt(p) {
   const bits = [
@@ -38,7 +42,7 @@ async function viaAnthropic(prompt, key) {
     method: 'POST',
     headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-3-haiku-20240307',
+      model: process.env.DESCRIBE_MODEL || 'claude-3-5-sonnet-latest',
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }],
     }),
@@ -70,9 +74,17 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'POST only' });
 
-  // Authorize the caller (same token as /api/publish).
+  // Authorize the caller: must present a valid, unexpired wd-master login (JWT).
   const bearer = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
-  if (!TOKEN || bearer !== TOKEN) return res.status(401).json({ error: 'Unauthorized' });
+  if (!bearer) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    const who = await fetch(`${MASTER_URL}/auth/v1/user`, {
+      headers: { apikey: MASTER_ANON, Authorization: `Bearer ${bearer}` },
+    });
+    if (!who.ok) return res.status(401).json({ error: 'Unauthorized — please sign in again' });
+  } catch (e) {
+    return res.status(401).json({ error: 'Auth verification failed' });
+  }
 
   const p = (req.body && req.body.product) || {};
   if (!p.title) return res.status(400).json({ error: 'product.title is required' });
