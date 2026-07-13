@@ -1393,6 +1393,15 @@
             const params = new URLSearchParams(window.location.search);
             if (params.get('order') === 'success') {
                 clearCart();
+                // Google Ads purchase conversion — reports the real order value + Stripe id.
+                try {
+                    if (window.gtag) gtag('event', 'conversion', {
+                        send_to: 'AW-18266305787/1jErCIyB988cEPvphoZE',
+                        value: parseFloat(params.get('value')) || 0,
+                        currency: 'USD',
+                        transaction_id: params.get('sid') || ''
+                    });
+                } catch (e) {}
                 const banner = document.createElement('div');
                 banner.className = 'fixed top-24 left-1/2 -translate-x-1/2 z-[200] bg-emerald-500 text-black font-bold px-8 py-4 rounded-3xl shadow-2xl text-center';
                 banner.innerHTML = '✅ Order placed successfully! Thank you for shopping at Nubz Toys!';
