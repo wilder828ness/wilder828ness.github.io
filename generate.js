@@ -218,7 +218,8 @@ ${GA_SNIPPET}
     html, body { overflow-x: hidden; }
     body { font-family: 'Inter', system-ui, sans-serif; min-height: 100%; }
     .gradient-title { background: linear-gradient(to right,#22d3ee,#e879f9,#fbbf24);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      line-height:1.15; padding-bottom:0.12em; }
     .compare-price { text-decoration: line-through; color:#64748b; }
   </style>
 ${jsonld.map(j => `  <script type="application/ld+json">${JSON.stringify(j)}</script>`).join('\n')}
