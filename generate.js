@@ -32,7 +32,7 @@ const SKIP_SUPABASE = process.env.SKIP_SUPABASE === '1';
 // generated product/category pages. Left empty = no tracking script emitted.
 const GA_ID = process.env.GA_MEASUREMENT_ID || 'G-3C0EDZG38D';
 const GA_SNIPPET = GA_ID ? `  <script async src="https://www.googletagmanager.com/gtag/js?id=${GA_ID}"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');</script>` : '';
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');gtag('config','AW-18266305787');</script>` : '';
 
 const ROOT           = __dirname;
 const PRODUCTS_DIR   = path.join(ROOT, 'products');
