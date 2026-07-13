@@ -625,24 +625,46 @@ function categoriesIndexPage(byCat) {
       { '@type': 'ListItem', position: 2, name: 'Categories', item: canonical },
     ],
   };
-  const cards = Object.entries(byCat).map(([cat, items]) => {
+  // Fixed, deliberate card order (known categories in this sequence, any others
+  // after, alphabetically) so the landing page never renders them shuffled.
+  const CAT_ORDER = Object.keys(ICONS);
+  const rank = (c) => { const i = CAT_ORDER.indexOf(c); return i === -1 ? 999 : i; };
+  // Brand logos we carry, shown as white chips on each card (files in /logos/).
+  const BRAND_LOGOS = {
+    'Action Figures':          ['dc', 'marvel', 'starwars'],
+    'Model Sets':              ['blokees', 'transformers'],
+    'Funko Pop':               ['funko', 'starwars'],
+    'Blind Bag & Mini Figures':['disney', 'minecraft', 'loungefly'],
+    'Toys':                    ['hotwheels', 'barbie', 'hasbro'],
+    'Collectibles':            ['funko', 'dc', 'marvel'],
+  };
+  const BRAND_ALT = { dc:'DC Comics', marvel:'Marvel', starwars:'Star Wars', blokees:'Blokees',
+    transformers:'Transformers', funko:'Funko', disney:'Disney', minecraft:'Minecraft',
+    loungefly:'Loungefly', hotwheels:'Hot Wheels', barbie:'Barbie', hasbro:'Hasbro', mattel:'Mattel' };
+  const chipRow = (cat) => {
+    const logos = BRAND_LOGOS[cat] || [];
+    if (!logos.length) return '';
+    return `<div class="flex flex-wrap gap-2 mb-5">` + logos.map(l =>
+      `<span class="bg-white rounded-lg h-9 px-2.5 flex items-center"><img src="/logos/${l}.png" alt="${esc(BRAND_ALT[l] || l)}" class="h-5 w-auto" loading="lazy"></span>`
+    ).join('') + `</div>`;
+  };
+  const cards = Object.entries(byCat)
+    .sort((a, b) => (rank(a[0]) - rank(b[0])) || a[0].localeCompare(b[0]))
+    .map(([cat, items]) => {
     const slug  = slugify(cat);
     const icon  = ICONS[cat] || 'fa-tag';
     const color = COLORS[cat] || '#22d3ee';
-    const img   = items.length ? firstImage(items[0]) : '';
+    // Brand-logo chips when we have them; icon tile fallback otherwise (e.g. Bulk).
+    const header = BRAND_LOGOS[cat] ? chipRow(cat)
+      : `<div class="mb-5 w-16 h-16 rounded-2xl flex items-center justify-center" style="background:${color}1a"><i class="fa-solid ${icon} text-3xl" style="color:${color}"></i></div>`;
     return `
-    <a href="/categories/${slug}" class="group relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-cyan-500/50 transition-all hover:-translate-y-1 flex flex-col">
-      ${img ? `<div class="aspect-video overflow-hidden"><img src="${esc(img)}" alt="${esc(cat)} collectibles at Nubz Toys" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy"></div>` : ''}
-      <div class="p-6 flex-1 flex flex-col justify-between">
-        <div class="flex items-center gap-x-3 mb-2">
-          <i class="fa-solid ${icon} text-xl" style="color:${color}"></i>
-          <h2 class="font-bold text-lg">${esc(cat)}</h2>
-        </div>
-        <p class="text-slate-400 text-sm mb-4">${esc(CATEGORY_DESC[cat] || `Shop ${cat} at Nubz Toys.`)}</p>
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-slate-500">${items.length} item${items.length === 1 ? '' : 's'}</span>
-          <span class="text-cyan-400 text-sm font-semibold group-hover:text-cyan-300">Shop Now →</span>
-        </div>
+    <a href="/categories/${slug}" class="group relative bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-cyan-500/50 transition-all hover:-translate-y-1 flex flex-col p-8">
+      ${header}
+      <h2 class="font-bold text-xl mb-2">${esc(cat)}</h2>
+      <p class="text-slate-400 text-sm mb-6 flex-1">${esc(CATEGORY_DESC[cat] || `Shop ${cat} at Nubz Toys.`)}</p>
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-slate-500">${items.length} item${items.length === 1 ? '' : 's'}</span>
+        <span class="text-cyan-400 text-sm font-semibold group-hover:text-cyan-300">Shop Now →</span>
       </div>
     </a>`;
   }).join('');
@@ -654,7 +676,7 @@ function categoriesIndexPage(byCat) {
   <header class="max-w-6xl mx-auto px-6 py-10 text-center">
     <div class="text-xs uppercase tracking-[2px] text-cyan-400 font-semibold mb-3">SHOP BY CATEGORY</div>
     <h1 class="text-4xl md:text-5xl font-bold gradient-title inline-block mb-4">All Categories</h1>
-    <p class="text-slate-400 text-lg max-w-2xl mx-auto">Action figures, Funko Pop, blind bags, model kits, die-cast and more — find exactly what you're looking for.</p>
+    <p class="text-slate-400 text-lg max-w-2xl mx-auto">Straight to what you collect — authentic pieces, fair prices, and fast USA shipping on every order.</p>
   </header>
   <section class="max-w-6xl mx-auto px-6 pb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">${cards}</section>`;
 
