@@ -353,7 +353,7 @@ function productPage(p, related) {
     </section>` : '';
 
   const buyItem = JSON.stringify({
-    id: p.id, name: p.name, price: pr || 0, images: p.images, quantity: 1, shipping_weight: p.shipping_weight || 0,
+    id: p.id, sku: p.sku || '', name: p.name, price: pr || 0, images: p.images, quantity: 1, shipping_weight: p.shipping_weight || 0,
   });
 
   const body = `
