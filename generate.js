@@ -754,7 +754,7 @@ function aboutPage() {
     description: desc,
     parentOrganization: { '@type': 'Organization', name: 'Wilderness Dealz LLC' },
     sameAs: [SOCIAL.facebook, SOCIAL.instagram, SOCIAL.youtube, SOCIAL.whatnot],
-    contactPoint: { '@type': 'ContactPoint', email: 'nubz@wildernessdealz.com', contactType: 'customer service' },
+    contactPoint: { '@type': 'ContactPoint', email: 'sales@nubztoys.com', contactType: 'customer service' },
   };
 
   const body = `
@@ -802,7 +802,7 @@ function aboutPage() {
 // ── CONTACT PAGE ────────────────────────────────────────────────────────
 function contactPage() {
   const canonical = `${SITE}/contact`;
-  const desc = 'Contact Nubz Toys & Collectibles — order questions, returns, or just want to say hi? Email nubz@wildernessdealz.com. Real people, real responses.';
+  const desc = 'Contact Nubz Toys & Collectibles — order questions, returns, or just want to say hi? Email sales@nubztoys.com. Real people, real responses.';
   const crumbLd = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: [
@@ -813,7 +813,7 @@ function contactPage() {
   const contactLd = {
     '@context': 'https://schema.org', '@type': 'ContactPage',
     name: `Contact ${SITE_NAME}`, url: canonical,
-    mainEntity: { '@type': 'Organization', name: SITE_NAME, email: 'nubz@wildernessdealz.com' },
+    mainEntity: { '@type': 'Organization', name: SITE_NAME, email: 'sales@nubztoys.com' },
   };
 
   const body = `
@@ -829,8 +829,8 @@ function contactPage() {
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8">
       <h2 class="font-bold text-lg mb-2 text-white">Email us directly</h2>
       <p class="text-slate-400 text-sm mb-4">The fastest way to reach us for order questions, returns, or anything else.</p>
-      <a href="mailto:nubz@wildernessdealz.com" class="inline-flex items-center gap-x-2 text-cyan-400 hover:text-cyan-300 font-semibold text-lg">
-        <i class="fa-solid fa-envelope"></i> nubz@wildernessdealz.com
+      <a href="mailto:sales@nubztoys.com" class="inline-flex items-center gap-x-2 text-cyan-400 hover:text-cyan-300 font-semibold text-lg">
+        <i class="fa-solid fa-envelope"></i> sales@nubztoys.com
       </a>
     </div>
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8">
@@ -868,7 +868,7 @@ function contactPage() {
       if (!name || !email || !message) { alert('Please fill in all fields.'); return; }
       var subject = encodeURIComponent('Message from ' + name + ' via NubzToys.com');
       var body    = encodeURIComponent('Name: ' + name + '\\nEmail: ' + email + '\\n\\n' + message);
-      window.location.href = 'mailto:nubz@wildernessdealz.com?subject=' + subject + '&body=' + body;
+      window.location.href = 'mailto:sales@nubztoys.com?subject=' + subject + '&body=' + body;
     }
   </script>`;
 
@@ -908,13 +908,13 @@ function privacyPage() {
       <p>We may share your information with: service providers who help us operate our business (payment processors, shipping carriers, email platforms); business partners and affiliates under confidentiality obligations; and as required by law, court order, or government authority.</p>
 
       <h2 class="text-xl font-bold text-white mt-8 not-prose">Your Rights</h2>
-      <p>Depending on your location, you may have the right to access, correct, delete, or port your personal data. To exercise any of these rights, contact us at <a href="mailto:nubz@wildernessdealz.com" class="text-cyan-400 hover:text-cyan-300">nubz@wildernessdealz.com</a>.</p>
+      <p>Depending on your location, you may have the right to access, correct, delete, or port your personal data. To exercise any of these rights, contact us at <a href="mailto:sales@nubztoys.com" class="text-cyan-400 hover:text-cyan-300">sales@nubztoys.com</a>.</p>
 
       <h2 class="text-xl font-bold text-white mt-8 not-prose">Children's Privacy</h2>
       <p>Our services are not directed to children under the age of majority. We do not knowingly collect personal information from minors. If you believe a minor has provided us personal information, contact us immediately.</p>
 
       <h2 class="text-xl font-bold text-white mt-8 not-prose">Contact</h2>
-      <p>Questions about this policy? Email us at <a href="mailto:nubz@wildernessdealz.com" class="text-cyan-400 hover:text-cyan-300">nubz@wildernessdealz.com</a>.</p>
+      <p>Questions about this policy? Email us at <a href="mailto:sales@nubztoys.com" class="text-cyan-400 hover:text-cyan-300">sales@nubztoys.com</a>.</p>
     </div>
   </article>`;
 
@@ -964,7 +964,7 @@ function returnsPage() {
       <h2 class="text-xl font-bold text-white mt-8 not-prose">Exceptions — We Always Make It Right</h2>
       <p>Manufacturer defects (no, that hand was <em>not</em> supposed to fall off Superman!) and fulfillment errors on our end (you received Donatello instead of Squirtle) are fully covered. In these cases, we will either send the correct item or issue a full refund including return shipping — your choice.</p>
       <h2 class="text-xl font-bold text-white mt-8 not-prose">How to Start a Return</h2>
-      <p>Email us at <a href="mailto:nubz@wildernessdealz.com" class="text-cyan-400 hover:text-cyan-300">nubz@wildernessdealz.com</a> with your order details and the reason for the return. Please respond to any follow-up communication so we can process it quickly. Have a Nub-riffic day!</p>
+      <p>Email us at <a href="mailto:sales@nubztoys.com" class="text-cyan-400 hover:text-cyan-300">sales@nubztoys.com</a> with your order details and the reason for the return. Please respond to any follow-up communication so we can process it quickly. Have a Nub-riffic day!</p>
     </div>
     <div class="mt-10">
       <a href="/contact" class="inline-flex items-center gap-x-2 px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl hover:bg-slate-100 transition">
@@ -975,6 +975,99 @@ function returnsPage() {
 
   return head({ title: `Returns & Exchanges | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
     type: 'website', jsonld: [crumbLd] }) + body + footer();
+}
+
+// ── ORDER CONFIRMATION PAGE ──────────────────────────────────────────────
+// Real, standalone URL Stripe redirects to on a successful checkout (see
+// api/create-checkout.js success_url). Replaces the old approach of dumping
+// the customer back on the homepage with a toast that vanished in 6 seconds —
+// that read as "paid then dumped back on the site" with no proof of purchase.
+// noindex'd (transactional, not for search) and left out of sitemap.xml.
+function orderConfirmedPage() {
+  const canonical = `${SITE}/order-confirmed`;
+  const desc = `Your order at ${SITE_NAME} is confirmed.`;
+
+  const body = `
+  <section class="max-w-2xl mx-auto px-6 py-16">
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/15 border border-emerald-500/40 mb-6">
+        <i class="fa-solid fa-check text-4xl text-emerald-400"></i>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold gradient-title inline-block mb-4">Order Confirmed!</h1>
+      <p class="text-slate-400 text-lg">Thank you for shopping at ${esc(SITE_NAME)}.</p>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8 text-center">
+      <p class="text-slate-300 mb-2"><i class="fa-solid fa-envelope text-cyan-400 mr-2"></i>A confirmation email with your receipt is on its way.</p>
+      <p class="text-slate-300 mb-4"><i class="fa-solid fa-box text-cyan-400 mr-2"></i>We'll get your order packed and shipped within 1–2 business days.</p>
+      <p id="order-ref" class="text-slate-500 text-xs font-mono hidden"></p>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4 mb-12">
+      <a href="/" class="text-center py-4 bg-white text-slate-950 font-bold rounded-3xl hover:bg-slate-100 transition">Continue Shopping</a>
+      <a href="/inventory" class="text-center py-4 bg-slate-900 border border-slate-700 text-white font-bold rounded-3xl hover:bg-slate-800 transition">Browse All Inventory</a>
+    </div>
+    <div class="text-center mb-6">
+      <p class="text-xs uppercase tracking-[2px] text-slate-500 font-semibold">While you're here</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <a href="https://wildernessdealz.com" target="_blank" rel="noopener noreferrer" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-solid fa-store text-2xl text-amber-400 mb-2"></i>
+        <p class="font-semibold text-sm">Wilderness Dealz</p>
+        <p class="text-slate-500 text-xs mt-1">Our sister shop</p>
+      </a>
+      <a href="${SOCIAL.instagram}" target="_blank" rel="noopener noreferrer" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-brands fa-instagram text-2xl text-fuchsia-400 mb-2"></i>
+        <p class="font-semibold text-sm">Instagram</p>
+        <p class="text-slate-500 text-xs mt-1">Follow along</p>
+      </a>
+      <a href="${SOCIAL.facebook}" target="_blank" rel="noopener noreferrer" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-brands fa-facebook text-2xl text-cyan-400 mb-2"></i>
+        <p class="font-semibold text-sm">Facebook</p>
+        <p class="text-slate-500 text-xs mt-1">Like our page</p>
+      </a>
+      <a href="${SOCIAL.youtube}" target="_blank" rel="noopener noreferrer" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-brands fa-youtube text-2xl text-red-400 mb-2"></i>
+        <p class="font-semibold text-sm">YouTube</p>
+        <p class="text-slate-500 text-xs mt-1">Watch our videos</p>
+      </a>
+      <a href="${SOCIAL.whatnot}" target="_blank" rel="noopener noreferrer" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-solid fa-tower-broadcast text-2xl text-violet-400 mb-2"></i>
+        <p class="font-semibold text-sm">Whatnot</p>
+        <p class="text-slate-500 text-xs mt-1">Live auctions</p>
+      </a>
+      <a href="/blog" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 hover:border-cyan-500/50 transition text-center">
+        <i class="fa-solid fa-newspaper text-2xl text-emerald-400 mb-2"></i>
+        <p class="font-semibold text-sm">Blog</p>
+        <p class="text-slate-500 text-xs mt-1">Latest posts</p>
+      </a>
+    </div>
+  </section>
+  <script>
+    (function() {
+      try {
+        // Order confirmed — clear the cart (shared localStorage key with the storefront).
+        localStorage.removeItem('nubz_cart');
+        var params = new URLSearchParams(window.location.search);
+        var sid = params.get('sid');
+        var value = parseFloat(params.get('value')) || 0;
+        if (sid) {
+          var ref = document.getElementById('order-ref');
+          if (ref) { ref.textContent = 'Order ref: ' + sid.slice(-12); ref.classList.remove('hidden'); }
+        }
+        // Google Ads purchase conversion — reports the real order value + Stripe id.
+        if (window.gtag && (sid || value)) {
+          gtag('event', 'conversion', {
+            send_to: 'AW-18266305787/1jErCIyB988cEPvphoZE',
+            value: value,
+            currency: 'USD',
+            transaction_id: sid || ''
+          });
+        }
+      } catch (e) {}
+    })();
+  </script>`;
+
+  return head({ title: `Order Confirmed | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
+    type: 'website', jsonld: [] }).replace('</title>', '</title>\n  <meta name="robots" content="noindex,nofollow">') + body + footer();
 }
 
 // ── MAIN ───────────────────────────────────────────────────────────────
@@ -1038,6 +1131,7 @@ function returnsPage() {
   fs.writeFileSync(path.join(ROOT, 'contact.html'), contactPage());
   fs.writeFileSync(path.join(ROOT, 'privacy-policy.html'), privacyPage());
   fs.writeFileSync(path.join(ROOT, 'returns.html'), returnsPage());
+  fs.writeFileSync(path.join(ROOT, 'order-confirmed.html'), orderConfirmedPage());
 
   // sitemap / robots / snapshot
   fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), sitemap(products, Object.keys(byCat)));
