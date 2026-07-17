@@ -51,7 +51,15 @@ module.exports = async (req, res) => {
     let recorded = false, alreadyDone = false;
     const masterDebug = { key_present: !!MASTER_SERVICE };
     if (MASTER_SERVICE) {
-      const mh = { apikey: MASTER_SERVICE, Authorization: `Bearer ${MASTER_SERVICE}`, 'Content-Type': 'application/json' };
+      // The master DB's real tables live in the "master" Postgres schema, not
+      // "public" — PostgREST defaults to public unless told otherwise via these
+      // profile headers (Accept-Profile for reads, Content-Profile for
+      // writes/RPC calls). Also requires "master" to be added to this project's
+      // Settings → API → Exposed schemas — the header alone isn't enough.
+      const mh = {
+        apikey: MASTER_SERVICE, Authorization: `Bearer ${MASTER_SERVICE}`, 'Content-Type': 'application/json',
+        'Accept-Profile': 'master', 'Content-Profile': 'master',
+      };
       // Map storefront SKUs → master product ids. The master catalog is its own
       // Supabase project with its own uuid ids, so sku (or upc) is the only way to
       // cross-reference it — there's no shared id to fall back on like there is
