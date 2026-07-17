@@ -81,10 +81,19 @@ module.exports = async (req, res) => {
             ],
             metadata: {
                 source: 'nubztoys-web',
-                // Compact cart so the webhook knows what sold (sku, qty, price).
+                // Compact cart so the webhook knows what sold (sku, id, qty, price).
+                // sku and id are sent SEPARATELY (not merged/falling back into each
+                // other) so the webhook can use the storefront row id — always
+                // reliable, it's the primary key — even if a product's sku happens
+                // to be blank. A blank sku alone should never silently kill recording.
                 // Stripe caps a metadata value at 500 chars — typical carts fit.
                 items: JSON.stringify(
-                    cartItems.map(i => ({ s: String(i.sku || i.id || '').slice(0, 24), q: i.quantity || 1, p: Number(i.price) || 0 }))
+                    cartItems.map(i => ({
+                        s: String(i.sku || '').slice(0, 24),
+                        i: String(i.id || '').slice(0, 24),
+                        q: i.quantity || 1,
+                        p: Number(i.price) || 0
+                    }))
                 ).slice(0, 490)
             }
         });

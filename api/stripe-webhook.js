@@ -52,10 +52,20 @@ module.exports = async (req, res) => {
     const masterDebug = { key_present: !!MASTER_SERVICE };
     if (MASTER_SERVICE) {
       const mh = { apikey: MASTER_SERVICE, Authorization: `Bearer ${MASTER_SERVICE}`, 'Content-Type': 'application/json' };
-      // Map storefront SKUs → master product ids.
+      // Map storefront SKUs → master product ids. The master catalog is its own
+      // Supabase project with its own uuid ids, so sku (or upc) is the only way to
+      // cross-reference it — there's no shared id to fall back on like there is
+      // for the storefront lookup below.
       const mItems = [];
       const lookupIssues = [];
       for (const it of items) {
+        if (!it.s) {
+          // No sku on this line item at all — flag distinctly from "not found",
+          // since this means create-checkout.js never had a sku to send in the
+          // first place (e.g. product's sku field was blank at cart time).
+          lookupIssues.push({ sku: it.s, id: it.i, issue: 'no_sku_provided' });
+          continue;
+        }
         const r = await fetch(`${MASTER_URL}/rest/v1/products?sku=eq.${encodeURIComponent(it.s)}&select=id&limit=1`, { headers: mh });
         const rows = await r.json().catch(() => null);
         if (Array.isArray(rows) && rows[0]) {
@@ -93,15 +103,19 @@ module.exports = async (req, res) => {
     if (alreadyDone) return res.status(200).json({ ok: true, note: 'already processed' });
 
     // ── 2. Storefront: draw down + retreat at zero ──
+    // Look up by the storefront's own row id first — it's the primary key, always
+    // reliable regardless of whether sku happens to be populated. Falls back to sku
+    // only for older sessions created before this field was split out (7/16 fix).
     const storefrontDebug = { key_present: !!SERVICE, decremented: 0 };
     if (SERVICE) {
       const sh = { apikey: SERVICE, Authorization: `Bearer ${SERVICE}`, 'Content-Type': 'application/json' };
       const issues = [];
       for (const it of items) {
-        const r = await fetch(`${SUPA_URL}/rest/v1/products?sku=eq.${encodeURIComponent(it.s)}&select=id,quantity`, { headers: sh });
+        const filter = it.i ? `id=eq.${encodeURIComponent(it.i)}` : `sku=eq.${encodeURIComponent(it.s)}`;
+        const r = await fetch(`${SUPA_URL}/rest/v1/products?${filter}&select=id,quantity`, { headers: sh });
         const rows = await r.json().catch(() => null);
         const p = Array.isArray(rows) && rows[0];
-        if (!p) { issues.push({ sku: it.s, http_status: r.status, response: rows }); continue; }
+        if (!p) { issues.push({ sku: it.s, id: it.i, matched_by: it.i ? 'id' : 'sku', http_status: r.status, response: rows }); continue; }
         const newQty = Math.max(0, (Number(p.quantity) || 0) - (Number(it.q) || 1));
         const upd = { quantity: newQty };
         if (newQty === 0) upd.status = 'Sold Out';
