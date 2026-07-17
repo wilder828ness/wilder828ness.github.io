@@ -46,16 +46,28 @@ module.exports = async (req, res) => {
     const procFee  = Math.round((0.029 * ((session.amount_total || 0) / 100) + 0.30) * 100) / 100;
 
     // ── 1. Record into the Master DB (idempotent by external_order_id = session id) ──
+    // masterDebug travels in the JSON response so Ron can see exactly why a recording
+    // attempt failed straight from the Stripe webhook event log — no log-digging needed.
     let recorded = false, alreadyDone = false;
+    const masterDebug = { key_present: !!MASTER_SERVICE };
     if (MASTER_SERVICE) {
       const mh = { apikey: MASTER_SERVICE, Authorization: `Bearer ${MASTER_SERVICE}`, 'Content-Type': 'application/json' };
       // Map storefront SKUs → master product ids.
       const mItems = [];
+      const lookupIssues = [];
       for (const it of items) {
         const r = await fetch(`${MASTER_URL}/rest/v1/products?sku=eq.${encodeURIComponent(it.s)}&select=id&limit=1`, { headers: mh });
-        const rows = await r.json().catch(() => []);
-        if (Array.isArray(rows) && rows[0]) mItems.push({ product_id: rows[0].id, qty: Number(it.q) || 1, unit_price: Number(it.p) || 0 });
+        const rows = await r.json().catch(() => null);
+        if (Array.isArray(rows) && rows[0]) {
+          mItems.push({ product_id: rows[0].id, qty: Number(it.q) || 1, unit_price: Number(it.p) || 0 });
+        } else {
+          // Either the SKU truly isn't in the master catalog, or the key was rejected
+          // (r.status 401/403 = bad/expired key; body carries Supabase's own message).
+          lookupIssues.push({ sku: it.s, http_status: r.status, response: rows });
+        }
       }
+      masterDebug.matched = mItems.length;
+      if (lookupIssues.length) masterDebug.lookup_issues = lookupIssues;
       if (mItems.length) {
         const body = {
           p_items: mItems, p_channel: 'nubz', p_store: 'NBZ',
@@ -70,6 +82,7 @@ module.exports = async (req, res) => {
         if (rr.ok) { recorded = true; }
         else {
           const txt = await rr.text();
+          masterDebug.rpc_error = txt.slice(0, 300);
           if (/already recorded/i.test(txt)) { alreadyDone = true; } // idempotent: this session was already processed
           else console.error('master record_sale_multi failed:', txt);
         }
@@ -80,18 +93,22 @@ module.exports = async (req, res) => {
     if (alreadyDone) return res.status(200).json({ ok: true, note: 'already processed' });
 
     // ── 2. Storefront: draw down + retreat at zero ──
+    const storefrontDebug = { key_present: !!SERVICE, decremented: 0 };
     if (SERVICE) {
       const sh = { apikey: SERVICE, Authorization: `Bearer ${SERVICE}`, 'Content-Type': 'application/json' };
+      const issues = [];
       for (const it of items) {
         const r = await fetch(`${SUPA_URL}/rest/v1/products?sku=eq.${encodeURIComponent(it.s)}&select=id,quantity`, { headers: sh });
-        const rows = await r.json().catch(() => []);
+        const rows = await r.json().catch(() => null);
         const p = Array.isArray(rows) && rows[0];
-        if (!p) continue;
+        if (!p) { issues.push({ sku: it.s, http_status: r.status, response: rows }); continue; }
         const newQty = Math.max(0, (Number(p.quantity) || 0) - (Number(it.q) || 1));
         const upd = { quantity: newQty };
         if (newQty === 0) upd.status = 'Sold Out';
         await fetch(`${SUPA_URL}/rest/v1/products?id=eq.${p.id}`, { method: 'PATCH', headers: { ...sh, Prefer: 'return=minimal' }, body: JSON.stringify(upd) });
+        storefrontDebug.decremented++;
       }
+      if (issues.length) storefrontDebug.lookup_issues = issues;
     }
 
     // ── 3. Optional: regenerate static pages so a sold-out item leaves the static browse too ──
@@ -99,7 +116,7 @@ module.exports = async (req, res) => {
       try { await fetch(process.env.REBUILD_HOOK_URL, { method: 'POST' }); } catch (e) {}
     }
 
-    return res.status(200).json({ ok: true, recorded, items: items.length });
+    return res.status(200).json({ ok: true, recorded, items: items.length, masterDebug, storefrontDebug });
   } catch (e) {
     console.error('stripe-webhook error:', e);
     // Return 200 so Stripe doesn't hammer retries on a transient issue we've logged.

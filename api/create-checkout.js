@@ -59,7 +59,7 @@ module.exports = async (req, res) => {
             // Shows a "Add promotion code" field on the Stripe checkout page.
             // Create the actual codes in the Stripe dashboard (Coupons + Promotion codes).
             allow_promotion_codes: true,
-            success_url: `https://nubztoys.com?order=success&value=${orderValue}&sid={CHECKOUT_SESSION_ID}`,
+            success_url: `https://nubztoys.com/order-confirmed?value=${orderValue}&sid={CHECKOUT_SESSION_ID}`,
             cancel_url: 'https://nubztoys.com?order=cancelled',
             billing_address_collection: 'required',
             shipping_address_collection: {
