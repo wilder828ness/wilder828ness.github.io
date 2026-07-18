@@ -573,6 +573,9 @@
         let upsellGroups   = [];
         let isAdminLoggedIn      = false;
         let adminPassword        = '';   // legacy field, no longer used for the gate (auth is via Supabase)
+        // Set when a product's static SEO page sends the owner here to edit
+        // (via /?edit=SKU) and they weren't signed in yet — resumed after login.
+        let pendingEditSku       = null;
         let currentProductId     = null;
         let currentCategoryFilter = null;
         let currentModalImages   = [];
@@ -1459,6 +1462,19 @@
             renderFlashSaleProductCheckboxes();
         }
 
+        // Opens the quick edit/delete modal for a specific product, coming from
+        // a static product page's "Edit this listing" link (/?edit=SKU or ?edit=id).
+        // Matches by sku first (the normal case), falling back to id for items
+        // that don't have one yet.
+        function openPendingEdit(skuOrId) {
+            const p = products.find(x => String(x.sku) === String(skuOrId))
+                   || products.find(x => String(x.id) === String(skuOrId));
+            if (!p) { alert('Could not find a product matching "' + skuOrId + '" to edit.'); return; }
+            closeAdmin();
+            showProductModal(p);
+            editCurrentProduct();
+        }
+
         // Real authentication via Supabase Auth. A valid session is what unlocks
         // database writes once Row-Level Security is enabled, so this gate is now
         // backed by the database itself rather than a client-side string compare.
@@ -1476,6 +1492,7 @@
                 if (errEl) errEl.classList.add('hidden');
                 passInput.value = '';
                 showAdminPanel(email);
+                if (pendingEditSku) { const s = pendingEditSku; pendingEditSku = null; openPendingEdit(s); }
             } catch (e) {
                 if (errEl) { errEl.textContent = 'Sign in failed: ' + (e.message || 'check your email and password'); errEl.classList.remove('hidden'); }
                 else alert('Sign in failed');
@@ -2347,6 +2364,15 @@
             if (new URLSearchParams(window.location.search).get('checkout') === '1') {
                 window.history.replaceState({}, '', '/');
                 if (cart.length) showCart();
+            }
+            // A static product page's "Edit this listing" link sends the owner
+            // here as /?edit=SKU. If already signed in, jump straight to the
+            // edit form; otherwise queue it and prompt for login first.
+            const editParam = new URLSearchParams(window.location.search).get('edit');
+            if (editParam) {
+                window.history.replaceState({}, '', '/');
+                if (isAdminLoggedIn) openPendingEdit(editParam);
+                else { pendingEditSku = editParam; showAdmin(); }
             }
             console.log('%c✅ Nubz Toys loaded successfully', 'color:#22d3ee; font-weight:bold;');
         }

@@ -395,6 +395,7 @@ function productPage(p, related) {
         ? `<div class="inline-block px-6 py-4 bg-purple-500/15 border border-purple-500/40 text-purple-200 rounded-3xl font-semibold">🔜 Coming soon — not yet available to order. Check back!</div>`
         : `<a href="/inventory" class="inline-block px-10 py-4 border border-slate-700 rounded-3xl font-semibold hover:bg-white/5">Browse other items</a>`}
       <p class="mt-6 text-sm"><a href="/categories/${catSlug}" class="text-cyan-400 hover:text-cyan-300">← More in ${esc(cat)}</a></p>
+      <a id="editListingLink" href="#" class="hidden mt-3 text-sm items-center gap-x-1 text-amber-400 hover:text-amber-300"><i class="fa-solid fa-pen"></i> Edit this listing</a>
     </div>
   </article>
   ${relatedHtml}
@@ -402,6 +403,7 @@ function productPage(p, related) {
     <button id="lightboxClose" aria-label="Close" class="absolute top-4 right-5 text-white text-4xl leading-none">&times;</button>
     <img id="lightboxImg" src="" alt="${esc(p.name)}" class="max-w-full max-h-full object-contain rounded-xl">
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3"></script>
   <script>
     (function(){
       var ITEM = ${buyItem};
@@ -458,6 +460,22 @@ function productPage(p, related) {
           alert('Unable to start checkout. Please try again.');
         }
       });
+      // Show an "Edit this listing" link if signed in as admin (same Supabase
+      // login used on the homepage) — deep-links back to the homepage admin
+      // modal for this SKU rather than duplicating the edit UI on every page.
+      (function(){
+        var link = document.getElementById('editListingLink');
+        if (!link || typeof supabase === 'undefined' || !supabase.createClient) return;
+        try {
+          var sb = supabase.createClient('https://vdkjjyjfwfndrksruisn.supabase.co', 'sb_publishable_MUbT8VJ6HKCa1pNUgZYjuA_wzXzECNr');
+          sb.auth.getSession().then(function(r){
+            if (r && r.data && r.data.session) {
+              link.href = '/?edit=' + encodeURIComponent(ITEM.sku || ITEM.id);
+              link.classList.remove('hidden'); link.classList.add('inline-flex');
+            }
+          });
+        } catch (e) {}
+      })();
     })();
   </script>`;
 
