@@ -78,6 +78,20 @@ module.exports = async (req, res) => {
       const upd = { status: row.status, quantity: row.quantity, cost: row.cost };
       if (ex.price == null || Number(ex.price) === 0)           upd.price = row.price;
       if (ex.compare_to == null || Number(ex.compare_to) === 0) upd.compare_to = row.compare_to;
+      // Sync the image on re-publish when Master actually has one. This is what
+      // makes the Back Office photo upload reach the live storefront — previously
+      // images were dropped on UPDATE (treated as store-owned merchandising), so a
+      // newly uploaded photo saved to Master but never appeared on the site; the
+      // store kept its original/stock image.
+      //   * Only sets images when Master has a non-empty image — so a re-publish
+      //     can NEVER wipe the store's image to blank.
+      //   * When Master has an image, it becomes authoritative (replaces the
+      //     store's). That's the intended workflow now that photos are managed in
+      //     the Back Office. TRADE-OFF: if you ever added extra angles / reordered
+      //     images directly in the storefront admin for this product, the next
+      //     publish will replace them with Master's single image. Flagged for Ron —
+      //     easy to change to "fill only if the store has none" if he prefers.
+      if (Array.isArray(row.images) && row.images.length) upd.images = row.images;
       method = 'PATCH'; url = `${base}?sku=eq.${encodeURIComponent(p.sku)}`; body = upd;
     } else {
       // CREATE: first publish seeds everything (initial staged price included).
