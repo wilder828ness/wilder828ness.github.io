@@ -43,6 +43,16 @@ module.exports = async (req, res) => {
   const base = `${SUPA_URL}/rest/v1/products`;
   const headers = { apikey: SERVICE, Authorization: `Bearer ${SERVICE}`, 'Content-Type': 'application/json' };
 
+  // Storefront stores `images` as a comma-separated STRING (the SPA + generate.js
+  // split it back into an array on load), NOT a JSON array. Every other writer
+  // (SPA add/edit, CSV import) joins before writing; publish.js used to send a raw
+  // array, which PostgREST stored as a bracketed literal ["…"] in the text column —
+  // that then rendered as a broken/stock image and never showed the uploaded photo.
+  // Flatten to the same comma-separated format here. (imagesArr kept for the length
+  // check on the re-publish path below.)
+  const imagesArr = Array.isArray(p.images) ? p.images.filter(Boolean) : (p.images ? [p.images] : []);
+  const imagesStr = imagesArr.join(', ');
+
   // Map Master fields → storefront product columns.
   const row = {
     name:            p.name,
@@ -55,11 +65,18 @@ module.exports = async (req, res) => {
     quantity:        p.quantity != null ? p.quantity : 0,
     shipping_weight: p.shipping_weight != null ? p.shipping_weight : 0,
     status:          p.status || 'In Stock',
-    images:          Array.isArray(p.images) ? p.images : (p.images ? [p.images] : []),
+    images:          imagesStr,
     description:     p.description || '',
     sku:             p.sku,
     upc:             p.upc || null,
     cost:            p.cost != null ? p.cost : null,
+    // Grouped-items (variety picker) fields — pass through master → storefront so
+    // the storefront can render varieties as one card. All nullable; a standalone
+    // item just sends nulls and renders exactly as before.
+    group_key:       p.group_key || null,
+    variant_label:   p.variant_label || null,
+    group_sort:      (p.group_sort === 0 || p.group_sort) ? Number(p.group_sort) : null,
+    group_name:      p.group_name || null,
   };
 
   try {
@@ -78,6 +95,10 @@ module.exports = async (req, res) => {
       const upd = { status: row.status, quantity: row.quantity, cost: row.cost };
       if (ex.price == null || Number(ex.price) === 0)           upd.price = row.price;
       if (ex.compare_to == null || Number(ex.compare_to) === 0) upd.compare_to = row.compare_to;
+      // Grouping is master-owned (back office decides which items form a card), so
+      // sync it on every re-publish — including clearing it (ungrouping an item).
+      upd.group_key = row.group_key; upd.variant_label = row.variant_label;
+      upd.group_sort = row.group_sort; upd.group_name = row.group_name;
       // Sync the image on re-publish when Master actually has one. This is what
       // makes the Back Office photo upload reach the live storefront — previously
       // images were dropped on UPDATE (treated as store-owned merchandising), so a
@@ -91,7 +112,7 @@ module.exports = async (req, res) => {
       //     images directly in the storefront admin for this product, the next
       //     publish will replace them with Master's single image. Flagged for Ron —
       //     easy to change to "fill only if the store has none" if he prefers.
-      if (Array.isArray(row.images) && row.images.length) upd.images = row.images;
+      if (imagesArr.length) upd.images = imagesStr;
       method = 'PATCH'; url = `${base}?sku=eq.${encodeURIComponent(p.sku)}`; body = upd;
     } else {
       // CREATE: first publish seeds everything (initial staged price included).
