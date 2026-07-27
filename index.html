@@ -875,9 +875,9 @@
             const container = document.getElementById('featured-grid');
             if (!container) return;
             container.innerHTML = '';
-            const inStock = products
+            const inStock = collapseGroups(products
                 .filter(p => p.status === "In Stock" && !stockState(p).soldOut)
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
                 .slice(0, 8);
             inStock.forEach(p => container.appendChild(createProductCard(p)));
         }
@@ -886,7 +886,7 @@
             const container = document.getElementById('inventory-grid');
             if (!container) return;
             container.innerHTML = '';
-            products.forEach(p => container.appendChild(createProductCard(p)));
+            collapseGroups(products).forEach(p => container.appendChild(createProductCard(p)));
         }
 
         function renderCategoryCards() {
@@ -938,6 +938,27 @@
             return { qty, soldOut, onOrder, inTransit };
         }
 
+        // Grouped items: collapse a list so each group_key shows once (its
+        // group_sort=0 member), tagged with _variantCount for the card badge.
+        // Standalone items (no group_key) are untouched.
+        function groupKeyOf(p){ const k = (p && p.group_key != null) ? String(p.group_key).trim() : ''; return k || null; }
+        function collapseGroups(list){
+            const byKey = {}, seen = {}, out = [];
+            list.forEach(p => { const k = groupKeyOf(p); if (k) (byKey[k] = byKey[k] || []).push(p); });
+            list.forEach(p => {
+                const k = groupKeyOf(p);
+                if (!k) { out.push(p); return; }
+                if (seen[k]) return; seen[k] = true;
+                const sorted = byKey[k].slice().sort((a, b) => {
+                    const sa = (a.group_sort == null || a.group_sort === '') ? 9999 : Number(a.group_sort);
+                    const sb = (b.group_sort == null || b.group_sort === '') ? 9999 : Number(b.group_sort);
+                    return (sa - sb) || String(a.name || '').localeCompare(String(b.name || ''));
+                });
+                out.push(Object.assign({}, sorted[0], { _variantCount: byKey[k].length }));
+            });
+            return out;
+        }
+
         function createProductCard(product) {
             const card = document.createElement('div');
             card.className = 'toy-card bg-slate-950 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer';
@@ -957,33 +978,42 @@
                         : '';
             const lowQtyHTML  = (!ss.soldOut && !ss.onOrder && !ss.inTransit && product.quantity && product.quantity <= 2)
                 ? `<span class="status-badge bg-amber-500 text-black ml-1">LOW QTY</span>` : '';
+            // Grouped representative: this card stands for a whole variety set. Show
+            // an "N OPTIONS" badge and route to the product page picker instead of
+            // adding the face item (which variety would we add?).
+            const isGroup     = product._variantCount > 1;
+            const variantBadge = isGroup ? `<span class="status-badge bg-cyan-500 text-black">${product._variantCount} OPTIONS</span>` : '';
+            const priceHTML   = ss.onOrder
+                ? `<div class="text-base font-semibold text-purple-300">Coming soon</div>`
+                : `<div class="text-xl sm:text-3xl font-bold">$${(product.price || 0).toFixed(2)}${isGroup ? '<span class="text-sm text-slate-400 font-medium"> &amp; up</span>' : ''}</div>
+                   ${(!isGroup && product.compare_to && product.compare_to > product.price)
+                       ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}`;
+            const actionHTML  = isGroup
+                ? `<button onclick="event.stopImmediatePropagation(); window.location.href='${productUrl(product)}';"
+                        class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">OPTIONS →</button>`
+                : ss.soldOut
+                    ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">SOLD OUT</button>`
+                    : ss.onOrder
+                        ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">COMING SOON</button>`
+                        : ss.inTransit
+                            ? `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                class="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-2xl">PRE-ORDER</button>`
+                            : `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
+                                class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>`;
 
             card.innerHTML = `
                 <div class="relative">
                     <img src="${firstImage}" alt="${(product.name||'').replace(/"/g,'&quot;')}" class="w-full h-48 sm:h-56 object-cover object-top" loading="lazy"
                          onerror="this.src='https://picsum.photos/id/106/600/400'">
                     <div class="absolute top-4 right-4 flex gap-1">${statusHTML}${lowQtyHTML}</div>
+                    ${variantBadge ? `<div class="absolute top-4 left-4 flex gap-1">${variantBadge}</div>` : ''}
                 </div>
                 <div class="p-4 sm:p-6">
                     <div class="font-semibold text-sm sm:text-lg line-clamp-2">${product.name}</div>
                     <div class="text-xs text-slate-400">${product.brand || 'Unknown'} • ${catDisplay}</div>
                     <div class="flex justify-between items-center mt-4">
-                        <div>
-                            ${ss.onOrder
-                                ? `<div class="text-base font-semibold text-purple-300">Coming soon</div>`
-                                : `<div class="text-xl sm:text-3xl font-bold">$${(product.price || 0).toFixed(2)}</div>
-                                   ${product.compare_to && product.compare_to > product.price
-                                       ? `<div class="compare-price text-sm">$${(product.compare_to).toFixed(2)}</div>` : ''}`}
-                        </div>
-                        ${ss.soldOut
-                            ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">SOLD OUT</button>`
-                            : ss.onOrder
-                                ? `<button disabled class="px-5 py-2 bg-slate-700 text-slate-400 font-bold text-sm rounded-2xl cursor-not-allowed">COMING SOON</button>`
-                                : ss.inTransit
-                                    ? `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
-                                        class="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-2xl">PRE-ORDER</button>`
-                                    : `<button onclick="event.stopImmediatePropagation(); addToCart(${product.id});"
-                                        class="px-5 py-2 bg-cyan-500 hover:bg-cyan-600 text-black font-bold text-sm rounded-2xl">ADD</button>`}
+                        <div>${priceHTML}</div>
+                        ${actionHTML}
                     </div>
                 </div>`;
             // Customers go to the clean standalone product page; admins still get
@@ -1071,7 +1101,7 @@
             const container = document.getElementById('inventory-grid');
             if (!container) return;
             container.innerHTML = '';
-            filtered.forEach(p => container.appendChild(createProductCard(p)));
+            collapseGroups(filtered).forEach(p => container.appendChild(createProductCard(p)));
         }
 
         // ─── PRODUCT MODAL ───────────────────────────────────────────────────

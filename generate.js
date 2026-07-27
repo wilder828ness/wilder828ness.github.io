@@ -158,6 +158,60 @@ function normalize(p) {
   return { ...p, categories: cats, images: httpFirst };
 }
 
+// ── GROUPED ITEMS (variety picker) ─────────────────────────────────────
+// Items that share a `group_key` render as ONE card on listing grids (with an
+// "N options" badge) and each of their product pages shows a variety picker so
+// a shopper can switch between varieties without leaving the page. Standalone
+// items (no group_key) are completely unaffected — every existing product keeps
+// behaving exactly as before. This is a display layer only: each variety is
+// still its own product row with its own SKU/price/stock, so checkout and the
+// inventory webhook are untouched.
+const groupKeyOf = (p) => {
+  const k = (p && p.group_key != null) ? String(p.group_key).trim() : '';
+  return k || null;
+};
+// Order siblings for the picker: group_sort ascending (0 = the card face shown
+// before a pick), then name. Missing sort sinks to the end.
+function sortGroup(items) {
+  return items.slice().sort((a, b) => {
+    const sa = (a.group_sort == null || a.group_sort === '') ? 9999 : Number(a.group_sort);
+    const sb = (b.group_sort == null || b.group_sort === '') ? 9999 : Number(b.group_sort);
+    if (sa !== sb) return sa - sb;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+}
+// Collapse a listing so each group shows once, at the position of its first
+// member (preserves the incoming order), represented by its group_sort=0 item.
+// Tags the representative with `_variantCount` so the card can badge it.
+function collapseGroups(items) {
+  const membersByKey = {};
+  for (const p of items) {
+    const k = groupKeyOf(p);
+    if (k) (membersByKey[k] = membersByKey[k] || []).push(p);
+  }
+  const seen = {}; const out = [];
+  for (const p of items) {
+    const k = groupKeyOf(p);
+    if (!k) { out.push(p); continue; }
+    if (seen[k]) continue;
+    seen[k] = true;
+    const rep = sortGroup(membersByKey[k])[0];
+    rep._variantCount = membersByKey[k].length;
+    out.push(rep);
+  }
+  return out;
+}
+// All siblings of p (including p) that share its group_key, ordered for the picker.
+function groupMembers(p, all) {
+  const k = groupKeyOf(p);
+  if (!k) return [];
+  return sortGroup(all.filter(x => groupKeyOf(x) === k));
+}
+// "N options" badge for a collapsed representative card.
+const variantBadge = (p) => (p && p._variantCount > 1)
+  ? `<span class="absolute top-2 right-2 z-10 bg-cyan-500 text-black text-[11px] font-bold px-2 py-0.5 rounded-full shadow">${p._variantCount} options</span>`
+  : '';
+
 // ── DATA SOURCE ────────────────────────────────────────────────────────
 async function getProducts() {
   if (!SKIP_SUPABASE) {
@@ -300,7 +354,9 @@ const footer = () => `
 </html>`;
 
 // ── PRODUCT PAGE ───────────────────────────────────────────────────────
-function productPage(p, related) {
+function productPage(p, related, members) {
+  members = members || [];
+  const isGroup   = members.length > 1;
   const slug      = p.slug;
   const canonical = `${SITE}/products/${slug}`;
   const img       = firstImage(p);
@@ -310,7 +366,11 @@ function productPage(p, related) {
   const catSlug   = slugify(cat);
   const desc      = metaFrom(p.description, `${p.name} — available now at ${SITE_NAME}.`);
   const st        = availState(p);
+  // Standalone: purchasable only if in stock / pre-order. Grouped: always show the
+  // buy UI so a shopper who lands on a sold-out variety can still pick an in-stock
+  // sibling; the buttons enable/disable in JS based on the selected variety.
   const available = (st === 'in_stock' || st === 'in_transit'); // purchasable (in stock or pre-order)
+  const showBuyUI = available || isGroup;
 
   const productLd = {
     '@context': 'https://schema.org', '@type': 'Product',
@@ -356,6 +416,29 @@ function productPage(p, related) {
     id: p.id, sku: p.sku || '', name: p.name, price: pr || 0, images: p.images, quantity: 1, shipping_weight: p.shipping_weight || 0,
   });
 
+  // Grouped-items variety picker: embed every sibling so selecting one swaps the
+  // photo, price and Add-to-Cart target in place (no reload). Each variety is its
+  // own product row, so the cart item / checkout / inventory path is unchanged.
+  const groupData = members.map(m => {
+    const mst = availState(m);
+    return {
+      id: m.id, sku: m.sku || '', name: m.name,
+      label: (m.variant_label && String(m.variant_label).trim()) || m.name,
+      price: price(m) || 0,
+      compare_to: (!isNaN(Number(m.compare_to)) && Number(m.compare_to) > (price(m) || 0)) ? Number(m.compare_to) : null,
+      img: firstImage(m), images: m.images, shipping_weight: m.shipping_weight || 0,
+      state: mst, buyable: (mst === 'in_stock' || mst === 'in_transit'),
+    };
+  });
+  const curIdx = isGroup ? Math.max(0, members.findIndex(m => String(m.id) === String(p.id))) : 0;
+  const pickerHtml = isGroup ? `
+      <div id="variantPicker" class="mb-6" data-cur="${curIdx}">
+        <p class="text-sm font-semibold text-slate-300 mb-2">Choose your option <span class="text-slate-500 font-normal">· ${members.length} in this set</span></p>
+        <div class="flex flex-wrap gap-2">
+          ${groupData.map((m, i) => `<button type="button" data-idx="${i}" class="vpick text-sm px-3 py-2 rounded-xl border transition ${m.buyable ? 'border-slate-700 hover:border-cyan-500 text-slate-200' : 'border-slate-800 text-slate-600 cursor-not-allowed'}"${m.buyable ? '' : ' disabled'}>${esc(m.label)}${m.buyable ? '' : ' · sold out'}</button>`).join('')}
+        </div>
+      </div>` : '';
+
   const body = `
   <nav class="max-w-6xl mx-auto px-6 pt-6 text-xs text-slate-500">
     <a href="/" class="hover:text-cyan-400">Home</a>
@@ -371,14 +454,15 @@ function productPage(p, related) {
     </div>
     <div>
       ${p.brand ? `<p class="text-cyan-400 text-sm font-semibold tracking-wide uppercase mb-2">${esc(p.brand)}</p>` : ''}
-      <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-4">${esc(p.name)}</h1>
+      <h1 id="pdpTitle" class="text-3xl md:text-4xl font-bold leading-tight mb-4">${esc(p.name)}</h1>
       <div class="flex items-center gap-x-3 mb-6">
-        ${(pr != null && st !== 'on_order') ? `<span class="text-3xl font-bold">$${pr.toFixed(2)}</span>` : ''}
-        ${(!isNaN(cmp) && cmp > (pr||0) && st !== 'on_order') ? `<span class="compare-price text-lg">$${cmp.toFixed(2)}</span>` : ''}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full ${st==='in_stock' ? 'bg-emerald-600/20 text-emerald-400' : st==='in_transit' ? 'bg-blue-500/20 text-blue-300' : st==='on_order' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-300'}">${st==='in_stock' ? 'In Stock' : st==='in_transit' ? 'Pre-order' : st==='on_order' ? 'Coming Soon' : 'Sold Out'}</span>
+        <span id="pdpPrice" class="text-3xl font-bold"${(pr != null && st !== 'on_order') ? '' : ' style="display:none"'}>${pr != null ? '$' + pr.toFixed(2) : ''}</span>
+        <span id="pdpCompare" class="compare-price text-lg"${(!isNaN(cmp) && cmp > (pr||0) && st !== 'on_order') ? '' : ' style="display:none"'}>${!isNaN(cmp) ? '$' + cmp.toFixed(2) : ''}</span>
+        <span id="pdpStatus" class="text-xs font-semibold px-3 py-1 rounded-full ${st==='in_stock' ? 'bg-emerald-600/20 text-emerald-400' : st==='in_transit' ? 'bg-blue-500/20 text-blue-300' : st==='on_order' ? 'bg-purple-500/20 text-purple-300' : 'bg-slate-700 text-slate-300'}">${st==='in_stock' ? 'In Stock' : st==='in_transit' ? 'Pre-order' : st==='on_order' ? 'Coming Soon' : 'Sold Out'}</span>
       </div>
+      ${pickerHtml}
       <div class="prose prose-invert text-slate-300 leading-relaxed mb-8 whitespace-pre-line">${esc(String(p.description || '').split(/keywords:/i)[0].trim())}</div>
-      ${available ? `${st === 'in_transit' ? `<div class="mb-3 text-sm bg-blue-500/15 border border-blue-500/40 text-blue-200 rounded-2xl px-4 py-3">⏳ Available for <b>pre-order</b> — ships when it arrives in stock.</div>` : ''}<div class="flex flex-col sm:flex-row gap-3">
+      ${showBuyUI ? `${st === 'in_transit' ? `<div class="mb-3 text-sm bg-blue-500/15 border border-blue-500/40 text-blue-200 rounded-2xl px-4 py-3">⏳ Available for <b>pre-order</b> — ships when it arrives in stock.</div>` : ''}<div class="flex flex-col sm:flex-row gap-3">
         <button id="addCart" class="flex-1 px-8 py-4 bg-cyan-500 hover:bg-cyan-600 text-black font-bold rounded-3xl text-lg inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-cart-plus"></i> ${st === 'in_transit' ? 'Pre-order' : 'Add to Cart'}</button>
         <button id="buyNow" class="flex-1 px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition inline-flex items-center justify-center gap-x-2"><i class="fa-solid fa-bolt"></i> Buy Now</button>
       </div>
@@ -444,6 +528,47 @@ function productPage(p, related) {
         add.innerHTML = '<i class="fa-solid fa-check"></i> Added';
       });
 
+      // --- Grouped-items variety picker: swap photo/price/status/target in place ---
+      var GROUP = ${JSON.stringify(groupData)};
+      if (GROUP && GROUP.length > 1) {
+        var vpTitle = document.getElementById('pdpTitle');
+        var vpPrice = document.getElementById('pdpPrice');
+        var vpCompare = document.getElementById('pdpCompare');
+        var vpStatus = document.getElementById('pdpStatus');
+        var vpMain = document.getElementById('mainImg');
+        var addBtn = document.getElementById('addCart');
+        var buyBtn = document.getElementById('buyNow');
+        var STMAP = {
+          in_stock:   { cls:'bg-emerald-600/20 text-emerald-400', txt:'In Stock' },
+          in_transit: { cls:'bg-blue-500/20 text-blue-300',       txt:'Pre-order' },
+          on_order:   { cls:'bg-purple-500/20 text-purple-300',   txt:'Coming Soon' },
+          sold_out:   { cls:'bg-slate-700 text-slate-300',        txt:'Sold Out' }
+        };
+        function selectVariant(i){
+          var m = GROUP[i]; if(!m) return;
+          ITEM = { id:m.id, sku:m.sku||'', name:m.name, price:m.price||0, images:m.images||[], quantity:1, shipping_weight:m.shipping_weight||0 };
+          if (vpTitle) vpTitle.textContent = m.name;
+          if (vpMain && m.img) vpMain.src = m.img;
+          if (vpPrice){ vpPrice.textContent = '$' + Number(m.price||0).toFixed(2); vpPrice.style.display = ''; }
+          if (vpCompare){ if(m.compare_to){ vpCompare.textContent = '$' + Number(m.compare_to).toFixed(2); vpCompare.style.display=''; } else { vpCompare.style.display='none'; } }
+          if (vpStatus){ var s = STMAP[m.state] || STMAP.in_stock; vpStatus.className = 'text-xs font-semibold px-3 py-1 rounded-full ' + s.cls; vpStatus.textContent = s.txt; }
+          var okBuy = !!m.buyable;
+          [addBtn, buyBtn].forEach(function(b){ if(!b) return; b.disabled = !okBuy; b.classList.toggle('opacity-40', !okBuy); b.classList.toggle('cursor-not-allowed', !okBuy); });
+          if (addBtn) addBtn.innerHTML = okBuy ? ('<i class="fa-solid fa-cart-plus"></i> ' + (m.state==='in_transit' ? 'Pre-order' : 'Add to Cart')) : '<i class="fa-solid fa-ban"></i> Sold Out';
+          var addedMsg = document.getElementById('addedMsg'); if (addedMsg) addedMsg.classList.add('hidden');
+          document.querySelectorAll('.vpick').forEach(function(btn){
+            var on = String(btn.getAttribute('data-idx')) === String(i);
+            btn.classList.toggle('border-cyan-500', on); btn.classList.toggle('bg-cyan-500/10', on);
+          });
+        }
+        document.querySelectorAll('.vpick').forEach(function(btn){
+          if (btn.disabled) return;
+          btn.addEventListener('click', function(){ selectVariant(Number(btn.getAttribute('data-idx'))); });
+        });
+        var vp = document.getElementById('variantPicker');
+        selectVariant(vp ? Number(vp.getAttribute('data-cur')) : 0);
+      }
+
       var buy = document.getElementById('buyNow');
       if (buy) buy.addEventListener('click', async function(e){
         var btn = e.currentTarget; btn.disabled = true; btn.textContent = 'Redirecting…';
@@ -507,13 +632,17 @@ function categoryPage(cat, items) {
     ],
   };
 
+  items = collapseGroups(items);
   const grid = items.map(p => `
     <a href="/products/${p.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
-      <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover object-top" loading="lazy">
+      <div class="relative">
+        ${variantBadge(p)}
+        <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover object-top" loading="lazy">
+      </div>
       <div class="p-4">
         ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
         <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
-        ${price(p) != null ? `<p class="font-bold">$${price(p).toFixed(2)}</p>` : ''}
+        ${price(p) != null ? `<p class="font-bold">$${price(p).toFixed(2)}${p._variantCount > 1 ? '<span class="text-slate-400 text-xs font-medium"> & up</span>' : ''}</p>` : ''}
       </div>
     </a>`).join('');
 
@@ -721,6 +850,7 @@ function inventoryPage(products) {
       '@type': 'ListItem', position: i + 1, url: `${SITE}/products/${p.slug}`, name: p.name,
     })),
   };
+  products = collapseGroups(products);
   const grid = products.map(p => {
     const pr = price(p);
     const st = availState(p);
@@ -728,13 +858,14 @@ function inventoryPage(products) {
     return `
     <a href="/products/${p.slug}" class="block bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition">
       <div class="relative">
+        ${variantBadge(p)}
         <img src="${esc(firstImage(p))}" alt="${esc(p.name)}" class="w-full aspect-square object-cover object-top" loading="lazy">
         ${st==='sold_out' ? '<div class="absolute inset-0 bg-black/60 flex items-center justify-center"><span class="bg-slate-900 text-slate-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700">SOLD OUT</span></div>' : st==='on_order' ? '<div class="absolute inset-0 bg-black/50 flex items-center justify-center"><span class="bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">COMING SOON</span></div>' : st==='in_transit' ? '<span class="absolute top-2 left-2 bg-blue-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">PRE-ORDER</span>' : ''}
       </div>
       <div class="p-4">
         ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
         <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
-        ${(pr != null && st !== 'on_order') ? `<p class="font-bold">${available ? `$${pr.toFixed(2)}` : `<span class="text-slate-500 line-through">$${pr.toFixed(2)}</span>`}</p>` : (st === 'on_order' ? `<p class="font-bold text-purple-300 text-sm">Coming soon</p>` : '')}
+        ${(pr != null && st !== 'on_order') ? `<p class="font-bold">${available ? `$${pr.toFixed(2)}` : `<span class="text-slate-500 line-through">$${pr.toFixed(2)}</span>`}${p._variantCount > 1 ? '<span class="text-slate-400 text-xs font-medium"> & up</span>' : ''}</p>` : (st === 'on_order' ? `<p class="font-bold text-purple-300 text-sm">Coming soon</p>` : '')}
       </div>
     </a>`;
   }).join('');
@@ -1130,8 +1261,14 @@ function orderConfirmedPage() {
   // related pulled from LIVE items only (never link out to a retreated item).
   for (const p of products) {
     const cat = p.categories[0] || 'Toys';
-    const related = (liveByCat[cat] || []).filter(r => r.slug !== p.slug).slice(0, 4);
-    fs.writeFileSync(path.join(PRODUCTS_DIR, `${p.slug}.html`), productPage(p, related));
+    const gk = groupKeyOf(p);
+    // Related: collapse groups (don't list 4 siblings) and never link back into
+    // the item's own group.
+    const related = collapseGroups((liveByCat[cat] || []).filter(r => r.slug !== p.slug && groupKeyOf(r) !== gk)).slice(0, 4);
+    // Members: all siblings (incl. sold-out, so the picker can grey them) for the
+    // variety picker; empty for standalone items.
+    const members = groupMembers(p, products);
+    fs.writeFileSync(path.join(PRODUCTS_DIR, `${p.slug}.html`), productPage(p, related, members));
   }
 
   // category pages — page still generated for every category (SEO), grid shows
