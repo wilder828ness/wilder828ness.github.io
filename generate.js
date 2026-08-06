@@ -212,6 +212,10 @@ const variantBadge = (p) => (p && p._variantCount > 1)
   ? `<span class="absolute top-2 right-2 z-10 bg-cyan-500 text-black text-[11px] font-bold px-2 py-0.5 rounded-full shadow">${p._variantCount} options</span>`
   : '';
 
+// Neutral "not yet reviewed" state — visual only, NO rating schema (a 0-rating
+// aggregateRating can itself trip Merchant Center). Replaces the old Whatnot claim.
+const noReviews = `<div class="text-[11px] text-slate-600 mt-1" aria-label="No reviews yet"><span class="tracking-tight">☆☆☆☆☆</span> No reviews yet</div>`;
+
 // ── DATA SOURCE ────────────────────────────────────────────────────────
 async function getProducts() {
   if (!SKIP_SUPABASE) {
@@ -330,12 +334,24 @@ const footer = () => `
             <ul class="space-y-2">
               <li><a href="/about" class="hover:text-white">About Us</a></li>
               <li><a href="/contact" class="hover:text-white">Contact</a></li>
+              <li><a href="/shipping" class="hover:text-white">Shipping</a></li>
               <li><a href="/privacy-policy" class="hover:text-white">Privacy Policy</a></li>
               <li><a href="/returns" class="hover:text-white">Returns &amp; Exchanges</a></li>
             </ul>
           </div>
+          <div>
+            <p class="font-semibold text-slate-300 mb-3 uppercase tracking-widest text-xs">Contact</p>
+            <address class="not-italic space-y-1">
+              <p>Wilderness Dealz LLC<br>dba Nubz Toys &amp; Collectibles</p>
+              <p>125 Lexington Ave, Suite 191A PMB 187<br>Asheville, NC 28801</p>
+              <p>Phone: <a href="tel:+18286494355" class="hover:text-white">828-649-4355</a></p>
+              <p>WhatsApp: <a href="https://wa.me/18286494355" target="_blank" rel="noopener noreferrer" class="hover:text-white">@NubzTC</a></p>
+              <p>Email: <a href="mailto:sales@nubztoys.com" class="hover:text-white">sales@nubztoys.com</a></p>
+            </address>
+          </div>
         </div>
       </div>
+      <p class="text-xs text-slate-600 leading-relaxed mb-3">Nubz Toys &amp; Collectibles is a retailer of brand-new, 100% authentic, officially licensed merchandise sourced through authorized distributors. All product names, characters, logos, and brands are the property of their respective owners; their use here does not imply any affiliation with, or endorsement by, the manufacturers.</p>
       <p class="border-t border-slate-800 pt-6 text-xs text-slate-600">© ${new Date().getFullYear()} ${esc(SITE_NAME)} — a Wilderness Dealz LLC company. All rights reserved.</p>
     </div>
   </footer>
@@ -350,6 +366,7 @@ const footer = () => `
       } catch(e) {}
     })();
   </script>
+  <script defer src="/js/google-reviews.js"></script>
 </body>
 </html>`;
 
@@ -473,7 +490,7 @@ function productPage(p, related, members) {
           <a href="/?checkout=1" class="flex-1 text-center px-5 py-3 bg-white text-slate-950 hover:bg-slate-100 rounded-2xl font-semibold">View cart &amp; checkout →</a>
         </div>
       </div>
-      <p class="text-sm text-slate-300 mt-4"><i class="fa-solid fa-bolt text-cyan-400"></i> Fast shipping · Packed with care · <span class="text-amber-400">★</span> 5-star seller on Whatnot</p>
+      <p class="text-sm text-slate-300 mt-4"><i class="fa-solid fa-bolt text-cyan-400"></i> Fast shipping · Packed with care · 100% authentic, officially licensed</p>
       <p class="text-xs text-slate-500 mt-2">🔒 Secure checkout powered by Stripe</p>` :
       st === 'on_order'
         ? `<div class="inline-block px-6 py-4 bg-purple-500/15 border border-purple-500/40 text-purple-200 rounded-3xl font-semibold">🔜 Coming soon — not yet available to order. Check back!</div>`
@@ -615,7 +632,7 @@ function categoryPage(cat, items) {
   const img       = items.length ? firstImage(items[0]) : `${SITE}${LOGO}`;
   const n         = items.length;
   const base      = CATEGORY_DESC[cat] || `Shop ${cat} at ${SITE_NAME}.`;
-  const desc      = metaFrom(`${base} ${n} in stock — fair prices, fast shipping from the USA.`, base);
+  const desc      = metaFrom(`${base} Fair prices and fast shipping from the USA.`, base);
 
   const listLd = {
     '@context': 'https://schema.org', '@type': 'ItemList',
@@ -643,6 +660,7 @@ function categoryPage(cat, items) {
         ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
         <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
         ${price(p) != null ? `<p class="font-bold">$${price(p).toFixed(2)}${p._variantCount > 1 ? '<span class="text-slate-400 text-xs font-medium"> & up</span>' : ''}</p>` : ''}
+        ${noReviews}
       </div>
     </a>`).join('');
 
@@ -674,6 +692,7 @@ function sitemap(products, categories) {
     url(`${SITE}/blog`, '0.6'),
     url(`${SITE}/privacy-policy`, '0.3'),
     url(`${SITE}/returns`, '0.3'),
+    url(`${SITE}/shipping`, '0.4'),
     ...categories.map(c => url(`${SITE}/categories/${slugify(c)}`, '0.7')),
     ...products.map(p => url(`${SITE}/products/${p.slug}`, '0.8')),
   ];
@@ -835,7 +854,7 @@ function categoriesIndexPage(byCat) {
 // ── ALL INVENTORY PAGE ─────────────────────────────────────────────────
 function inventoryPage(products) {
   const canonical = `${SITE}/inventory`;
-  const desc = `Shop all ${products.length}+ toys and collectibles at Nubz Toys — action figures, Funko Pop, blind bags, model kits, die-cast and more. Fair prices, fast USA shipping.`;
+  const desc = `Shop the full catalog of toys and collectibles at Nubz Toys — action figures, Funko Pop, blind bags, model kits, die-cast and more. Fair prices, fast USA shipping.`;
   const crumbLd = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: [
@@ -866,6 +885,7 @@ function inventoryPage(products) {
         ${p.brand ? `<p class="text-xs text-cyan-400 font-semibold uppercase mb-1">${esc(p.brand)}</p>` : ''}
         <p class="text-sm font-medium line-clamp-2 mb-2">${esc(p.name)}</p>
         ${(pr != null && st !== 'on_order') ? `<p class="font-bold">${available ? `$${pr.toFixed(2)}` : `<span class="text-slate-500 line-through">$${pr.toFixed(2)}</span>`}${p._variantCount > 1 ? '<span class="text-slate-400 text-xs font-medium"> & up</span>' : ''}</p>` : (st === 'on_order' ? `<p class="font-bold text-purple-300 text-sm">Coming soon</p>` : '')}
+        ${noReviews}
       </div>
     </a>`;
   }).join('');
@@ -903,7 +923,13 @@ function aboutPage() {
     description: desc,
     parentOrganization: { '@type': 'Organization', name: 'Wilderness Dealz LLC' },
     sameAs: [SOCIAL.facebook, SOCIAL.instagram, SOCIAL.youtube, SOCIAL.whatnot],
-    contactPoint: { '@type': 'ContactPoint', email: 'sales@nubztoys.com', contactType: 'customer service' },
+    telephone: '+1-828-649-4355',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '125 Lexington Ave, Suite 191A PMB 187',
+      addressLocality: 'Asheville', addressRegion: 'NC', postalCode: '28801', addressCountry: 'US',
+    },
+    contactPoint: { '@type': 'ContactPoint', telephone: '+1-828-649-4355', email: 'sales@nubztoys.com', contactType: 'customer service' },
   };
 
   const body = `
@@ -925,9 +951,9 @@ function aboutPage() {
           <div class="text-slate-500 text-sm mt-1">Action figures, Funko, die-cast &amp; more</div>
         </div>
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center">
-          <div class="text-3xl font-black text-fuchsia-400 mb-2">★★★★★</div>
-          <div class="text-slate-300 font-semibold">5-Star Seller</div>
-          <div class="text-slate-500 text-sm mt-1">Verified reviews on Whatnot</div>
+          <div class="text-3xl font-black text-fuchsia-400 mb-2">100%</div>
+          <div class="text-slate-300 font-semibold">Authentic &amp; Licensed</div>
+          <div class="text-slate-500 text-sm mt-1">Brand-new official merchandise</div>
         </div>
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 text-center">
           <div class="text-3xl font-black text-amber-400 mb-2">🚀</div>
@@ -937,6 +963,19 @@ function aboutPage() {
       </div>
       <h2 class="text-2xl font-bold text-white not-prose">Part of the Wilderness Dealz Family</h2>
       <p>Nubz Toys &amp; Collectibles is a DBA of Wilderness Dealz LLC, based in North Carolina. We also operate <strong>Wilderness Dealz</strong> — an auction and resale business on Whatnot and our own Shopify store. Whether you find us through Nubz or Dealz, you're shopping with the same team that packs your order, answers your emails, and takes pride in getting it right.</p>
+
+      <h2 class="text-2xl font-bold text-white not-prose">The basics</h2>
+      <ul class="not-prose text-slate-300 space-y-2 leading-relaxed list-none pl-0">
+        <li><strong class="text-white">Who we are:</strong> Nubz Toys &amp; Collectibles, a DBA of Wilderness Dealz LLC — a North Carolina limited liability company.</li>
+        <li><strong class="text-white">What we sell:</strong> brand-new, 100% authentic, officially licensed toys &amp; collectibles — action figures, Funko Pop, blind bags, model kits, die-cast and more — sourced through authorized distributors.</li>
+        <li><strong class="text-white">Where we are:</strong> 125 Lexington Ave, Suite 191A PMB 187, Asheville, NC 28801.</li>
+        <li><strong class="text-white">In business since:</strong> 2026.</li>
+        <li><strong class="text-white">Reach a human:</strong> <a href="tel:+18286494355" class="text-cyan-400 hover:text-cyan-300">828-649-4355</a> · WhatsApp <a href="https://wa.me/18286494355" class="text-cyan-400 hover:text-cyan-300">@NubzTC</a> · <a href="mailto:sales@nubztoys.com" class="text-cyan-400 hover:text-cyan-300">sales@nubztoys.com</a>.</li>
+      </ul>
+      <p class="text-sm text-slate-500 not-prose">Nubz Toys &amp; Collectibles is a retailer of officially licensed merchandise. All product names, characters, logos, and brands are the property of their respective owners; their use here does not imply affiliation with, or endorsement by, the manufacturers.</p>
+
+      <!-- Live Google reviews mount (populated by /js/google-reviews once place_id + key are set) -->
+      <div id="google-reviews" class="not-prose my-8"></div>
     </div>
     <div class="mt-12 flex flex-wrap gap-4 justify-center">
       <a href="/categories" class="px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl text-lg hover:bg-slate-100 transition">Shop Now</a>
@@ -962,7 +1001,9 @@ function contactPage() {
   const contactLd = {
     '@context': 'https://schema.org', '@type': 'ContactPage',
     name: `Contact ${SITE_NAME}`, url: canonical,
-    mainEntity: { '@type': 'Organization', name: SITE_NAME, email: 'sales@nubztoys.com' },
+    mainEntity: { '@type': 'Organization', name: SITE_NAME, email: 'sales@nubztoys.com',
+      telephone: '+1-828-649-4355',
+      address: { '@type': 'PostalAddress', streetAddress: '125 Lexington Ave, Suite 191A PMB 187', addressLocality: 'Asheville', addressRegion: 'NC', postalCode: '28801', addressCountry: 'US' } },
   };
 
   const body = `
@@ -981,6 +1022,19 @@ function contactPage() {
       <a href="mailto:sales@nubztoys.com" class="inline-flex items-center gap-x-2 text-cyan-400 hover:text-cyan-300 font-semibold text-lg">
         <i class="fa-solid fa-envelope"></i> sales@nubztoys.com
       </a>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8">
+      <h2 class="font-bold text-lg mb-4 text-white">Call, message, or write us</h2>
+      <div class="grid sm:grid-cols-2 gap-6 text-sm">
+        <div class="space-y-3">
+          <p><i class="fa-solid fa-phone text-cyan-400 w-5"></i> <a href="tel:+18286494355" class="text-slate-200 hover:text-white">828-649-4355</a></p>
+          <p><i class="fa-brands fa-whatsapp text-cyan-400 w-5"></i> <a href="https://wa.me/18286494355" target="_blank" rel="noopener noreferrer" class="text-slate-200 hover:text-white">WhatsApp @NubzTC</a></p>
+        </div>
+        <address class="not-italic text-slate-400 leading-relaxed">
+          Wilderness Dealz LLC<br>dba Nubz Toys &amp; Collectibles<br>
+          125 Lexington Ave, Suite 191A PMB 187<br>Asheville, NC 28801
+        </address>
+      </div>
     </div>
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 mb-8">
       <h2 class="font-bold text-lg mb-4 text-white">Send a message</h2>
@@ -1072,6 +1126,58 @@ function privacyPage() {
 }
 
 // ── RETURNS PAGE ────────────────────────────────────────────────────────
+function shippingPage() {
+  const canonical = `${SITE}/shipping`;
+  const desc = 'Shipping at Nubz Toys — flat, no-upcharge shipping across the USA with fast handling, plus FREE local delivery in NC within 45 miles of Waynesville.';
+  const crumbLd = {
+    '@context': 'https://schema.org', '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE + '/' },
+      { '@type': 'ListItem', position: 2, name: 'Shipping', item: canonical },
+    ],
+  };
+  const body = `
+  <nav class="max-w-4xl mx-auto px-6 pt-6 text-xs text-slate-500">
+    <a href="/" class="hover:text-cyan-400">Home</a><span class="mx-2">/</span><span class="text-slate-300">Shipping</span>
+  </nav>
+  <article class="max-w-4xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-bold gradient-title inline-block mb-3">Shipping</h1>
+    <p class="text-slate-500 text-sm mb-10">Fair, fast, and no shipping games. Here's exactly how it works.</p>
+    <div class="grid md:grid-cols-3 gap-4 mb-10">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">🇺🇸</div>
+        <div class="font-bold text-white">Ships from the USA</div>
+        <div class="text-slate-400 text-sm mt-1">Packed with care, dispatched fast</div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">🏷️</div>
+        <div class="font-bold text-white">No Upcharge</div>
+        <div class="text-slate-400 text-sm mt-1">Shipping billed at cost, never padded</div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 text-center">
+        <div class="text-3xl mb-2">🚚</div>
+        <div class="font-bold text-white">Free Local Delivery</div>
+        <div class="text-slate-400 text-sm mt-1">NC, within 45 miles of Waynesville</div>
+      </div>
+    </div>
+    <div class="prose prose-invert text-slate-300 leading-relaxed space-y-5 text-base">
+      <h2 class="text-xl font-bold text-white not-prose">Processing &amp; handling</h2>
+      <p>Orders are typically packed and shipped within 1–2 business days. You'll get a confirmation email when your order is placed, and everything ships from the USA with tracking.</p>
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Shipping cost</h2>
+      <p>We don't inflate shipping to pad the order — it's based on the item's weight. Because we keep it at cost, buyers cover return shipping (see <a href="/returns" class="text-cyan-400 hover:text-cyan-300">Returns &amp; Exchanges</a>).</p>
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Free local delivery 🚚</h2>
+      <p><strong class="text-white">Local to us?</strong> We deliver <strong>free within 45 miles of Waynesville, North Carolina</strong>. Just choose <strong>“Local delivery (free)”</strong> at checkout. If your address turns out to be outside the zone, we'll reach out to set up standard shipping before anything ships — no surprise charges, ever.</p>
+      <h2 class="text-xl font-bold text-white mt-8 not-prose">Questions?</h2>
+      <p>Email <a href="mailto:sales@nubztoys.com" class="text-cyan-400 hover:text-cyan-300">sales@nubztoys.com</a> or call <a href="tel:+18286494355" class="text-cyan-400 hover:text-cyan-300">828-649-4355</a>. Real people, real answers.</p>
+    </div>
+    <div class="mt-10">
+      <a href="/inventory" class="inline-flex items-center gap-x-2 px-8 py-4 bg-white text-slate-950 font-bold rounded-3xl hover:bg-slate-100 transition">Start shopping</a>
+    </div>
+  </article>`;
+  return head({ title: `Shipping | ${SITE_NAME}`, desc, canonical, image: SITE + LOGO,
+    type: 'website', jsonld: [crumbLd] }) + body + footer();
+}
+
 function returnsPage() {
   const canonical = `${SITE}/returns`;
   const desc = 'Returns & Exchanges at Nubz Toys — 30-day returns on new, unopened items. Manufacturer defects and fulfillment errors always made right. Easy process.';
@@ -1286,6 +1392,7 @@ function orderConfirmedPage() {
   fs.writeFileSync(path.join(ROOT, 'contact.html'), contactPage());
   fs.writeFileSync(path.join(ROOT, 'privacy-policy.html'), privacyPage());
   fs.writeFileSync(path.join(ROOT, 'returns.html'), returnsPage());
+  fs.writeFileSync(path.join(ROOT, 'shipping.html'), shippingPage());
   fs.writeFileSync(path.join(ROOT, 'order-confirmed.html'), orderConfirmedPage());
 
   // sitemap / robots / snapshot
