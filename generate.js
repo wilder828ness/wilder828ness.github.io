@@ -343,7 +343,7 @@ const footer = () => `
             <p class="font-semibold text-slate-300 mb-3 uppercase tracking-widest text-xs">Contact</p>
             <address class="not-italic space-y-1">
               <p>Wilderness Dealz LLC<br>dba Nubz Toys &amp; Collectibles</p>
-              <p>125 Lexington Ave, Suite 191A PMB 187<br>Asheville, NC 28801</p>
+              <p>125 Lexington Ave, Suite 101A PMB 187<br>Asheville, NC 28801</p>
               <p>Phone: <a href="tel:+18286494355" class="hover:text-white">828-649-4355</a></p>
               <p>WhatsApp: <a href="https://wa.me/18286494355" target="_blank" rel="noopener noreferrer" class="hover:text-white">@NubzTC</a></p>
               <p>Email: <a href="mailto:sales@nubztoys.com" class="hover:text-white">sales@nubztoys.com</a></p>
@@ -926,7 +926,7 @@ function aboutPage() {
     telephone: '+1-828-649-4355',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '125 Lexington Ave, Suite 191A PMB 187',
+      streetAddress: '125 Lexington Ave, Suite 101A PMB 187',
       addressLocality: 'Asheville', addressRegion: 'NC', postalCode: '28801', addressCountry: 'US',
     },
     contactPoint: { '@type': 'ContactPoint', telephone: '+1-828-649-4355', email: 'sales@nubztoys.com', contactType: 'customer service' },
@@ -968,7 +968,7 @@ function aboutPage() {
       <ul class="not-prose text-slate-300 space-y-2 leading-relaxed list-none pl-0">
         <li><strong class="text-white">Who we are:</strong> Nubz Toys &amp; Collectibles, a DBA of Wilderness Dealz LLC — a North Carolina limited liability company.</li>
         <li><strong class="text-white">What we sell:</strong> brand-new, 100% authentic, officially licensed toys &amp; collectibles — action figures, Funko Pop, blind bags, model kits, die-cast and more — sourced through authorized distributors.</li>
-        <li><strong class="text-white">Where we are:</strong> 125 Lexington Ave, Suite 191A PMB 187, Asheville, NC 28801.</li>
+        <li><strong class="text-white">Where we are:</strong> 125 Lexington Ave, Suite 101A PMB 187, Asheville, NC 28801.</li>
         <li><strong class="text-white">In business since:</strong> 2026.</li>
         <li><strong class="text-white">Reach a human:</strong> <a href="tel:+18286494355" class="text-cyan-400 hover:text-cyan-300">828-649-4355</a> · WhatsApp <a href="https://wa.me/18286494355" class="text-cyan-400 hover:text-cyan-300">@NubzTC</a> · <a href="mailto:sales@nubztoys.com" class="text-cyan-400 hover:text-cyan-300">sales@nubztoys.com</a>.</li>
       </ul>
@@ -1003,7 +1003,7 @@ function contactPage() {
     name: `Contact ${SITE_NAME}`, url: canonical,
     mainEntity: { '@type': 'Organization', name: SITE_NAME, email: 'sales@nubztoys.com',
       telephone: '+1-828-649-4355',
-      address: { '@type': 'PostalAddress', streetAddress: '125 Lexington Ave, Suite 191A PMB 187', addressLocality: 'Asheville', addressRegion: 'NC', postalCode: '28801', addressCountry: 'US' } },
+      address: { '@type': 'PostalAddress', streetAddress: '125 Lexington Ave, Suite 101A PMB 187', addressLocality: 'Asheville', addressRegion: 'NC', postalCode: '28801', addressCountry: 'US' } },
   };
 
   const body = `
@@ -1032,7 +1032,7 @@ function contactPage() {
         </div>
         <address class="not-italic text-slate-400 leading-relaxed">
           Wilderness Dealz LLC<br>dba Nubz Toys &amp; Collectibles<br>
-          125 Lexington Ave, Suite 191A PMB 187<br>Asheville, NC 28801
+          125 Lexington Ave, Suite 101A PMB 187<br>Asheville, NC 28801
         </address>
       </div>
     </div>
