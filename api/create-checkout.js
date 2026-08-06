@@ -65,16 +65,31 @@ module.exports = async (req, res) => {
             shipping_address_collection: {
                 allowed_countries: ['US', 'CA', 'GB', 'AU']
             },
-            // Weight-tiered shipping computed above (shippingCents).
+            // Weight-tiered shipping computed above (shippingCents), plus a FREE
+            // local-delivery option. Stripe can't verify the buyer is actually
+            // within 45 mi of Waynesville, NC — it's a selectable choice; if the
+            // shipping address falls outside the zone we reach out to arrange
+            // standard shipping before fulfilling (see the /shipping page copy).
             shipping_options: [
                 {
                     shipping_rate_data: {
                         type: 'fixed_amount',
                         fixed_amount: { amount: shippingCents, currency: 'usd' },
-                        display_name: 'Shipping',
+                        display_name: 'Standard shipping',
                         delivery_estimate: {
                             minimum: { unit: 'business_day', value: 2 },
                             maximum: { unit: 'business_day', value: 6 }
+                        }
+                    }
+                },
+                {
+                    shipping_rate_data: {
+                        type: 'fixed_amount',
+                        fixed_amount: { amount: 0, currency: 'usd' },
+                        display_name: 'Local delivery (FREE) — within 45mi of Waynesville, NC',
+                        delivery_estimate: {
+                            minimum: { unit: 'business_day', value: 1 },
+                            maximum: { unit: 'business_day', value: 3 }
                         }
                     }
                 }
