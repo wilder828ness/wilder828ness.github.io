@@ -705,6 +705,12 @@ ${urls.join('\n')}
 const robots = () => `User-agent: *
 Allow: /
 
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
 Sitemap: ${SITE}/sitemap.xml`;
 
 // ── GOOGLE MERCHANT CENTER FEED ────────────────────────────────────────
