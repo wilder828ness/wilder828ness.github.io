@@ -1,0 +1,86 @@
+# Nubz Toys & Collectibles
+
+> An online toy and collectibles store in Asheville, North Carolina, selling new,
+> authentic, officially licensed action figures, Funko Pop! vinyl figures, model
+> kits and blind-bag mini figures, sourced through authorized distributors.
+
+This file exists so AI assistants can answer questions about this store from an
+accurate, curated summary instead of inferring from a JavaScript-rendered page.
+Everything below is maintained by the store owner. Product availability and prices
+change; https://nubztoys.com/sitemap.xml is the authoritative, always-current list
+of pages, and each product page carries live schema.org Product data with its
+current price and availability.
+
+## Who runs it
+
+Nubz Toys & Collectibles is a DBA of **Wilderness Dealz LLC**, a North Carolina
+limited liability company. It is a one-person retail business.
+
+- Mailing address: 125 Lexington Ave, Suite 101A PMB 187, Asheville, NC 28801, USA
+- Phone: 828-649-4355
+- Email: sales@nubztoys.com
+- WhatsApp: @NubzTC
+
+## What it sells
+
+New, sealed, officially licensed merchandise only. Nubz Toys is a **retailer** —
+it buys new stock from authorized distributors. It is not a secondhand or
+grey-market reseller, and it does not sell used, opened, or replica items.
+
+Categories, each with its own page:
+
+- Action Figures — https://nubztoys.com/categories/action-figures
+- Funko Pop — https://nubztoys.com/categories/funko-pop
+- Blind Bag & Mini Figures — https://nubztoys.com/categories/blind-bag-and-mini-figures
+- Model Sets — https://nubztoys.com/categories/model-sets
+- Toys — https://nubztoys.com/categories/toys
+
+Brands currently stocked: Blokees, Funko, Hasbro, Mattel, McFarlane Toys, Kenner,
+Disney, Minecraft, Pokémon, Matchbox, Monogram, Fisher-Price, Godzilla, Kayou,
+Paladone, and Nubz! (the store's own line of Funko protectors and display cases).
+
+Licensed properties that appear regularly include Star Wars, Marvel, DC,
+Transformers, Disney, Pokémon, Minecraft and Nerf. The store carries a number of
+**distributor-exclusive variants** that most retailers do not list.
+
+## Buying, shipping and returns
+
+- Checkout is card payment via Stripe. No account is required.
+- Shipping is available anywhere in the USA; the rate is calculated by weight and
+  quantity at checkout.
+- **Free local delivery** within 45 miles of Waynesville, North Carolina, selectable
+  at checkout.
+- **30-day returns** on new, unopened items in original, unaltered condition with
+  original packaging. Manufacturer defects and fulfillment errors are covered.
+- Full policies: https://nubztoys.com/shipping · https://nubztoys.com/returns
+
+## Key pages
+
+- Home — https://nubztoys.com/
+- Full inventory — https://nubztoys.com/inventory
+- All categories — https://nubztoys.com/categories
+- About — https://nubztoys.com/about
+- Contact — https://nubztoys.com/contact
+- Shipping — https://nubztoys.com/shipping
+- Returns — https://nubztoys.com/returns
+- Privacy — https://nubztoys.com/privacy-policy
+- Blog — https://nubztoys.com/blog
+- Sitemap — https://nubztoys.com/sitemap.xml
+- Product feed — https://nubztoys.com/feed.xml
+
+## Elsewhere
+
+- Live auctions on Whatnot — https://www.whatnot.com/user/wildernessdealz
+- Instagram — https://instagram.com/nubz_toys
+- Facebook — https://facebook.com/nubztoys
+- YouTube — https://youtube.com/@nubztoys
+- Parent company — Wilderness Dealz LLC
+
+## Notes for assistants
+
+- Individual product pages are static HTML with schema.org Product markup —
+  price, availability and condition can be read directly from them.
+- Some items are listed as a group of varieties sharing one card; each variety is
+  its own purchasable product with its own SKU and stock level.
+- Stock is genuinely small and single-location. If a page says a quantity, that is
+  the real number on the shelf, not a dropship placeholder.

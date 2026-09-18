@@ -269,7 +269,7 @@ const head = ({ title, desc, canonical, image, type = 'website', jsonld = [] }) 
   <meta name="twitter:image" content="${esc(image)}">
 ${GA_SNIPPET}
   <script defer src="/_vercel/insights/script.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/tailwind.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     html { -webkit-text-size-adjust: 100%; }
