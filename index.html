@@ -897,15 +897,26 @@
         }
 
         // ─── RENDERING ───────────────────────────────────────────────────────
+        // "Newest Arrivals" mode. 'random' = 8 random in-stock items, picked fresh on
+        // each page load (no new deliveries right now). Set back to 'newest' when
+        // deliveries resume to show the 8 most recently added items again.
+        const FEATURED_MODE = 'random';
+        const featuredRank = new Map();   // one random rank per item for this page load
         function renderFeatured() {
             const container = document.getElementById('featured-grid');
             if (!container) return;
             container.innerHTML = '';
-            const inStock = collapseGroups(products
-                .filter(p => p.status === "In Stock" && !stockState(p).soldOut)
-                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
-                .slice(0, 8);
-            inStock.forEach(p => container.appendChild(createProductCard(p)));
+            const live = products.filter(p => p.status === "In Stock" && !stockState(p).soldOut);
+            let picks;
+            if (FEATURED_MODE === 'newest') {
+                picks = collapseGroups(live.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))).slice(0, 8);
+            } else {
+                // Rank is fixed for the visit, so re-renders (filters, cart) don't reshuffle.
+                const key = p => String(groupKeyOf(p) || p.id);
+                live.forEach(p => { if (!featuredRank.has(key(p))) featuredRank.set(key(p), Math.random()); });
+                picks = collapseGroups(live.sort((a, b) => featuredRank.get(key(a)) - featuredRank.get(key(b)))).slice(0, 8);
+            }
+            picks.forEach(p => container.appendChild(createProductCard(p)));
         }
 
         function renderInventory() {
